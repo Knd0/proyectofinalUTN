@@ -202,6 +202,29 @@ export const authController = {
     console.error("🔥 Error en loadBalance:", error);
     return res.status(500).json({ error: "Error al cargar el balance" });
   }
-}
+},
+updateProfile: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) return res.status(401).json({ error: "Token no proporcionado" });
+
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
+
+      const { imagen, descripcion, nacionalidad, dni } = req.body;
+
+      await Usuario.update(
+        { imagen, descripcion, nacionalidad, dni },
+        { where: { id: userId } }
+      );
+
+      const updatedUser = await Usuario.findByPk(userId);
+
+      return res.json({ message: "Perfil actualizado", user: updatedUser });
+    } catch (error) {
+      console.error("❌ Error al actualizar perfil:", error);
+      return res.status(500).json({ error: "Error al actualizar el perfil" });
+    }
+  },
 
 }

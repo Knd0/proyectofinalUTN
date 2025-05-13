@@ -1,6 +1,7 @@
 // LoadBalance.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../Loader/loader';
 
 const LoadBalance: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
@@ -62,6 +63,9 @@ const LoadBalance: React.FC = () => {
       setLoading(false);
     }
   };
+  if (loading) {
+    return <Loader/>;
+  }
 
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-20">

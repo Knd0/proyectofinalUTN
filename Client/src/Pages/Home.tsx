@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
+import Loader from "../Components/Loader/loader";
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -73,9 +74,14 @@ const Home = () => {
     setSelectedCurrency(e.target.value);
   };
 
+ 
   if (loading) {
-    return <div>Loading...</div>;
-  }
+  return <Loader />;
+}
+
+if (!userInfo) {
+  return <Loader />;
+}
 
   const currencyOptions = Object.keys(balance);
 
