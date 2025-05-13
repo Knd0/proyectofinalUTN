@@ -7,7 +7,7 @@ Este proyecto es una **billetera virtual** desarrollada como trabajo final para 
 ### 🖥️ Frontend
 - **React** con **TypeScript**
 - **React Router DOM** para rutas
-- Estilos con CSS o framework a elección
+- Estilos con CSS y framework a elección
 
 ### 🛠️ Backend
 - **Node.js** con **Express**
@@ -35,9 +35,15 @@ proyecto/
 │   │   ├── App.tsx
 │   │   ├── index.tsx
 │   │   ├── components/
-│   │   │   ├── Landing.tsx
-│   │   │   ├── Login.tsx
-│   │   │   └── Register.tsx
+│   │   │      │ 
+│   │   │      ├── Landing.tsx
+│   │   │      ├── Home.tsx
+│   │   │      ├── Login.tsx
+│   │   │      ├── History.tsx
+│   │   │      ├── Profile.tsx
+│   │   │      ├── Navbar.tsx
+│   │   │      ├── Register.tsx
+│   │   │      └── LoadBalance.tsx
 │   │   └── ...
 │
 └── Server/                # Backend (Node.js + Express)
@@ -98,7 +104,7 @@ proyecto/
    npm run dev
    ```
 
-   Por defecto corre en: [http://localhost:5173](http://localhost:5173)
+   Por defecto corre en: [http://localhost:3000](http://localhost:3000)
 
 ## 🔐 Autenticación con JWT
 
@@ -147,11 +153,21 @@ Authorization: Bearer <token>
 
 - [x] Backend funcional con Sequelize y SQLite
 - [x] Autenticación JWT implementada
-- [x] CRUD básico de usuario
+- [ ] CRUD básico de usuario
 - [x] Sistema de carga de saldo por moneda
-- [ ] Frontend básico con rutas: `Landing`, `Login`, `Register`
+- [x] Frontend básico con rutas: `Landing`, `Login`, `Register`, `Home`, `LoadBalance`
+- [x] Conexión entre frontend y backend vía fetch/axios
+- [ ] Cambio de divisas a tiempo real con el mercado
+- [ ] Actualización de datos del usuario en su propio perfil
+- [ ] Dashboard Admin
 - [ ] Conexión entre frontend y backend vía fetch/axios
+- [ ] Modularización del frontend
+- [ ] Transferencia de divisas entre usuarios
+- [ ] Métricas de la aplicación
+- [ ] Diseño profesional y minimalista
+- [ ] Alertas para guiar al usuario
+
 
 ## 🧑‍🎓 Autor
 
-Proyecto realizado por [Tu Nombre], estudiante de la UTN.
+Proyecto realizado por Jonas Mendelovich, Mateo Zeballos, Franco de Iriondo y Gaston Nuñez, estudiantes de la UTN.
