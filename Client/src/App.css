@@ -1,0 +1,4 @@
+/* index.css o App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
