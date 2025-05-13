@@ -101,7 +101,7 @@ proyecto/
 3. Ejecutá la aplicación:
 
    ```bash
-   npm run dev
+   npm start
    ```
 
    Por defecto corre en: [http://localhost:3000](http://localhost:3000)
