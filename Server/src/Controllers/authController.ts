@@ -77,6 +77,7 @@ export const authController = {
 
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
       const cvu = await generateUniqueCVU();
+      
 
       const newUser = await Usuario.create({
         nombre,
@@ -87,7 +88,7 @@ export const authController = {
           "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg", 
         descripcion: "",
         nacionalidad: "",
-        dni: "",
+        dni: null,
         COD: {
           ARS: 0,
           USD: 0,
@@ -264,7 +265,7 @@ updateProfile: async (req: Request, res: Response, next: NextFunction) => {
       currency_id: 'ARS',
     }],
     back_urls: {
-      success: `https://proyectofinalutn2025.vercel.app/home`,
+      success: `https://proyectofinalutn2025.vercel.app/success`,
       failure: "https://proyectofinalutn2025.vercel.app/",
     },
     auto_return: "approved",
