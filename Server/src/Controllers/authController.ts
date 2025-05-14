@@ -217,10 +217,10 @@ updateProfile: async (req: Request, res: Response, next: NextFunction) => {
       const decoded: any = jwt.verify(token, JWT_SECRET);
       const userId = decoded.id;
 
-      const { imagen, descripcion, nacionalidad, dni } = req.body;
+      const { imagen, nombre, descripcion, nacionalidad, dni } = req.body;
 
       await Usuario.update(
-        { imagen, descripcion, nacionalidad, dni },
+        { imagen, nombre, descripcion, nacionalidad, dni },
         { where: { id: userId } }
       );
 
