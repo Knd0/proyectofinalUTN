@@ -264,7 +264,7 @@ updateProfile: async (req: Request, res: Response, next: NextFunction) => {
       currency_id: 'ARS',
     }],
     back_urls: {
-      success: `https://proyectofinalutn2025.vercel.app/success`,
+      success: `https://proyectofinalutn2025.vercel.app/home`,
       failure: "https://proyectofinalutn2025.vercel.app/",
     },
     auto_return: "approved",

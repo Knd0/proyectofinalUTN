@@ -31,7 +31,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: 'Ha ocurrido un error en el servidor', error: err.message });
 });
 
-const port = 5000;
+const port = process.env.PORT || 5000;
+
 
 sequelize.sync({ force: false })
   .then(() => {

@@ -14,6 +14,7 @@ export class Usuario extends Model {
   public COD!: {
   [key: string]: number;  // Esto permite el acceso a las propiedades mediante una cadena.
 };
+  public admin!: boolean;
 }
 
 Usuario.init(
@@ -25,6 +26,7 @@ Usuario.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true
     },
     password: {
       type: DataTypes.STRING,
@@ -50,6 +52,7 @@ Usuario.init(
     dni: {
       type: DataTypes.STRING,
       allowNull: true,
+      unique: true
     },
     COD: {
       type: DataTypes.JSON,  // Campo COD con balances de monedas
@@ -62,6 +65,10 @@ Usuario.init(
         ETH: 0,
         USDT: 0,
       },
+    },
+    admin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     },
   },
   {

@@ -1,8 +1,15 @@
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Configura la conexión a la base de datos
-export const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite', 
-  logging: false, 
+export const sequelize = new Sequelize(process.env.DATABASE_URL as string, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // necesario para Railway
+    },
+  },
+  logging: false, // Opcional: desactiva logs SQL
 });
