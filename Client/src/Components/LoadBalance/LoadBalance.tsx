@@ -37,7 +37,7 @@ const LoadBalance: React.FC = () => {
   }
 
   try {
-    const response = await fetch('http://localhost:5000/auth/create-preference', {
+    const response = await fetch('https://proyectofinalutn-production.up.railway.app/auth/create-preference', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

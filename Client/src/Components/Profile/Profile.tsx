@@ -39,7 +39,7 @@ const Profile = () => {
           return;
         }
 
-        const response = await fetch("http://localhost:5000/auth/me", {
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`, // Enviar el token en los headers
@@ -68,7 +68,7 @@ const Profile = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/me", {
+      const res = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,7 +96,7 @@ const Profile = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:5000/auth/me", {
+      const res = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
