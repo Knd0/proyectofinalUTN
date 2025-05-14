@@ -13,9 +13,9 @@ const app = express();
 
 // Configura CORSS
 app.use(cors({
-  origin: 'https://proyectofinalutn-production.up.railway.app',  // Permite solicitudes desde el frontend en localhost:3000
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Métodos HTTP permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'],  // Encabezados permitidos
+  origin: 'https://proyectofinalutn2025.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
