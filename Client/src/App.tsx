@@ -7,6 +7,8 @@ import Register from './Components/Login/Register';
 import Home from './Pages/Home';  // Asegúrate de tener este componente Home
 import PrivateRoute from './Pages/PrivateRoute';  // Componente para proteger las rutas privadas
 import LoadBalance from './Components/LoadBalance/LoadBalance';
+import Profile from './Components/Profile/Profile';
+import Success from './Components/LoadBalance/Success';
 
 
 
@@ -21,6 +23,9 @@ const App: React.FC = () => {
       <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
         <Route path="/home" element={<Home />} />
         <Route path="/loadbalance" element={<LoadBalance />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/success" element={<Success />} />
+
       </Route>
     </Routes>
   );

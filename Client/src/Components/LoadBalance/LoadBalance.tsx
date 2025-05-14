@@ -1,6 +1,7 @@
 // LoadBalance.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../Loader/loader';
 
 const LoadBalance: React.FC = () => {
   const [amount, setAmount] = useState<number>(0);
@@ -20,48 +21,48 @@ const LoadBalance: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (amount <= 0) {
-      setError('La cantidad debe ser mayor que cero.');
-      return;
+  if (amount <= 0) {
+    setError('La cantidad debe ser mayor que cero.');
+    return;
+  }
+
+  setLoading(true);
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/auth/create-preference', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount, currency }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error('Error al crear preferencia de pago');
     }
 
-    setLoading(true);
+    window.location.href = data.init_point; // Redirige a Mercado Pago
+  } catch (error) {
+    setError('Hubo un problema al iniciar el pago.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-        console.log(amount, currency);
-        
-      const response = await fetch('http://localhost:5000/auth/balance', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount,
-          currency,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al cargar el balance');
-      }
-
-      // Si la carga es exitosa, redirige al Home o muestra un mensaje
-      navigate('/home');
-    } catch (error) {
-      setError('Hubo un problema al cargar el balance.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return <Loader/>;
+  }
 
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-20">

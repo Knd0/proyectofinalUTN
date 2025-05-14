@@ -30,6 +30,7 @@ const Home = () => {
   useEffect(() => {
     // Obtener el token del localStorage
     const token = localStorage.getItem("token");
+    console.log("Token:", token);
     if (!token) {
       navigate("/login"); // Redirige al login si no hay token
     }
@@ -37,6 +38,7 @@ const Home = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Token:", token);
         if (!token) {
           navigate("/login"); // Redirige al login si no hay token
           return;
