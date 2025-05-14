@@ -25,8 +25,7 @@ Usuario.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
+      allowNull: false, 
     },
     password: {
       type: DataTypes.STRING,
@@ -52,7 +51,6 @@ Usuario.init(
     dni: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true
     },
     COD: {
       type: DataTypes.JSON,  // Campo COD con balances de monedas
