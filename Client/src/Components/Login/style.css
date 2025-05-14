@@ -1,6 +1,6 @@
 /* Contenedor general de las páginas */
 .img{
-  background-image: url('D:\GitHub\proyectofinalUTN\Client\public\Images\login.jpeg');
+  background-image: url('../public/Images/login.jpeg');
   background-size: cover;
   background-position: center;
   height: 100vh;
