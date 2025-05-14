@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';  // Importa cors
@@ -14,6 +16,7 @@ app.use(cors({
   origin: 'http://localhost:3000',  // Permite solicitudes desde el frontend en localhost:3000
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Métodos HTTP permitidos
   allowedHeaders: ['Content-Type', 'Authorization'],  // Encabezados permitidos
+  credentials: true,
 }));
 
 // Middleware para parsear JSON en el body

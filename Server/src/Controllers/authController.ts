@@ -3,7 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Usuario } from "../models/Usuario";
 import { generateUniqueCVU } from "../utils/GenerateCVU";
+import axios from "axios";
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 
+const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
+const preference = new Preference(mercadopago);
+
+const CURRENCY_API_KEY = process.env.CURRENCY_API_KEY;
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Valor predeterminado
 
@@ -51,7 +57,6 @@ export const authController = {
       return res.status(500).json({ error: "Error al obtener la información del usuario" });
     }
   },
-
   // Registro de un nuevo usuario
   register: async (
     req: Request,
@@ -122,7 +127,7 @@ export const authController = {
       }
 
       const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3h",
       });
 
       return res.json({
@@ -202,6 +207,78 @@ export const authController = {
     console.error("🔥 Error en loadBalance:", error);
     return res.status(500).json({ error: "Error al cargar el balance" });
   }
-}
+},
+updateProfile: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) return res.status(401).json({ error: "Token no proporcionado" });
+
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
+
+      const { imagen, descripcion, nacionalidad, dni } = req.body;
+
+      await Usuario.update(
+        { imagen, descripcion, nacionalidad, dni },
+        { where: { id: userId } }
+      );
+
+      const updatedUser = await Usuario.findByPk(userId);
+
+      return res.json({ message: "Perfil actualizado", user: updatedUser });
+    } catch (error) {
+      console.error("❌ Error al actualizar perfil:", error);
+      return res.status(500).json({ error: "Error al actualizar el perfil" });
+    }
+  },
+  createPreference: async (req: Request, res: Response) => {
+    const { amount, currency } = req.body;
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) return res.status(401).json({ error: "Token requerido" });
+
+    try {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
+
+      let finalAmountARS = amount;
+      let originalCurrency = currency;
+
+      // Si no es ARS, convertimos
+      if (currency !== "ARS") {
+        const response = await axios.get(
+          `https://api.currencyapi.com/v3/latest?apikey=${CURRENCY_API_KEY}&currencies=ARS&base_currency=${currency}`
+        );
+
+        const rate = response.data.data["ARS"].value;
+        finalAmountARS = parseFloat((amount * rate).toFixed(2));
+      }
+
+      const result = await preference.create({
+  body: {
+    items: [{
+      id: "saldo-usuario",
+      title: 'Carga de saldo',
+      unit_price: finalAmountARS,
+      quantity: 1,
+      currency_id: 'ARS',
+    }],
+    back_urls: {
+      success: `https://proyectofinalutn2025.vercel.app/success`,
+      failure: "https://proyectofinalutn2025.vercel.app/",
+    },
+    auto_return: "approved",
+  }
+});
+
+
+
+      res.json({ init_point: result.init_point });
+    } catch (error) {
+      console.error("❌ Error al crear preferencia:", error);
+      res.status(500).json({ error: "No se pudo crear la preferencia" });
+    }
+  }
+
 
 }
