@@ -11,7 +11,7 @@ import  jwt  from 'jsonwebtoken';
 
 const app = express();
 
-// Configura CORS
+// Configura CORSS
 app.use(cors({
   origin: 'https://proyectofinalutn-production.up.railway.app',  // Permite solicitudes desde el frontend en localhost:3000
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Métodos HTTP permitidos
