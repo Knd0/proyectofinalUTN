@@ -289,10 +289,15 @@ export const authController = {
       });
 
       res.json({ init_point: result.sandbox_init_point });
-    } catch (error) {
-      console.error("❌ Error al crear preferencia:", error);
+    } catch (error: any) {
+      console.error("❌ Error al crear preferencia:", error.message || error);
+      if (error.response) {
+        // Error de axios (currencyapi, mercado pago)
+        console.error("Detalles de error:", error.response.data);
+      }
       res.status(500).json({ error: "No se pudo crear la preferencia" });
     }
+    
   },
   handleWebhook: async (req: Request, res: Response) => {
     try {
