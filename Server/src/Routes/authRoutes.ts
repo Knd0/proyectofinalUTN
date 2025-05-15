@@ -30,4 +30,8 @@ router.post('/balance', authenticateToken, async (req, res, next) => {
   await authController.loadBalance(req, res, next);
 });
 
+router.post('/webhook', authenticateToken,async (req, res, next) => {
+  await authController.handleWebhook(req, res);
+});
+
 export default router;

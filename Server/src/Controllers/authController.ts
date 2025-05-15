@@ -4,10 +4,11 @@ import jwt from "jsonwebtoken";
 import { Usuario } from "../models/Usuario";
 import { generateUniqueCVU } from "../utils/GenerateCVU";
 import axios from "axios";
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
 const preference = new Preference(mercadopago);
+const payment = new Payment(mercadopago);
 
 const CURRENCY_API_KEY = process.env.CURRENCY_API_KEY;
 const SALT_ROUNDS = 10;
@@ -269,6 +270,11 @@ updateProfile: async (req: Request, res: Response, next: NextFunction) => {
       failure: "https://proyectofinalutn2025.vercel.app/",
     },
     auto_return: "approved",
+     metadata: {
+      userId,
+      originalAmount: amount,
+      originalCurrency: currency
+    }
   }
 });
 
@@ -278,6 +284,40 @@ updateProfile: async (req: Request, res: Response, next: NextFunction) => {
     } catch (error) {
       console.error("❌ Error al crear preferencia:", error);
       res.status(500).json({ error: "No se pudo crear la preferencia" });
+    }
+  },
+  handleWebhook: async (req: Request, res: Response) => {
+    try {
+      const { type, data } = req.body;
+
+      if (type === 'payment') {
+        const mpPayment = await payment.get({ id: data.id });
+
+        if (mpPayment.status === 'approved') {
+          const metadata = mpPayment.metadata as any;
+          const userId = metadata.userId;
+          const currency = metadata.originalCurrency;
+          const amount = Number(metadata.originalAmount);
+
+          const user = await Usuario.findByPk(userId);
+          if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+          const updatedCOD = {
+            ...user.COD,
+            [currency]: user.COD[currency] + amount,
+          };
+
+          await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
+
+          console.log("✅ Balance actualizado por webhook");
+          return res.status(200).send("OK");
+        }
+      }
+
+      res.status(200).send("Evento recibido");
+    } catch (error) {
+      console.error("❌ Error en webhook:", error);
+      res.status(500).send("Error interno");
     }
   }
 

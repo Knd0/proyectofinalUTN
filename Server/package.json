@@ -17,6 +17,7 @@
     "mercadopago": "^2.6.0",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
+    "react-toastify": "^11.0.5",
     "sequelize": "^6.32.1",
     "sqlite3": "^5.1.6"
   },
