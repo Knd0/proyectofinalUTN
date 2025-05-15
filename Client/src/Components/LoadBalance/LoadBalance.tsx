@@ -26,8 +26,9 @@ const LoadBalance = () => {
 
     try {
       const response = await axios.post(
-        "https://proyectofinalutn-production.up.railway.app/auth/create_preference",
+        "https://proyectofinalutn-production.up.railway.app/auth/create-preference",
         {
+          
           amount,
           currency,
         }
