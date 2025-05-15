@@ -276,8 +276,8 @@ export const authController = {
             },
           ],
           back_urls: {
-            success: `http://localhost:3000/success`,
-            failure: "http://localhost:3000/home",
+            success: `https://proyectofinalutn.vercel.app/success`,
+            failure: "https://proyectofinalutn.vercel.app/home",
           },
           auto_return: "approved",
           metadata: {
