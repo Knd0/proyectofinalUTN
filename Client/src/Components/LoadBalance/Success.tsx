@@ -1,40 +1,39 @@
-// Success.tsx
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Success = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const [secondsLeft, setSecondsLeft] = useState(30);
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const amount = Number(query.get("amount"));
-    const currency = query.get("currency");
-    const userId = query.get("userId");
-    const token = localStorage.getItem("token");
-
-    if (!amount || !currency || !token) return;
-
-    const creditBalance = async () => {
-      await fetch("http://localhost:5000/auth/balance", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount, currency }),
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev === 1) {
+          clearInterval(interval);
+          navigate("/home");
+        }
+        return prev - 1;
       });
+    }, 1000);
 
-      navigate("/home");
-    };
+    return () => clearInterval(interval);
+  }, [navigate]);
 
-    creditBalance();
-  }, [location, navigate]);
+  const handleRedirectNow = () => {
+    navigate("/home");
+  };
 
   return (
-    <div className="text-white text-center mt-20">
-      <h1 className="text-3xl font-bold">Pago exitoso 🎉</h1>
-      <p>Redirigiendo...</p>
+    <div className="text-white text-center mt-20 px-4">
+      <h1 className="text-4xl font-bold mb-4">¡Pago exitoso 🎉!</h1>
+      <p className="text-lg mb-6">Tu saldo se acreditará automáticamente.</p>
+      <p className="mb-6">Serás redirigido en {secondsLeft} segundos...</p>
+      <button
+        onClick={handleRedirectNow}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition"
+      >
+        Ir ahora
+      </button>
     </div>
   );
 };

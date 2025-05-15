@@ -1,16 +1,12 @@
-// LoadBalance.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Loader from '../Loader/loader';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const LoadBalance: React.FC = () => {
+const LoadBalance = ({ userId }: { userId: number }) => {
   const [amount, setAmount] = useState<number>(0);
-  const [currency, setCurrency] = useState<string>('USD');
+  const [currency, setCurrency] = useState<string>('ARS');
   const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
-
-  const currencyOptions = ['ARS', 'USD', 'EUR', 'BTC', 'ETH', 'USDT'];
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value));
@@ -21,101 +17,51 @@ const LoadBalance: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (amount <= 0) {
-    setError('La cantidad debe ser mayor que cero.');
-    return;
-  }
-
-  setLoading(true);
-
-  const token = localStorage.getItem('token');
-  if (!token) {
-    navigate('/login');
-    return;
-  }
-
-  try {
-    const response = await fetch('https://proyectofinalutn-production.up.railway.app/auth/create-preference', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ amount, currency }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error('Error al crear preferencia de pago');
+    if (amount <= 0) {
+      setError('El monto debe ser mayor a 0');
+      return;
     }
 
-    window.location.href = data.init_point; // Redirige a Mercado Pago
-  } catch (error) {
-    setError('Hubo un problema al iniciar el pago.');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const response = await axios.post('https://proyectofinalutn-production.up.railway.app/auth/create_preference', {
+        userId,
+        amount,
+        currency,
+      });
 
-  if (loading) {
-    return <Loader/>;
-  }
+      const { id } = response.data;
+      toast.success("Redirigiendo a Mercado Pago...");
+      window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al generar el pago");
+    }
+  };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-20">
-      <h2 className="text-4xl font-bold mb-6">Cargar Balance</h2>
-
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2">
-        <div className="mb-4">
-          <label htmlFor="currency" className="block text-lg mb-2">Selecciona la moneda</label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={handleCurrencyChange}
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg w-full"
-          >
-            {currencyOptions.map((curr) => (
-              <option key={curr} value={curr}>
-                {curr}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="amount" className="block text-lg mb-2">Cantidad a cargar</label>
-          <input
-            id="amount"
-            type="number"
-            value={amount}
-            onChange={handleAmountChange}
-            placeholder="Ingrese la cantidad"
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg w-full"
-          />
-        </div>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        <div className="flex justify-center gap-4">
-          <button
-            type="submit"
-            className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition w-full"
-            disabled={loading}
-          >
-            {loading ? 'Cargando...' : 'Cargar Balance'}
-          </button>
-        </div>
+    <div>
+      <h2 className="text-xl font-bold mb-4">Cargar saldo</h2>
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="number"
+          value={amount}
+          onChange={handleAmountChange}
+          placeholder="Monto"
+          className="border p-2 mb-2 w-full"
+        />
+        <select value={currency} onChange={handleCurrencyChange} className="border p-2 mb-2 w-full">
+          <option value="ARS">ARS</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          Cargar saldo
+        </button>
       </form>
-
-      <button
-        onClick={() => navigate('/home')}
-        className="mt-6 text-blue-500 hover:underline"
-      >
-        Volver al inicio
-      </button>
+      <ToastContainer />
     </div>
   );
 };
