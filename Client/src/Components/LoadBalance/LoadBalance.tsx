@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoadBalance = ({ userId }: { userId: number }) => {
   const [amount, setAmount] = useState<number>(0);
-  const [currency, setCurrency] = useState<string>('ARS');
-  const [error, setError] = useState<string>('');
+  const [currency, setCurrency] = useState<string>("ARS");
+  const [error, setError] = useState<string>("");
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value));
@@ -20,16 +20,19 @@ const LoadBalance = ({ userId }: { userId: number }) => {
     e.preventDefault();
 
     if (amount <= 0) {
-      setError('El monto debe ser mayor a 0');
+      setError("El monto debe ser mayor a 0");
       return;
     }
 
     try {
-      const response = await axios.post('https://proyectofinalutn-production.up.railway.app/auth/create_preference', {
-        userId,
-        amount,
-        currency,
-      });
+      const response = await axios.post(
+        "https://proyectofinalutn-production.up.railway.app/auth/create_preference",
+        {
+          userId,
+          amount,
+          currency,
+        }
+      );
 
       const { id } = response.data;
       toast.success("Redirigiendo a Mercado Pago...");
@@ -47,17 +50,26 @@ const LoadBalance = ({ userId }: { userId: number }) => {
       <form onSubmit={handleSubmit}>
         <input
           type="number"
+          step="0.01" // 🟢 Acepta valores con 2 decimales
+          min="0.01" // 🟢 Evita valores negativos o cero
           value={amount}
           onChange={handleAmountChange}
           placeholder="Monto"
           className="border p-2 mb-2 w-full"
         />
-        <select value={currency} onChange={handleCurrencyChange} className="border p-2 mb-2 w-full">
+        <select
+          value={currency}
+          onChange={handleCurrencyChange}
+          className="border p-2 mb-2 w-full"
+        >
           <option value="ARS">ARS</option>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
         </select>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
           Cargar saldo
         </button>
       </form>
