@@ -24,7 +24,7 @@ const Success = () => {
   };
 
   return (
-    <div className="text-white text-center mt-20 px-4">
+    <div className="bg-grey-900 text-white text-center mt-20 px-4">
       <h1 className="text-4xl font-bold mb-4">¡Pago exitoso 🎉!</h1>
       <p className="text-lg mb-6">Tu saldo se acreditará automáticamente.</p>
       <p className="mb-6">Serás redirigido en {secondsLeft} segundos...</p>

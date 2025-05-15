@@ -3,7 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const LoadBalance = ({ userId }: { userId: number }) => {
+const LoadBalance = () => {
   const [amount, setAmount] = useState<number>(0);
   const [currency, setCurrency] = useState<string>("ARS");
   const [error, setError] = useState<string>("");
@@ -28,7 +28,6 @@ const LoadBalance = ({ userId }: { userId: number }) => {
       const response = await axios.post(
         "https://proyectofinalutn-production.up.railway.app/auth/create_preference",
         {
-          userId,
           amount,
           currency,
         }
