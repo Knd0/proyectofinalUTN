@@ -13,7 +13,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://proyectofinalutn-production.up.railway.app/auth/register', {
+      const response = await fetch('http://localhost:5000/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -17,30 +17,34 @@ const LoadBalance = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (amount <= 0) {
-      setError("El monto debe ser mayor a 0");
+  if (amount <= 0) {
+    setError("El monto debe ser mayor a 0");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token"); // o donde tengas guardado el JWT
+    if (!token) {
+      toast.error("No estás autenticado");
       return;
     }
 
-    try {
-      const response = await axios.post(
-        "https://proyectofinalutn-production.up.railway.app/auth/create_preference",
-        {
-          amount,
-          currency,
-        }
-      );
+    const response = await axios.post(
+      "http://localhost:5000/auth/create-preference",
+      { amount, currency },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      const { id } = response.data;
-      toast.success("Redirigiendo a Mercado Pago...");
-      window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${id}`;
-    } catch (err) {
-      console.error(err);
-      toast.error("Error al generar el pago");
-    }
-  };
+    const { init_point } = response.data;
+    toast.success("Redirigiendo a Mercado Pago...");
+    window.location.href = init_point;
+  } catch (err) {
+    console.error(err);
+    toast.error("Error al generar el pago");
+  }
+};
 
   return (
     <div>

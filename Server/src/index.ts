@@ -13,7 +13,7 @@ const app = express();
 
 // Configura CORSS
 app.use(cors({
-  origin: 'https://proyectofinalutn2025.vercel.app',
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
