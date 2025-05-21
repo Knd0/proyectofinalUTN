@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
 
+
 export class Usuario extends Model {
   public id!: number;
   public nombre!: string;
@@ -69,6 +70,7 @@ Usuario.init(
       allowNull: true,
     },
   },
+
   {
     sequelize,
     modelName: "Usuario",
@@ -76,3 +78,24 @@ Usuario.init(
     timestamps: false,
   }
 );
+import { Transaction } from "./Transaction";
+  
+Usuario.hasMany(Transaction, {
+  foreignKey: "from_user_id",
+  as: "sentTransactions"
+});
+
+Usuario.hasMany(Transaction, {
+  foreignKey: "to_user_id",
+  as: "receivedTransactions"
+});
+
+Transaction.belongsTo(Usuario, {
+  foreignKey: "from_user_id",
+  as: "fromUser"
+});
+
+Transaction.belongsTo(Usuario, {
+  foreignKey: "to_user_id",
+  as: "toUser"
+});
