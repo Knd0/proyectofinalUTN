@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
-import Transaction from "../Components/Transaction/Transaction";
+
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
