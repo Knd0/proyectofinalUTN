@@ -98,11 +98,11 @@ const Home = () => {
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2 flex flex-col items-center mb-8">
           <h3 className="text-3xl font-semibold mb-4">Balance Actual</h3>
           <p className="text-lg mb-4">
-            <span className="font-bold">{balance[selectedCurrency]}</span>{" "}
+            <span className="text-4xl font-extrabold text-green-600">$ {balance[selectedCurrency]}</span>{" "}
             <select
               value={selectedCurrency}
               onChange={handleCurrencyChange}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg mb-4"
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg mb-4 m-5"
             >
               {currencyOptions.map((currency) => (
                 <option key={currency} value={currency}>
