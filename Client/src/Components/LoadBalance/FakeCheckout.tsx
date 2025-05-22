@@ -38,7 +38,7 @@ const FakeCheckout = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/auth/balance",
+        "https://proyectofinalutn-production.up.railway.app/auth/balance",
         {
           amount: parseFloat(amount),
           currency,

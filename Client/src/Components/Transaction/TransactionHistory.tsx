@@ -29,7 +29,7 @@ const TransactionHistory: React.FC = () => {
     const fetchTransactions = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/transactions/all", {
+        const res = await fetch("https://proyectofinalutn-production.up.railway.app/transactions/all", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
