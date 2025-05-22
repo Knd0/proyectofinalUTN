@@ -9,17 +9,19 @@ import { Usuario } from './models/Usuario';
 import  jwt  from 'jsonwebtoken';
 import transactionRoutes from './Routes/transactionRoutes';
 
-
-
 const app = express();
 
 // Configura CORSS
 app.use(cors({
+
   origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+
   credentials: true,
 }));
+
+
 
 // Middleware para parsear JSON en el body
 app.use(bodyParser.json());

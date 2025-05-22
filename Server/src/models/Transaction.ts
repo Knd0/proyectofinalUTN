@@ -34,4 +34,3 @@ export const Transaction = sequelize.define("Transaction", {
   tableName: "transactions",
   timestamps: false
 });
-

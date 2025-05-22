@@ -143,4 +143,6 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
   );
 };
 
+
 export default Transaction;
+
