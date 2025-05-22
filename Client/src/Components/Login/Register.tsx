@@ -19,6 +19,7 @@ const Register = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, nombre: name }),
+        credentials: 'include'
       });
 
       const data = await response.json();
@@ -34,42 +35,44 @@ const Register = () => {
   };
 
   return (
-    <div className="wrapper">
-      <form onSubmit={handleRegister}>
-        <p className="form-login">Register</p>
-        <div className="input-box">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-            required
-          />
-        </div>
-        <div className="input-box">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
-        </div>
-        <div className="input-box">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
-        </div>
-        <button className="btn" type="submit">Register</button>
-        {error && <p className="error-message">{error}</p>}
-        <div className="register-link">
-          <p>Already have an account? <a href="/login">Login</a></p>
-        </div>
-      </form>
+    <div className="img">
+      <div className="wrapper">
+        <form onSubmit={handleRegister}>
+          <p className="form-login">Register</p>
+          <div className="input-box">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name"
+              required
+            />
+          </div>
+          <div className="input-box">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
+          </div>
+          <div className="input-box">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button className="btn" type="submit">Register</button>
+          {error && <p className="error-message">{error}</p>}
+          <div className="register-link">
+            <p>Already have an account? <a href="/login">Login</a></p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

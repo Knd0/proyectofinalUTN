@@ -8,12 +8,15 @@ import Home from './Pages/Home';  // Asegúrate de tener este componente Home
 import PrivateRoute from './Pages/PrivateRoute';  // Componente para proteger las rutas privadas
 import LoadBalance from './Components/LoadBalance/LoadBalance';
 import Profile from './Components/Profile/Profile';
+import Success from './Components/LoadBalance/Success';
+import Fail from './Components/LoadBalance/Fail';
+import Transaction from "./Components/Transaction/Transaction";
+import FakeCheckout from './Components/LoadBalance/FakeCheckout';
 
 
 
 const App: React.FC = () => {
   const isAuthenticated = true;  
-
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -23,7 +26,10 @@ const App: React.FC = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/loadbalance" element={<LoadBalance />} />
         <Route path="/profile" element={<Profile />} />
-
+        <Route path="/success" element={<Success />} />
+        <Route path="/fail" element={<Fail />} />
+        <Route path="/transaction" element={<Transaction />} />
+        <Route path="/fake-checkout" element={<FakeCheckout />} />
       </Route>
     </Routes>
   );

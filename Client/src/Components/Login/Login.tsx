@@ -19,6 +19,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
 
       const data = await response.json();
@@ -41,41 +42,43 @@ const Login = () => {
   };
 
   return (
-    <div className="wrapper">
-      <form onSubmit={handleLogin}>
-        <p className="form-login">Login</p>
-        <div className="input-box">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
+    <div className="img">
+      <div className="wrapper">
+          <form onSubmit={handleLogin}>
+            <p className="form-login">Login</p>
+            <div className="input-box">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                required
+              />
+            </div>
+            <div className="input-box">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+              />
+            </div>
+            <div className="remember-forgot">
+              <label>
+                <input type="checkbox" />
+                Remember Me
+              </label>
+              <a href="#">Forgot Password</a>
+            </div>
+            <button className="btn" type="submit">Login</button>
+            {error && <p className="error-message">{error}</p>}
+            <div className="register-link">
+              <p>Don't have an account?   <a href="/register">Register</a></p>
+            </div>
+          </form>
         </div>
-        <div className="input-box">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div className="remember-forgot">
-          <label>
-            <input type="checkbox" />
-            Remember Me
-          </label>
-          <a href="#">Forgot Password</a>
-        </div>
-        <button className="btn" type="submit">Login</button>
-        {error && <p className="error-message">{error}</p>}
-        <div className="register-link">
-          <p>Don't have an account? <a href="/register">Register</a></p>
-        </div>
-      </form>
-    </div>
+      </div>
   );
 };
 

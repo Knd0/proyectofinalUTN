@@ -26,4 +26,5 @@ router.post('/balance', authenticateToken, async (req, res, next) => {
   await authController.loadBalance(req, res, next);
 });
 
+
 export default router;

@@ -1,16 +1,14 @@
-// LoadBalance.tsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Loader from '../Loader/loader';
 
-const LoadBalance: React.FC = () => {
+import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import Navbar from "../Navbar/Navbar";
+import "react-toastify/dist/ReactToastify.css";
+
+
+const LoadBalance = () => {
   const [amount, setAmount] = useState<number>(0);
-  const [currency, setCurrency] = useState<string>('USD');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
-
-  const currencyOptions = ['ARS', 'USD', 'EUR', 'BTC', 'ETH', 'USDT'];
+  const [currency, setCurrency] = useState<string>("ARS");
+  const [error, setError] = useState<string>("");
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value));
@@ -20,105 +18,63 @@ const LoadBalance: React.FC = () => {
     setCurrency(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (amount <= 0) {
-      setError('La cantidad debe ser mayor que cero.');
+      setError("El monto debe ser mayor a 0");
       return;
     }
 
-    setLoading(true);
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+    // Guardar datos en localStorage para simular el pago
+    localStorage.setItem("fake_amount", amount.toString());
+    localStorage.setItem("fake_currency", currency);
 
-    try {
-        console.log(amount, currency);
-        
-      const response = await fetch('http://localhost:5000/auth/balance', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount,
-          currency,
-        }),
-      });
+    toast.info("Redirigiendo a la simulación de pago...");
+    setTimeout(() => {
+      window.location.href = "/fake-checkout";
+    }, 1000);
 
-      if (!response.ok) {
-        throw new Error('Error al cargar el balance');
-      }
-
-      // Si la carga es exitosa, redirige al Home o muestra un mensaje
-      navigate('/home');
-    } catch (error) {
-      setError('Hubo un problema al cargar el balance.');
-    } finally {
-      setLoading(false);
-    }
   };
-  if (loading) {
-    return <Loader/>;
-  }
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-20">
-      <h2 className="text-4xl font-bold mb-6">Cargar Balance</h2>
 
-      <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2">
-        <div className="mb-4">
-          <label htmlFor="currency" className="block text-lg mb-2">Selecciona la moneda</label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={handleCurrencyChange}
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg w-full"
-          >
-            {currencyOptions.map((curr) => (
-              <option key={curr} value={curr}>
-                {curr}
-              </option>
-            ))}
-          </select>
-        </div>
+    <div>
+      <Navbar/>
+      <h2 className="text-xl font-bold mb-4">Cargar saldo</h2>
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+      <form onSubmit={handleSubmit}>
 
-        <div className="mb-4">
-          <label htmlFor="amount" className="block text-lg mb-2">Cantidad a cargar</label>
-          <input
-            id="amount"
-            type="number"
-            value={amount}
-            onChange={handleAmountChange}
-            placeholder="Ingrese la cantidad"
-            className="bg-gray-700 text-white px-4 py-2 rounded-lg w-full"
-          />
-        </div>
+        <input
+          type="number"
+          step="0.01"
+          min="0.01"
+          value={amount}
+          onChange={handleAmountChange}
+          placeholder="Monto"
+          className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <select
+          value={currency}
+          onChange={handleCurrencyChange}
+          className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="ARS">ARS</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
 
-        <div className="flex justify-center gap-4">
-          <button
-            type="submit"
-            className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition w-full"
-            disabled={loading}
-          >
-            {loading ? 'Cargando...' : 'Cargar Balance'}
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300"
+        >
+          Cargar saldo
+        </button>
       </form>
 
-      <button
-        onClick={() => navigate('/home')}
-        className="mt-6 text-blue-500 hover:underline"
-      >
-        Volver al inicio
-      </button>
+      <ToastContainer />
     </div>
   );
 };
