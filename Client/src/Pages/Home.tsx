@@ -18,6 +18,7 @@ const Home = () => {
     ETH: 0,
     USDT: 0,
   });
+  
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
