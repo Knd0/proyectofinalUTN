@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
+import TransactionHistory from "../Components/Transaction/TransactionHistory";
+import Loader from "../Components/Loader/loader";
 
 
 const Home = () => {
@@ -16,6 +18,7 @@ const Home = () => {
     ETH: 0,
     USDT: 0,
   });
+  
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -61,7 +64,7 @@ const Home = () => {
         console.log(data.user)
         console.log(data.user.balance)
         setUserInfo(data.user);
-        setBalance(data.user.balance); // Asegurarse de que 'balance' esté en el formato adecuado
+        setBalance(data.user.balance);
         setLoading(false);
       } catch (err) {
         setError("No se pudo cargar la información del usuario");
@@ -76,15 +79,16 @@ const Home = () => {
     setSelectedCurrency(e.target.value);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const currencyOptions = Object.keys(balance);
 
+  if (!userInfo){
+    return <Loader/>
+  }
+
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      {userInfo && <Navbar userInfo={userInfo} />}
+      <Navbar/>
 
       <main
         className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center"
@@ -97,11 +101,11 @@ const Home = () => {
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2 flex flex-col items-center mb-8">
           <h3 className="text-3xl font-semibold mb-4">Balance Actual</h3>
           <p className="text-lg mb-4">
-            <span className="font-bold">{balance[selectedCurrency]}</span>{" "}
+            <span className="text-4xl font-extrabold text-green-600">$ {balance[selectedCurrency]}</span>{" "}
             <select
               value={selectedCurrency}
               onChange={handleCurrencyChange}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg mb-4"
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg mb-4 m-5"
             >
               {currencyOptions.map((currency) => (
                 <option key={currency} value={currency}>
@@ -110,24 +114,27 @@ const Home = () => {
               ))}
             </select>
           </p>
-
+              <div className="flex justify-between items-center ">
           <Link
             to="/loadbalance"
             className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
             Cargar Balance
           </Link>
-        </div>
-        <Link
+          <Link
           to="/transaction"
-          className="bg-pink-600 px-6 py-3 rounded-lg shadow hover:bg-pink-700 transition text-white font-semibold"
+          className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5"
         >
-          Ir a Transacciones
+          Enviar Dinero
         </Link>
+        </div>
+        </div>
 
         {error && <p className="text-red-500">{error}</p>}
+        <TransactionHistory/>
 
         <section className="w-full max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-10"></section>
+
       </main>
     </div>
   );
