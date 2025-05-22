@@ -64,6 +64,9 @@ const LoadBalance = () => {
           <option value="ARS">ARS</option>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
+          <option value="USDT">USDT</option>
+          <option value="BTC">BTC</option>
+          <option value="ETH">ETH</option>
         </select>
 
         <button
