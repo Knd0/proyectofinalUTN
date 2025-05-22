@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
+import TransactionHistory from "../Components/Transaction/TransactionHistory";
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -83,7 +84,7 @@ const Home = () => {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      {userInfo && <Navbar userInfo={userInfo} />}
+      <Navbar/>
 
       <main
         className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center"
@@ -109,18 +110,27 @@ const Home = () => {
               ))}
             </select>
           </p>
-
+              <div className="flex justify-between items-center ">
           <Link
             to="/loadbalance"
             className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
             Cargar Balance
           </Link>
+          <Link
+          to="/transaction"
+          className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5"
+        >
+          Enviar Dinero
+        </Link>
+        </div>
         </div>
 
         {error && <p className="text-red-500">{error}</p>}
+        <TransactionHistory/>
 
         <section className="w-full max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-10"></section>
+
       </main>
     </div>
   );

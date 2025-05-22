@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import Navbar from "../Navbar/Navbar";
 import "react-toastify/dist/ReactToastify.css";
 
 const LoadBalance = () => {
@@ -16,45 +16,34 @@ const LoadBalance = () => {
     setCurrency(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (amount <= 0) {
-    setError("El monto debe ser mayor a 0");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token"); // o donde tengas guardado el JWT
-    if (!token) {
-      toast.error("No estás autenticado");
+    if (amount <= 0) {
+      setError("El monto debe ser mayor a 0");
       return;
     }
 
-    const response = await axios.post(
-      "http://localhost:5000/auth/create-preference",
-      { amount, currency },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    // Guardar datos en localStorage para simular el pago
+    localStorage.setItem("fake_amount", amount.toString());
+    localStorage.setItem("fake_currency", currency);
 
-    const { init_point } = response.data;
-    toast.success("Redirigiendo a Mercado Pago...");
-    window.location.href = init_point;
-  } catch (err) {
-    console.error(err);
-    toast.error("Error al generar el pago");
-  }
-};
+    toast.info("Redirigiendo a la simulación de pago...");
+    setTimeout(() => {
+      window.location.href = "/fake-checkout";
+    }, 1000);
+  };
 
   return (
     <div>
+      <Navbar/>
       <h2 className="text-xl font-bold mb-4">Cargar saldo</h2>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="number"
-          step="0.01" // 🟢 Acepta valores con 2 decimales
-          min="0.01" // 🟢 Evita valores negativos o cero
+          step="0.01"
+          min="0.01"
           value={amount}
           onChange={handleAmountChange}
           placeholder="Monto"

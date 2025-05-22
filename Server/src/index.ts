@@ -7,6 +7,8 @@ import authRoutes from './Routes/authRoutes'; // Asegúrate de importar correcta
 import { sequelize } from './db';  // Importa la instancia de Sequelize
 import { Usuario } from './models/Usuario';
 import  jwt  from 'jsonwebtoken';
+import transactionRoutes from './Routes/transactionRoutes';
+
 
 
 const app = express();
@@ -24,6 +26,7 @@ app.use(bodyParser.json());
 
 // Rutas de autenticación
 app.use('/auth', authRoutes);
+app.use('/transactions', transactionRoutes);
 
 // Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
