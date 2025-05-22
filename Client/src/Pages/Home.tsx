@@ -39,25 +39,35 @@ const Home = () => {
     }
 
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-  
       try {
-        const res = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
+        const token = localStorage.getItem("token");
+        console.log("Token:", token);
+        if (!token) {
+          navigate("/login"); // Redirige al login si no hay token
+          return;
+        }
+
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Enviar el token en los headers
           },
         });
-  
-        if (res.ok) {
-          const data = await res.json();
-          setUserInfo(data.user);
-          setBalance(data.balance)
-        } else {
-          console.error("❌ Error al recargar datos del perfil");
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del usuario");
         }
-      } catch (error) {
-        console.error("❌ Error en la petición:", error);
+
+        const data = await response.json();
+        console.log(data)
+        console.log(data.user)
+        console.log(data.user.balance)
+        setUserInfo(data.user);
+        setBalance(data.user.balance);
+        setLoading(false);
+      } catch (err) {
+        setError("No se pudo cargar la información del usuario");
+        setLoading(false);
       }
     };
 
