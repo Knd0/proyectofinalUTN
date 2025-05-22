@@ -5,6 +5,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
+import Loader from "../Components/Loader/loader";
 
 
 const Home = () => {
@@ -69,6 +70,10 @@ const Home = () => {
 
 
   const currencyOptions = Object.keys(balance);
+
+  if (!userInfo){
+    return <Loader/>
+  }
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
