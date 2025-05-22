@@ -5,6 +5,7 @@ import Loader from "../Loader/loader";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 
+
 interface User {
   nombre: string;
   email: string;

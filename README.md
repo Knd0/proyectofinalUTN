@@ -151,21 +151,21 @@ Authorization: Bearer <token>
 
 ## 🧪 Estado Actual del Proyecto
 
-- [x] Backend funcional con Sequelize y SQLite
-- [x] Autenticación JWT implementada
-- [ ] CRUD básico de usuario
-- [x] Sistema de carga de saldo por moneda
-- [x] Frontend básico con rutas: `Landing`, `Login`, `Register`, `Home`, `LoadBalance`
-- [x] Conexión entre frontend y backend vía fetch/axios
-- [ ] Cambio de divisas a tiempo real con el mercado
-- [ ] Actualización de datos del usuario en su propio perfil
-- [ ] Dashboard Admin
-- [ ] Conexión entre frontend y backend vía fetch/axios
-- [ ] Modularización del frontend
-- [ ] Transferencia de divisas entre usuarios
-- [ ] Métricas de la aplicación
-- [ ] Diseño profesional y minimalista
-- [ ] Alertas para guiar al usuario
+- [x] Backend funcional con Sequelize y SQLite.
+- [x] Autenticación JWT implementada.
+- [ ] CRUD básico de usuario.
+- [x] Sistema de carga de saldo por moneda.
+- [x] Frontend básico con rutas: `Landing`, `Login`, `Register`, `Home`, `LoadBalance`.
+- [x] Conexión entre frontend y backend vía fetch/axios.
+- [ ] Cambio de divisas a tiempo real con el mercado.
+- [ ] Actualización de datos del usuario en su propio perfil.
+- [ ] Dashboard Admin.
+- [ ] Conexión entre frontend y backend vía fetch/axios.
+- [ ] Modularización del frontend.
+- [ ] Transferencia de divisas entre usuarios.
+- [ ] Métricas de la aplicación.
+- [ ] Diseño profesional y minimalista.
+- [ ] Alertas para guiar al usuario.
 
 
 ## 🧑‍🎓 Autor

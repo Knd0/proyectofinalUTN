@@ -77,9 +77,6 @@ const Home = () => {
     setSelectedCurrency(e.target.value);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const currencyOptions = Object.keys(balance);
 

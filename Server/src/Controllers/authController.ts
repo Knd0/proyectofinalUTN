@@ -217,19 +217,19 @@ export const authController = {
       return res.status(500).json({ error: "Error al cargar el balance" });
     }
   },
+  
   updateProfile: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
-      if (!token)
-        return res.status(401).json({ error: "Token no proporcionado" });
+      if (!token) return res.status(401).json({ error: "Token no proporcionado" });
 
       const decoded: any = jwt.verify(token, JWT_SECRET);
       const userId = decoded.id;
 
-      const { imagen, nombre, descripcion, nacionalidad, dni } = req.body;
+      const { imagen, descripcion, nacionalidad, dni } = req.body;
 
       await Usuario.update(
-        { imagen, nombre, descripcion, nacionalidad, dni },
+        { imagen, descripcion, nacionalidad, dni },
         { where: { id: userId } }
       );
 
@@ -241,4 +241,5 @@ export const authController = {
       return res.status(500).json({ error: "Error al actualizar el perfil" });
     }
   },
-};
+
+}

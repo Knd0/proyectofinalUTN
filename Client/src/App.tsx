@@ -14,6 +14,7 @@ import Transaction from "./Components/Transaction/Transaction";
 import FakeCheckout from './Components/LoadBalance/FakeCheckout';
 
 
+
 const App: React.FC = () => {
   const isAuthenticated = true;  
   return (
@@ -29,7 +30,6 @@ const App: React.FC = () => {
         <Route path="/fail" element={<Fail />} />
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/fake-checkout" element={<FakeCheckout />} />
-
       </Route>
     </Routes>
   );

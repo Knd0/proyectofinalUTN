@@ -22,7 +22,6 @@ router.put('/me', authenticateToken, async (req, res, next) => {
   await authController.updateProfile(req, res, next);
 });
 
-
 router.post('/balance', authenticateToken, async (req, res, next) => {
   await authController.loadBalance(req, res, next);
 });
