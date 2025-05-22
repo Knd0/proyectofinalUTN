@@ -3,6 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Loader from "../Loader/loader";
 import { useLocation, useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 
 interface User {
   nombre: string;
@@ -127,114 +128,117 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-10">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Mi Perfil</h1>
-        <button
-          onClick={() => setEditMode(!editMode)}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition"
-        >
-          {editMode ? "Cancelar" : "Editar"}
-        </button>
-      </div>
-
-      <div className="flex flex-col items-center gap-4">
-        <img
-          src={user.perfil?.imagen}
-          alt="Avatar"
-          className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500 shadow"
-        />
-        {editMode && (
-          <input
-            type="text"
-            name="imagen"
-            value={formData.perfil?.imagen}
-            onChange={handleChange}
-            placeholder={user.perfil?.imagen}
-            className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
-          />
-        )}
-      </div>
-
-      <div className="mt-6 space-y-4">
-        <div>
-          <label className="font-semibold text-gray-600">Nombre</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              placeholder={user.nombre}
-              className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
-            />
-          ) : (
-            <p>{user.nombre}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="font-semibold text-gray-600">Email</label>
-          <p>{user.email}</p>
-        </div>
-
-        <div>
-          <label className="font-semibold text-gray-600">Descripción</label>
-          {editMode ? (
-            <textarea
-              name="descripcion"
-              value={formData.perfil?.descripcion}
-              onChange={handleChange}
-              placeholder={user.perfil?.descripcion}
-              className="textarea textarea-bordered w-full px-4 py-2 rounded-md border border-gray-300"
-            />
-          ) : (
-            <p>{user.perfil?.descripcion || "Sin descripción"}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="font-semibold text-gray-600">Nacionalidad</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="nacionalidad"
-              value={formData.perfil?.nacionalidad}
-              onChange={handleChange}
-              placeholder={user.perfil?.nacionalidad}
-              className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
-            />
-          ) : (
-            <p>{user.perfil?.nacionalidad || "No especificado"}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="font-semibold text-gray-600">DNI</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="dni"
-              value={formData.perfil?.dni}
-              onChange={handleChange}
-              placeholder={user.perfil?.dni}
-              className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
-            />
-          ) : (
-            <p>{user.perfil?.dni || "No especificado"}</p>
-          )}
-        </div>
-
-        {editMode && (
+    <>
+      <Navbar />
+      <div className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-10">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Mi Perfil</h1>
           <button
-            onClick={handleSubmit}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            onClick={() => setEditMode(!editMode)}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition"
           >
-            Guardar Cambios
+            {editMode ? "Cancelar" : "Editar"}
           </button>
-        )}
+        </div>
+
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src={user.perfil?.imagen}
+            alt="Avatar"
+            className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500 shadow"
+          />
+          {editMode && (
+            <input
+              type="text"
+              name="imagen"
+              value={formData.perfil?.imagen}
+              onChange={handleChange}
+              placeholder={user.perfil?.imagen}
+              className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+            />
+          )}
+        </div>
+
+        <div className="mt-6 space-y-4">
+          <div>
+            <label className="font-semibold text-gray-600">Nombre</label>
+            {editMode ? (
+              <input
+                type="text"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder={user.nombre}
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.nombre}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-600">Email</label>
+            <p>{user.email}</p>
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-600">Descripción</label>
+            {editMode ? (
+              <textarea
+                name="descripcion"
+                value={formData.perfil?.descripcion}
+                onChange={handleChange}
+                placeholder={user.perfil?.descripcion}
+                className="textarea textarea-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.perfil?.descripcion || "Sin descripción"}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-600">Nacionalidad</label>
+            {editMode ? (
+              <input
+                type="text"
+                name="nacionalidad"
+                value={formData.perfil?.nacionalidad}
+                onChange={handleChange}
+                placeholder={user.perfil?.nacionalidad}
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.perfil?.nacionalidad || "No especificado"}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-600">DNI</label>
+            {editMode ? (
+              <input
+                type="text"
+                name="dni"
+                value={formData.perfil?.dni}
+                onChange={handleChange}
+                placeholder={user.perfil?.dni}
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.perfil?.dni || "No especificado"}</p>
+            )}
+          </div>
+
+          {editMode && (
+            <button
+              onClick={handleSubmit}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              Guardar Cambios
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
