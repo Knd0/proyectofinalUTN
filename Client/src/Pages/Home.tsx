@@ -126,12 +126,6 @@ const Home = () => {
         </Link>
         </div>
         </div>
-        <Link
-          to="/transaction"
-          className="bg-pink-600 px-6 py-3 rounded-lg shadow hover:bg-pink-700 transition text-white font-semibold"
-        >
-          Ir a Transacciones
-        </Link>
 
         {error && <p className="text-red-500">{error}</p>}
         <TransactionHistory/>
