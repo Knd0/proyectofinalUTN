@@ -13,12 +13,13 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/auth/register', {
+      const response = await fetch('https://proyectofinalutn-production.up.railway.app/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, nombre: name }),
+        credentials: 'include'
       });
 
       const data = await response.json();

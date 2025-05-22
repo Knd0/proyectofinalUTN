@@ -3,7 +3,16 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Usuario } from "../models/Usuario";
 import { generateUniqueCVU } from "../utils/GenerateCVU";
+import axios from "axios";
+import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
+const mercadopago = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN!,
+});
+const preference = new Preference(mercadopago);
+const payment = new Payment(mercadopago);
+
+const CURRENCY_API_KEY = process.env.CURRENCY_API_KEY;
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Valor predeterminado
 
@@ -48,10 +57,11 @@ export const authController = {
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Error al obtener la información del usuario" });
+      return res
+        .status(500)
+        .json({ error: "Error al obtener la información del usuario" });
     }
   },
-
   // Registro de un nuevo usuario
   register: async (
     req: Request,
@@ -79,10 +89,10 @@ export const authController = {
         password: hashedPassword,
         cvu,
         imagen:
-          "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg", 
+          "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg",
         descripcion: "",
         nacionalidad: "",
-        dni: "",
+        dni: null,
         COD: {
           ARS: 0,
           USD: 0,
@@ -122,7 +132,7 @@ export const authController = {
       }
 
       const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3h",
       });
 
       return res.json({
@@ -137,71 +147,191 @@ export const authController = {
 
   // Carga de balance de usuario
   loadBalance: async (req: Request, res: Response, next: NextFunction) => {
-  const { amount, currency } = req.body;
+    const { amount, currency } = req.body;
 
-  console.log("🔁 Datos recibidos:", { amount, currency });
+    console.log("🔁 Datos recibidos:", { amount, currency });
 
-  const token = req.headers.authorization?.split(" ")[1];
-  console.log("🔑 Token recibido:", token ? "Sí" : "No");
+    const token = req.headers.authorization?.split(" ")[1];
+    console.log("🔑 Token recibido:", token ? "Sí" : "No");
 
-  if (typeof amount !== "number" || typeof currency !== "string") {
-    console.log("❌ Campos inválidos:", { amount, currency });
-    return res.status(400).json({ error: "Faltan campos obligatorios o tipo incorrecto" });
-  }
-
-  try {
-    const validCurrencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
-    if (!validCurrencies.includes(currency)) {
-      console.log("❌ Moneda no válida:", currency);
-      return res.status(400).json({ error: "Moneda no válida" });
+    if (typeof amount !== "number" || typeof currency !== "string") {
+      console.log("❌ Campos inválidos:", { amount, currency });
+      return res
+        .status(400)
+        .json({ error: "Faltan campos obligatorios o tipo incorrecto" });
     }
 
-    if (!token) {
-      console.log("❌ Token no proporcionado");
-      return res.status(401).json({ error: "Token no proporcionado" });
+    try {
+      const validCurrencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
+      if (!validCurrencies.includes(currency)) {
+        console.log("❌ Moneda no válida:", currency);
+        return res.status(400).json({ error: "Moneda no válida" });
+      }
+
+      if (!token) {
+        console.log("❌ Token no proporcionado");
+        return res.status(401).json({ error: "Token no proporcionado" });
+      }
+
+      const decoded: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "default_secret"
+      );
+      const userId = decoded.id;
+      console.log("✅ Token verificado. Usuario ID:", userId);
+
+      const user = await Usuario.findOne({ where: { id: userId } });
+
+      if (!user) {
+        console.log("❌ Usuario no encontrado");
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      const currentCOD = user.COD;
+      console.log("📊 Balance actual:", currentCOD);
+
+      if (!(currency in currentCOD)) {
+        console.log("❌ Moneda no existe en COD:", currency);
+        return res
+          .status(400)
+          .json({ error: "Moneda no válida en el balance" });
+      }
+
+      const updatedCOD = {
+        ...currentCOD,
+        [currency]: currentCOD[currency] + amount,
+      };
+
+      console.log("📝 Nuevo balance COD:", updatedCOD);
+
+      await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
+
+      console.log("✅ Balance actualizado correctamente");
+
+      return res.json({
+        message: `Balance de ${currency} actualizado correctamente`,
+        balance: updatedCOD,
+      });
+    } catch (error) {
+      console.error("🔥 Error en loadBalance:", error);
+      return res.status(500).json({ error: "Error al cargar el balance" });
     }
+  },
+  updateProfile: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token)
+        return res.status(401).json({ error: "Token no proporcionado" });
 
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
-    const userId = decoded.id;
-    console.log("✅ Token verificado. Usuario ID:", userId);
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
 
-    const user = await Usuario.findOne({ where: { id: userId } });
+      const { imagen, nombre, descripcion, nacionalidad, dni } = req.body;
 
-    if (!user) {
-      console.log("❌ Usuario no encontrado");
-      return res.status(404).json({ error: "Usuario no encontrado" });
+      await Usuario.update(
+        { imagen, nombre, descripcion, nacionalidad, dni },
+        { where: { id: userId } }
+      );
+
+      const updatedUser = await Usuario.findByPk(userId);
+
+      return res.json({ message: "Perfil actualizado", user: updatedUser });
+    } catch (error) {
+      console.error("❌ Error al actualizar perfil:", error);
+      return res.status(500).json({ error: "Error al actualizar el perfil" });
     }
+  },
+  createPreference: async (req: Request, res: Response) => {
+    const { amount, currency } = req.body;
+    const token = req.headers.authorization?.split(" ")[1];
 
-    const currentCOD = user.COD;
-    console.log("📊 Balance actual:", currentCOD);
+    if (!token) return res.status(401).json({ error: "Token requerido" });
 
-    if (!(currency in currentCOD)) {
-      console.log("❌ Moneda no existe en COD:", currency);
-      return res.status(400).json({ error: "Moneda no válida en el balance" });
+    try {
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const userId = decoded.id;
+
+      let finalAmountARS = amount;
+      let originalCurrency = currency;
+
+      // Si no es ARS, convertimos
+      if (currency !== "ARS") {
+        const response = await axios.get(
+          `https://api.currencyapi.com/v3/latest?apikey=${CURRENCY_API_KEY}&currencies=ARS&base_currency=${currency}`
+        );
+
+        const rate = response.data.data["ARS"].value;
+        finalAmountARS = parseFloat((amount * rate).toFixed(2));
+      }
+
+      const result = await preference.create({
+        body: {
+          items: [
+            {
+              id: "saldo-usuario",
+              title: "Carga de saldo",
+              unit_price: finalAmountARS,
+              quantity: 1,
+              currency_id: "ARS",
+            },
+          ],
+          back_urls: {
+            success: `https://proyectofinalutn.vercel.app/success`,
+            failure: "https://proyectofinalutn.vercel.app/home",
+          },
+          auto_return: "approved",
+          metadata: {
+            userId,
+            originalAmount: amount,
+            originalCurrency: currency,
+          },
+        },
+      });
+
+      res.json({ init_point: result.sandbox_init_point });
+    } catch (error: any) {
+      console.error("❌ Error al crear preferencia:", error.message || error);
+      if (error.response) {
+        // Error de axios (currencyapi, mercado pago)
+        console.error("Detalles de error:", error.response.data);
+      }
+      res.status(500).json({ error: "No se pudo crear la preferencia" });
     }
+    
+  },
+  handleWebhook: async (req: Request, res: Response) => {
+    try {
+      const { type, data } = req.body;
 
-    const updatedCOD = {
-      ...currentCOD,
-      [currency]: currentCOD[currency] + amount,
-    };
+      if (type === "payment") {
+        const mpPayment = await payment.get({ id: data.id });
 
-    console.log("📝 Nuevo balance COD:", updatedCOD);
+        if (mpPayment.status === "approved") {
+          const metadata = mpPayment.metadata as any;
+          const userId = metadata.userId;
+          const currency = metadata.originalCurrency;
+          const amount = Number(metadata.originalAmount);
 
-    await Usuario.update(
-      { COD: updatedCOD },
-      { where: { id: userId } }
-    );
+          const user = await Usuario.findByPk(userId);
+          if (!user)
+            return res.status(404).json({ error: "Usuario no encontrado" });
 
-    console.log("✅ Balance actualizado correctamente");
+          const updatedCOD = {
+            ...user.COD,
+            [currency]: user.COD[currency] + amount,
+          };
 
-    return res.json({
-      message: `Balance de ${currency} actualizado correctamente`,
-      balance: updatedCOD,
-    });
-  } catch (error) {
-    console.error("🔥 Error en loadBalance:", error);
-    return res.status(500).json({ error: "Error al cargar el balance" });
-  }
-}
+          await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
 
-}
+          console.log("✅ Balance actualizado por webhook");
+          return res.status(200).send("OK");
+        }
+      }
+
+      res.status(200).send("Evento recibido");
+    } catch (error) {
+      console.error("❌ Error en webhook:", error);
+      res.status(500).send("Error interno");
+    }
+  },
+};

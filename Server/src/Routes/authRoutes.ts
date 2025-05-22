@@ -18,8 +18,20 @@ router.get('/me', authenticateToken, async (req, res, next) => {
   await authController.getUserInfo(req, res, next);
 });
 
+router.put('/me', authenticateToken, async (req, res, next) => {
+  await authController.updateProfile(req, res, next);
+});
+
+router.post('/create-preference', authenticateToken, async (req, res) => {
+  await authController.createPreference(req, res);
+});
+
 router.post('/balance', authenticateToken, async (req, res, next) => {
   await authController.loadBalance(req, res, next);
+});
+
+router.post('/webhook', authenticateToken,async (req, res, next) => {
+  await authController.handleWebhook(req, res);
 });
 
 export default router;

@@ -5,6 +5,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
 
+
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [balance, setBalance] = useState<any>({
@@ -30,6 +31,7 @@ const Home = () => {
   useEffect(() => {
     // Obtener el token del localStorage
     const token = localStorage.getItem("token");
+    console.log("Token:", token);
     if (!token) {
       navigate("/login"); // Redirige al login si no hay token
     }
@@ -37,12 +39,13 @@ const Home = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Token:", token);
         if (!token) {
           navigate("/login"); // Redirige al login si no hay token
           return;
         }
 
-        const response = await fetch("http://localhost:5000/auth/me", {
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`, // Enviar el token en los headers
@@ -115,6 +118,12 @@ const Home = () => {
             Cargar Balance
           </Link>
         </div>
+        <Link
+          to="/transaction"
+          className="bg-pink-600 px-6 py-3 rounded-lg shadow hover:bg-pink-700 transition text-white font-semibold"
+        >
+          Ir a Transacciones
+        </Link>
 
         {error && <p className="text-red-500">{error}</p>}
 
