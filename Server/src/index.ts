@@ -13,18 +13,9 @@ import transactionRoutes from './Routes/transactionRoutes';
 const app = express();
 
 // Configura CORSS
-const allowedOrigins = ['http://localhost:3000', 'https://proyectofinalutn2025.vercel.app/']; // Agrega también el dominio real de tu frontend si aplica
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: 'http://localhost:3000',
+  credentials: true,
 }));
 
 
