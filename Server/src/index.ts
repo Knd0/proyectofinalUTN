@@ -2,25 +2,27 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors';  // Importa cors
-import authRoutes from './Routes/authRoutes'; // Asegúrate de importar correctamente las rutas
-import { sequelize } from './db';  // Importa la instancia de Sequelize
+import cors from 'cors';  
+import authRoutes from './Routes/authRoutes'; 
+import { sequelize } from './db'; 
 import { Usuario } from './models/Usuario';
 import  jwt  from 'jsonwebtoken';
 import transactionRoutes from './Routes/transactionRoutes';
 
+
+
 const app = express();
+
 
 // Configura CORSS
 app.use(cors({
 
-  origin: 'http://localhost:3000',
+  origin: 'https://proyectofinalutn2025.vercel.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 
   credentials: true,
 }));
-
 
 
 // Middleware para parsear JSON en el body

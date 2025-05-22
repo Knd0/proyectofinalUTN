@@ -21,7 +21,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
     setMessage(null);
 
     try {
-      const res = await fetch("http://localhost:5000/transactions/send", {
+      const res = await fetch("https://proyectofinalutn-production.up.railway.app/transactions/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

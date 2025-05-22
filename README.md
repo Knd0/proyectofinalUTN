@@ -80,7 +80,7 @@ proyecto/
    npm run dev
    ```
 
-   Por defecto corre en: [http://localhost:5000](http://localhost:5000)
+   Por defecto corre en: [https://proyectofinalutn-production.up.railway.app](https://proyectofinalutn-production.up.railway.app)
 
 > **Nota:** el servidor genera la base de datos SQLite automáticamente en `Server/database.sqlite` si no existe.
 
