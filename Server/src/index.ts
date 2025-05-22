@@ -14,9 +14,10 @@ const app = express();
 
 // Configura CORSS
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000'],
   credentials: true,
 }));
+
 
 
 // Middleware para parsear JSON en el body
