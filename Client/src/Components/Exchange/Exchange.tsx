@@ -17,9 +17,15 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   const [balances, setBalances] = useState<Record<string, number> | null>(null);
   const navigate = useNavigate();
 
+  console.log("✅ Componente Exchange montado");
+  console.log("👤 userInfo recibido:", userInfo);
+
   useEffect(() => {
     if (userInfo?.COD) {
+      console.log("💰 Seteando balances desde userInfo.COD:", userInfo.COD);
       setBalances(userInfo.COD);
+    } else {
+      console.log("⚠️ No se encontraron balances en userInfo.COD");
     }
   }, [userInfo]);
 
@@ -28,17 +34,22 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
     setMessage(null);
     setResult(null);
 
+    console.log("🔄 Intentando convertir:", amount, fromCurrency, "→", toCurrency);
+
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setMessage("Ingrese un monto válido mayor a 0");
+      console.log("❌ Monto inválido");
       return;
     }
     if (fromCurrency === toCurrency) {
       setMessage("Las monedas deben ser diferentes");
+      console.log("❌ Monedas iguales");
       return;
     }
     if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
+      console.log("❌ Saldo insuficiente o balances no cargados");
       return;
     }
 
@@ -58,16 +69,20 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
       });
 
       const data = await res.json();
+      console.log("🌐 Respuesta de la API:", data);
 
       if (!res.ok) {
         setMessage(data.message || "Error inesperado");
+        console.log("❌ Error de API:", data.message);
       } else {
         setResult(data.convertedAmount);
         setBalances(data.balances);
         setMessage("✅ Conversión realizada con éxito");
         setAmount("");
+        console.log("✅ Conversión OK. Nuevo saldo:", data.balances);
       }
     } catch (error) {
+      console.log("❌ Error de conexión:", error);
       setMessage("Error al conectar con el servidor");
     }
     setLoading(false);
