@@ -122,12 +122,14 @@ const Home = () => {
             className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
             <FontAwesomeIcon icon={faDownload} />
+            Ingresar Dinero
           </Link>
           <Link
           to="/transaction"
           className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5"
         >
           <FontAwesomeIcon icon={faMoneyBillTransfer} />
+          Transferir Dinero
         </Link>
         </div>
         </div>
