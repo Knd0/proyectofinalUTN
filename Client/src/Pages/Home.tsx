@@ -132,9 +132,9 @@ const Home = () => {
             </Link>
             <Link
               to="/exchange"
-              className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
+              className="bg-blue-600 ml-3 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
             >
-              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2 ml-2" />
               Convertir
             </Link>
           </div>
