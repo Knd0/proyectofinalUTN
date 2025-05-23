@@ -53,7 +53,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
   return (
     <div
       className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-      bg-gradient-to-r from-purple-600 via-pink-500 to-red-500
+      bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
       animate-gradient-x text-white font-sans"
       style={{ backgroundSize: "200% 200%" }}
     >
@@ -75,7 +75,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
           onChange={(e) => setToCvu(e.target.value)}
           required
           className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-          focus:outline-none focus:ring-4 focus:ring-pink-400 focus:ring-opacity-70
+          focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
           shadow-md transition duration-300 placeholder:text-gray-400"
         />
 
@@ -88,7 +88,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
           onChange={(e) => setAmount(e.target.value)}
           required
           className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-          focus:outline-none focus:ring-4 focus:ring-pink-400 focus:ring-opacity-70
+          focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
           shadow-md transition duration-300 placeholder:text-gray-400"
         />
 
@@ -96,7 +96,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
           className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-          focus:outline-none focus:ring-4 focus:ring-pink-400 focus:ring-opacity-70
+          focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
           shadow-md transition duration-300"
         >
           {currencies.map((cur) => (
@@ -110,7 +110,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
           type="submit"
           disabled={loading}
           className={`w-full py-4 rounded-xl font-extrabold
-          text-pink-600 bg-white hover:bg-pink-50 transition duration-300
+          text-blue-600 bg-white hover:bg-blue-50 transition duration-300
           disabled:opacity-50 disabled:cursor-not-allowed
           ${loading ? "animate-pulse" : ""}`}
         >
@@ -135,7 +135,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
       <button
         onClick={() => navigate("/home")}
         className="mt-8 w-full py-4 rounded-xl font-extrabold
-        bg-white text-pink-600 hover:bg-pink-50 transition duration-300"
+        bg-white text-blue-600 hover:bg-blue-50 transition duration-300"
       >
         Volver al Inicio
       </button>

@@ -40,45 +40,64 @@ const LoadBalance = () => {
 
   return (
 
-    <div>
+    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
+  bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-500
+  animate-gradient-x text-white font-sans"
+  style={{ backgroundSize: "200% 200%" }}>
       <Navbar/>
-      <h2 className="text-xl font-bold mb-4">Cargar saldo</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-      <form onSubmit={handleSubmit}>
+      
+  <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
+    Cargar saldo
+  </h2>
 
-        <input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={amount}
-          onChange={handleAmountChange}
-          placeholder="Monto"
-          className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+  {error && (
+    <p className="text-center mb-4 text-red-300 font-semibold animate-fadeIn">
+      {error}
+    </p>
+  )}
 
-        <select
-          value={currency}
-          onChange={handleCurrencyChange}
-          className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="ARS">ARS</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="USDT">USDT</option>
-          <option value="BTC">BTC</option>
-          <option value="ETH">ETH</option>
-        </select>
+  <form onSubmit={handleSubmit} className="space-y-6">
+    <input
+      type="number"
+      step="0.01"
+      min="0.01"
+      value={amount}
+      onChange={handleAmountChange}
+      placeholder="Monto"
+      required
+      className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+      focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-70
+      shadow-md transition duration-300 placeholder:text-gray-400"
+    />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300"
-        >
-          Cargar saldo
-        </button>
-      </form>
+    <select
+      value={currency}
+      onChange={handleCurrencyChange}
+      className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+      focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-70
+      shadow-md transition duration-300"
+    >
+      <option value="ARS">ARS</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="USDT">USDT</option>
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+    </select>
 
-      <ToastContainer />
-    </div>
+    <button
+      type="submit"
+      className="w-full py-4 rounded-xl font-extrabold
+      text-blue-600 bg-white hover:bg-blue-50 transition duration-300
+      shadow-md"
+    >
+      Cargar saldo
+    </button>
+  </form>
+
+  <ToastContainer />
+</div>
+
   );
 };
 
