@@ -14,13 +14,17 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  // Inicializamos con objeto vacío para evitar errores
   const [balances, setBalances] = useState<Record<string, number>>({});
   const navigate = useNavigate();
 
+  console.log("Render Exchange - userInfo:", userInfo);
+  console.log("Render Exchange - balances:", balances);
+
   useEffect(() => {
+    console.log("useEffect userInfo.COD:", userInfo?.COD);
     if (userInfo?.COD) {
       setBalances(userInfo.COD);
+      console.log("Balances seteados a:", userInfo.COD);
     }
   }, [userInfo]);
 
@@ -29,22 +33,28 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
     setMessage(null);
     setResult(null);
 
+    console.log("Handle convert: ", { fromCurrency, toCurrency, amount });
+
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setMessage("Ingrese un monto válido mayor a 0");
+      console.log("Monto inválido");
       return;
     }
     if (fromCurrency === toCurrency) {
       setMessage("Las monedas deben ser diferentes");
+      console.log("Monedas iguales");
       return;
     }
     if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
+      console.log("Saldo insuficiente:", balances, parsedAmount);
       return;
     }
 
     setLoading(true);
     try {
+      console.log("Enviando request de conversión...");
       const res = await fetch(
         "https://proyectofinalutn-production.up.railway.app/exchange",
         {
@@ -62,17 +72,21 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
       );
 
       const data = await res.json();
+      console.log("Respuesta del servidor:", data);
 
       if (!res.ok) {
         setMessage(data.message || "Error inesperado");
+        console.log("Error en response:", data.message);
       } else {
         setResult(data.convertedAmount);
         setBalances(data.balances);
         setMessage("✅ Conversión realizada con éxito");
         setAmount("");
+        console.log("Conversión exitosa, balances actualizados:", data.balances);
       }
     } catch (error) {
       setMessage("Error al conectar con el servidor");
+      console.error("Error catch:", error);
     }
     setLoading(false);
   };
