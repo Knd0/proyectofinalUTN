@@ -114,14 +114,13 @@ const Home = () => {
               ))}
             </select>
 
-            <button
-              onClick={() => navigate("/exchange")}
+            <Link
+              to="/exchange"
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center"
-              title="Ir a Exchange"
             >
               <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
               Exchange
-            </button>
+            </Link>
           </p>
 
           <div className="flex justify-between items-center w-full mt-4">
