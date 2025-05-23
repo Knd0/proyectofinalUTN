@@ -10,6 +10,7 @@ const Exchange: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [balances, setBalances] = useState<Record<string, number>>({
     ARS: 0,
     USD: 0,
@@ -18,31 +19,38 @@ const Exchange: React.FC = () => {
     ETH: 0,
     USDT: 0,
   });
-  const [username, setUsername] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
       try {
-        const res = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        const response = await fetch(
+          "https://proyectofinalutn-production.up.railway.app/auth/me",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la info del usuario");
+        }
+
+        const data = await response.json();
+        setUserInfo(data.user);
         setBalances(data.user.COD);
-        setUsername(data.user.nombre);
-      } catch (err) {
-        setMessage("Error al obtener datos del usuario");
+      } catch (error) {
+        console.error(error);
+        navigate("/login");
       }
     };
 
@@ -102,6 +110,8 @@ const Exchange: React.FC = () => {
     setLoading(false);
   };
 
+  if (!userInfo) return null; // o un <Loader />
+
   return (
     <div
       className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
@@ -113,20 +123,16 @@ const Exchange: React.FC = () => {
         Conversor de monedas
       </h2>
 
-      {username && (
-        <p className="text-center mb-4 font-medium text-white/80">
-          Usuario: <span className="font-bold">{username}</span>
-        </p>
-      )}
+      <p className="text-center mb-4 font-medium text-white/80">
+        Usuario: <span className="font-bold">{userInfo.nombre}</span>
+      </p>
 
       <form onSubmit={handleConvert} className="space-y-6">
         <div className="flex gap-4">
           <select
             value={fromCurrency}
             onChange={(e) => setFromCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold
-            focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-opacity-70
-            shadow-md transition duration-300"
+            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold"
           >
             {currencies.map((cur) => (
               <option key={cur} value={cur}>
@@ -138,9 +144,7 @@ const Exchange: React.FC = () => {
           <select
             value={toCurrency}
             onChange={(e) => setToCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold
-            focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-opacity-70
-            shadow-md transition duration-300"
+            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold"
           >
             {currencies.map((cur) => (
               <option key={cur} value={cur}>
@@ -158,9 +162,7 @@ const Exchange: React.FC = () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           required
-          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-          focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-opacity-70
-          shadow-md transition duration-300 placeholder:text-gray-400"
+          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold"
         />
 
         <button
@@ -177,13 +179,11 @@ const Exchange: React.FC = () => {
 
       {message && (
         <p
-          className={`mt-6 text-center text-lg font-bold drop-shadow-lg
-          ${
+          className={`mt-6 text-center text-lg font-bold drop-shadow-lg ${
             message.includes("✅")
-              ? "text-green-300 animate-fadeIn"
-              : "text-yellow-300 animate-fadeIn"
+              ? "text-green-300"
+              : "text-yellow-300"
           }`}
-          style={{ animationDuration: "1s" }}
         >
           {message}
         </p>

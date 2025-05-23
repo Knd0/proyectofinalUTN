@@ -6,7 +6,7 @@ import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBillTransfer, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faMoneyBillTransfer, faDownload, faExchangeAlt  } from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -97,6 +97,7 @@ const Home = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition ml-3"
               title="Ir a Exchange"
             >
+             <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
               Convertir 
             </button>
           </p>
