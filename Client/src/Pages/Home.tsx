@@ -113,14 +113,6 @@ const Home = () => {
                 </option>
               ))}
             </select>
-
-            <Link
-              to="/exchange"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center"
-            >
-              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
-              Exchange
-            </Link>
           </p>
 
           <div className="flex justify-between items-center w-full mt-4">
@@ -137,6 +129,13 @@ const Home = () => {
             >
               <FontAwesomeIcon icon={faMoneyBillTransfer}  className="mr-2" />
               Transferir Dinero
+            </Link>
+            <Link
+              to="/exchange"
+              className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
+            >
+              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+              Convertir
             </Link>
           </div>
         </div>
