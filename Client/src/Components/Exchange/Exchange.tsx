@@ -14,17 +14,17 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  const [balances, setBalances] = useState<Record<string, number>>({});
+  const [balances, setBalances] = useState<Record<string, number> | null>(null);
   const navigate = useNavigate();
 
-  console.log("Render Exchange - userInfo:", userInfo);
-  console.log("Render Exchange - balances:", balances);
-
   useEffect(() => {
-    console.log("useEffect userInfo.COD:", userInfo?.COD);
-    if (userInfo?.COD) {
+    console.log("userInfo recibido en Exchange:", userInfo);
+    if (userInfo?.COD && typeof userInfo.COD === "object") {
+      console.log("Estableciendo balances:", userInfo.COD);
       setBalances(userInfo.COD);
-      console.log("Balances seteados a:", userInfo.COD);
+    } else {
+      console.warn("userInfo.COD es inválido o no existe");
+      setBalances(null);
     }
   }, [userInfo]);
 
@@ -33,61 +33,54 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
     setMessage(null);
     setResult(null);
 
-    console.log("Handle convert: ", { fromCurrency, toCurrency, amount });
-
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setMessage("Ingrese un monto válido mayor a 0");
-      console.log("Monto inválido");
       return;
     }
+
     if (fromCurrency === toCurrency) {
       setMessage("Las monedas deben ser diferentes");
-      console.log("Monedas iguales");
       return;
     }
+
     if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
-      console.log("Saldo insuficiente:", balances, parsedAmount);
       return;
     }
 
     setLoading(true);
+
     try {
-      console.log("Enviando request de conversión...");
-      const res = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/exchange",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            fromCurrency,
-            toCurrency,
-            amount: parsedAmount,
-          }),
-        }
-      );
+      const res = await fetch("https://proyectofinalutn-production.up.railway.app/exchange", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          fromCurrency,
+          toCurrency,
+          amount: parsedAmount,
+        }),
+      });
 
       const data = await res.json();
-      console.log("Respuesta del servidor:", data);
+      console.log("Respuesta del backend:", data);
 
       if (!res.ok) {
         setMessage(data.message || "Error inesperado");
-        console.log("Error en response:", data.message);
       } else {
         setResult(data.convertedAmount);
         setBalances(data.balances);
         setMessage("✅ Conversión realizada con éxito");
         setAmount("");
-        console.log("Conversión exitosa, balances actualizados:", data.balances);
       }
     } catch (error) {
+      console.error("Error de red:", error);
       setMessage("Error al conectar con el servidor");
-      console.error("Error catch:", error);
     }
+
     setLoading(false);
   };
 
@@ -168,7 +161,7 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
         </div>
       )}
 
-      {balances && Object.entries(balances).length > 0 && (
+      {balances && typeof balances === "object" ? (
         <div className="mt-8">
           <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
           <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
@@ -179,6 +172,10 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
             ))}
           </ul>
         </div>
+      ) : (
+        <p className="text-center mt-4 text-red-300 font-semibold">
+          No se pudieron cargar los saldos.
+        </p>
       )}
 
       <button
