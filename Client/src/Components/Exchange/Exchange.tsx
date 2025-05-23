@@ -1,30 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-type ExchangeProps = {
-  userInfo?: any;
-};
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
+const Exchange: React.FC = () => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  const [balances, setBalances] = useState<Record<string, number>>(
-    userInfo?.COD || {
-      ARS: 0,
-      USD: 0,
-      EUR: 0,
-      BTC: 0,
-      ETH: 0,
-      USDT: 0,
-    }
-  );
+  const [balances, setBalances] = useState<Record<string, number>>({
+    ARS: 0,
+    USD: 0,
+    EUR: 0,
+    BTC: 0,
+    ETH: 0,
+    USDT: 0,
+  });
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const res = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        setBalances(data.user.COD);
+        setUsername(data.user.nombre);
+      } catch (err) {
+        setMessage("Error al obtener datos del usuario");
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   const handleConvert = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +105,7 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   return (
     <div
       className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-      bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-600
+      bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-600
       animate-gradient-x text-white font-sans"
       style={{ backgroundSize: "200% 200%" }}
     >
@@ -90,9 +113,9 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
         Conversor de monedas
       </h2>
 
-      {userInfo?.nombre && (
+      {username && (
         <p className="text-center mb-4 font-medium text-white/80">
-          Usuario: <span className="font-bold">{userInfo.nombre}</span>
+          Usuario: <span className="font-bold">{username}</span>
         </p>
       )}
 
