@@ -119,16 +119,16 @@ const Home = () => {
               <div className="flex justify-between items-center ">
           <Link
             to="/loadbalance"
-            className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
+            className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition  flex items-center"
           >
-            <FontAwesomeIcon icon={faDownload} />
+            <FontAwesomeIcon icon={faDownload}  className="mr-2" />
             Ingresar Dinero
           </Link>
           <Link
           to="/transaction"
-          className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5"
+          className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5  flex items-center"
         >
-          <FontAwesomeIcon icon={faMoneyBillTransfer} />
+          <FontAwesomeIcon icon={faMoneyBillTransfer}  className="mr-2" />
           Transferir Dinero
         </Link>
         </div>
