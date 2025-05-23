@@ -6,6 +6,9 @@ import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMoneyBillTransfer } from '@fortawesome/free-solid-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -118,13 +121,13 @@ const Home = () => {
             to="/loadbalance"
             className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
-            Cargar Balance
+            <FontAwesomeIcon icon={faDownload} />
           </Link>
           <Link
           to="/transaction"
           className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5"
         >
-          Enviar Dinero
+          <FontAwesomeIcon icon={faMoneyBillTransfer} />
         </Link>
         </div>
         </div>

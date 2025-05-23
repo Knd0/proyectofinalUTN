@@ -69,32 +69,36 @@ const TransactionHistory: React.FC = () => {
 
   return (
     <li
-      key={tx.id}
-      className="border-b pb-4 flex justify-between items-center"
-    >
-      <div>
-        <p className="text-lg font-semibold text-gray-800">
-          {isReceived ? "Recibido de" : "Enviado a"}: {counterparty?.nombre || "Desconocido"}
-        </p>
-        <p className="text-sm text-gray-600">CVU: {counterparty?.cvu}</p>
-        <p className="text-sm text-gray-500">
-          Nº de operación: {generateOperationNumber(tx.id)}
-        </p>
-        <p className="text-sm text-gray-500">
-          Fecha: {new Date(tx.date).toLocaleString()}
-        </p>
-      </div>
-      <div className="text-right">
-        <p
-          className={`text-xl font-bold ${
-            isReceived ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {isReceived ? "+" : "-"}
-          {tx.amount} {tx.currency}
-        </p>
-      </div>
-    </li>
+  key={tx.id}
+  className="flex justify-between items-center gap-4 p-4 mb-4 rounded-xl shadow-sm
+    border-l-4 border-blue-500 bg-white hover:bg-blue-50 transition-all duration-200"
+>
+  <div>
+    <p className="text-lg font-semibold text-gray-900">
+      {isReceived ? "Recibido de" : "Enviado a"}:{" "}
+      <span className="font-bold">{counterparty?.nombre || "Desconocido"}</span>
+    </p>
+    <p className="text-sm text-gray-500">CVU: {counterparty?.cvu}</p>
+    <p className="text-sm text-gray-400">
+      Nº de operación:{" "}
+      <span className="font-medium text-gray-600">{generateOperationNumber(tx.id)}</span>
+    </p>
+    <p className="text-sm text-gray-400">
+      Fecha:{" "}
+      <span className="text-gray-600">
+        {new Date(tx.date).toLocaleString()}
+      </span>
+    </p>
+  </div>
+
+  <div className="text-right">
+    <p className="text-2xl font-extrabold tracking-tight text-blue-600">
+      {isReceived ? "+" : "-"}
+      {tx.amount} {tx.currency}
+    </p>
+  </div>
+</li>
+
   );
 })}
 
