@@ -7,8 +7,7 @@ import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBillTransfer } from '@fortawesome/free-solid-svg-icons';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faMoneyBillTransfer, faDownload, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -62,9 +61,7 @@ const Home = () => {
         }
 
         const data = await response.json();
-        console.log(data)
-        console.log(data.user)
-        console.log(data.user.balance)
+        console.log(data);
         setUserInfo(data.user);
         setBalance(data.user.balance);
         setLoading(false);
@@ -80,7 +77,6 @@ const Home = () => {
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCurrency(e.target.value);
   };
-
 
   const currencyOptions = Object.keys(balance);
 
@@ -102,12 +98,14 @@ const Home = () => {
 
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2 flex flex-col items-center mb-8">
           <h3 className="text-3xl font-semibold mb-4">Balance Actual</h3>
-          <p className="text-lg mb-4">
-            <span className="text-4xl font-extrabold text-green-600">$ {balance[selectedCurrency]}</span>{" "}
+          <p className="text-lg mb-4 flex items-center justify-center gap-4">
+            <span className="text-4xl font-extrabold text-green-600">
+              $ {balance[selectedCurrency]}
+            </span>
             <select
               value={selectedCurrency}
               onChange={handleCurrencyChange}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg mb-4 m-5"
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg"
             >
               {currencyOptions.map((currency) => (
                 <option key={currency} value={currency}>
@@ -115,23 +113,33 @@ const Home = () => {
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={() => navigate("/exchange")}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center"
+              title="Ir a Exchange"
+            >
+              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+              Exchange
+            </button>
           </p>
-              <div className="flex justify-between items-center ">
-          <Link
-            to="/loadbalance"
-            className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition  flex items-center"
-          >
-            <FontAwesomeIcon icon={faDownload}  className="mr-2" />
-            Ingresar Dinero
-          </Link>
-          <Link
-          to="/transaction"
-          className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5  flex items-center"
-        >
-          <FontAwesomeIcon icon={faMoneyBillTransfer}  className="mr-2" />
-          Transferir Dinero
-        </Link>
-        </div>
+
+          <div className="flex justify-between items-center w-full mt-4">
+            <Link
+              to="/loadbalance"
+              className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
+            >
+              <FontAwesomeIcon icon={faDownload}  className="mr-2" />
+              Ingresar Dinero
+            </Link>
+            <Link
+              to="/transaction"
+              className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5 flex items-center"
+            >
+              <FontAwesomeIcon icon={faMoneyBillTransfer}  className="mr-2" />
+              Transferir Dinero
+            </Link>
+          </div>
         </div>
 
         {error && <p className="text-red-500">{error}</p>}
