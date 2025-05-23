@@ -12,6 +12,7 @@ import Success from './Components/LoadBalance/Success';
 import Fail from './Components/LoadBalance/Fail';
 import Transaction from "./Components/Transaction/Transaction";
 import FakeCheckout from './Components/LoadBalance/FakeCheckout';
+import Exchange from './Components/Exchange/Exchange';
 
 
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         <Route path="/fail" element={<Fail />} />
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/fake-checkout" element={<FakeCheckout />} />
+        <Route path="/exchange" element={<Exchange />} />
       </Route>
     </Routes>
   );
