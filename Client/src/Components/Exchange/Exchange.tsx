@@ -20,6 +20,7 @@ const Exchange: React.FC = () => {
     USDT: 0,
   });
 
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,11 +28,12 @@ const Exchange: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
+          setError("Token no encontrado");
           navigate("/login");
           return;
         }
 
-        const response = await fetch(
+        const res = await fetch(
           "https://proyectofinalutn-production.up.railway.app/auth/me",
           {
             method: "GET",
@@ -41,16 +43,18 @@ const Exchange: React.FC = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error("No se pudo obtener la info del usuario");
+        if (!res.ok) {
+          throw new Error("Error al obtener los datos del usuario");
         }
 
-        const data = await response.json();
+        const data = await res.json();
         setUserInfo(data.user);
         setBalances(data.user.COD);
-      } catch (error) {
-        console.error(error);
-        navigate("/login");
+      } catch (err: any) {
+        setError("Error al cargar el usuario. Redirigiendo...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     };
 
@@ -84,7 +88,7 @@ const Exchange: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({
             fromCurrency,
@@ -110,18 +114,25 @@ const Exchange: React.FC = () => {
     setLoading(false);
   };
 
-  if (!userInfo) return null; // o un <Loader />
+  if (error) {
+    return (
+      <div className="p-8 text-center text-red-500 font-bold">
+        {error}
+      </div>
+    );
+  }
+
+  if (!userInfo) {
+    return (
+      <div className="p-8 text-center text-white font-semibold animate-pulse">
+        Cargando datos del usuario...
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-      bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-600
-      animate-gradient-x text-white font-sans"
-      style={{ backgroundSize: "200% 200%" }}
-    >
-      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-        Conversor de monedas
-      </h2>
+    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-600 text-white font-sans">
+      <h2 className="text-4xl font-extrabold mb-8 text-center">Conversor de monedas</h2>
 
       <p className="text-center mb-4 font-medium text-white/80">
         Usuario: <span className="font-bold">{userInfo.nombre}</span>
@@ -168,10 +179,7 @@ const Exchange: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-4 rounded-xl font-extrabold
-          text-indigo-600 bg-white hover:bg-indigo-50 transition duration-300
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${loading ? "animate-pulse" : ""}`}
+          className="w-full py-4 rounded-xl font-extrabold bg-white text-indigo-600 hover:bg-indigo-100"
         >
           {loading ? "Convirtiendo..." : "Convertir"}
         </button>
@@ -179,10 +187,8 @@ const Exchange: React.FC = () => {
 
       {message && (
         <p
-          className={`mt-6 text-center text-lg font-bold drop-shadow-lg ${
-            message.includes("✅")
-              ? "text-green-300"
-              : "text-yellow-300"
+          className={`mt-6 text-center text-lg font-bold ${
+            message.includes("✅") ? "text-green-300" : "text-yellow-300"
           }`}
         >
           {message}
@@ -199,7 +205,7 @@ const Exchange: React.FC = () => {
         <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
         <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
           {Object.entries(balances).map(([cur, bal]) => (
-            <li key={cur} className="bg-white/10 rounded-xl py-2">
+            <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
               {cur}: {bal.toFixed(4)}
             </li>
           ))}
@@ -208,8 +214,7 @@ const Exchange: React.FC = () => {
 
       <button
         onClick={() => navigate("/home")}
-        className="mt-10 w-full py-4 rounded-xl font-extrabold
-        bg-white text-indigo-600 hover:bg-indigo-50 transition duration-300"
+        className="mt-10 w-full py-4 rounded-xl font-extrabold bg-white text-indigo-600 hover:bg-indigo-100"
       >
         Volver al Inicio
       </button>
