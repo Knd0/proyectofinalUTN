@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
+import { Transaction } from "./Transaction";
 
 
 export class Usuario extends Model {
@@ -8,13 +9,13 @@ export class Usuario extends Model {
   public email!: string;
   public password!: string;
   public cvu!: string;
-  public imagen!: string;  // Nuevo campo imagen
-  public descripcion!: string;  // Nuevo campo descripcion
-  public nacionalidad!: string;  // Nuevo campo nacionalidad
-  public dni!: string;  // Nuevo campo dni
+  public imagen!: string; // Nuevo campo imagen
+  public descripcion!: string; // Nuevo campo descripcion
+  public nacionalidad!: string; // Nuevo campo nacionalidad
+  public dni!: string; // Nuevo campo dni
   public COD!: {
-  [key: string]: number;  // Esto permite el acceso a las propiedades mediante una cadena.
-};
+    [key: string]: number; // Esto permite el acceso a las propiedades mediante una cadena.
+  };
   public admin!: boolean;
 }
 
@@ -26,7 +27,7 @@ Usuario.init(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false, 
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
@@ -54,17 +55,18 @@ Usuario.init(
       allowNull: true,
     },
     COD: {
-      type: DataTypes.JSON,  // Campo COD con balances de monedas
+      type: DataTypes.JSON,
       allowNull: false,
       defaultValue: {
-        ARS: 0,
-        USD: 0,
-        EUR: 0,
-        BTC: 0,
-        ETH: 0,
-        USDT: 0,
+        ars: 0,
+        usd: 0,
+        eur: 0,
+        btc: 0,
+        eth: 0,
+        usdt: 0,
       },
     },
+
     admin: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -78,7 +80,6 @@ Usuario.init(
     timestamps: false,
   }
 );
-import { Transaction } from "./Transaction";
   
 Usuario.hasMany(Transaction, {
   foreignKey: "from_user_id",

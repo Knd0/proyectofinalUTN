@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import Navbar from "../Navbar/Navbar";
 import "react-toastify/dist/ReactToastify.css";
+
 
 const LoadBalance = () => {
   const [amount, setAmount] = useState<number>(0);
@@ -16,7 +18,7 @@ const LoadBalance = () => {
     setCurrency(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (amount <= 0) {
@@ -24,43 +26,26 @@ const LoadBalance = () => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      console.log("Token:", token);
 
-      const response = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/auth/create-preference",
-        {
-          method: "POST", // Debe ser POST
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ amount, currency }), // Convertir a JSON string
-        }
-      );
+    // Guardar datos en localStorage para simular el pago
+    localStorage.setItem("fake_amount", amount.toString());
+    localStorage.setItem("fake_currency", currency);
 
-      if (!response.ok) throw new Error("Error en la respuesta del servidor");
+    toast.info("Redirigiendo a la simulación de pago...");
+    setTimeout(() => {
+      window.location.href = "/fake-checkout";
+    }, 1000);
 
-      const data = await response.json();
-      toast.success("Redirigiendo a Mercado Pago...");
-      window.location.href = data.init_point;
-    } catch (err) {
-      console.error(err);
-      toast.error("Error al generar el pago");
-    }
   };
+
   return (
-    <div className="max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 mt-8">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-        Cargar saldo
-      </h2>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
-      )}
+    <div>
+      <Navbar/>
+      <h2 className="text-xl font-bold mb-4">Cargar saldo</h2>
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+      <form onSubmit={handleSubmit}>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="number"
           step="0.01"
@@ -79,6 +64,9 @@ const LoadBalance = () => {
           <option value="ARS">ARS</option>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
+          <option value="USDT">USDT</option>
+          <option value="BTC">BTC</option>
+          <option value="ETH">ETH</option>
         </select>
 
         <button
