@@ -1,65 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+type ExchangeProps = {
+  userInfo?: any;
+};
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-const Exchange: React.FC = () => {
+const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [balances, setBalances] = useState<Record<string, number>>({
-    ARS: 0,
-    USD: 0,
-    EUR: 0,
-    BTC: 0,
-    ETH: 0,
-    USDT: 0,
-  });
-
-  const [error, setError] = useState<string | null>(null);
+  const [balances, setBalances] = useState<Record<string, number> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Token no encontrado");
-          navigate("/login");
-          return;
-        }
-
-        const res = await fetch(
-          "https://proyectofinalutn-production.up.railway.app/auth/me",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Error al obtener los datos del usuario");
-        }
-
-        const data = await res.json();
-        setUserInfo(data.user);
-        setBalances(data.user.COD);
-      } catch (err: any) {
-        setError("Error al cargar el usuario. Redirigiendo...");
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
+    if (userInfo?.COD) {
+      setBalances(userInfo.COD);
+    }
+  }, [userInfo]);
 
   const handleConvert = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,28 +37,25 @@ const Exchange: React.FC = () => {
       setMessage("Las monedas deben ser diferentes");
       return;
     }
-    if (parsedAmount > (balances[fromCurrency] || 0)) {
+    if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/exchange",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            fromCurrency,
-            toCurrency,
-            amount: parsedAmount,
-          }),
-        }
-      );
+      const res = await fetch("https://proyectofinalutn-production.up.railway.app/exchange", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          fromCurrency,
+          toCurrency,
+          amount: parsedAmount,
+        }),
+      });
 
       const data = await res.json();
 
@@ -114,36 +73,22 @@ const Exchange: React.FC = () => {
     setLoading(false);
   };
 
-  if (error) {
-    return (
-      <div className="p-8 text-center text-red-500 font-bold">
-        {error}
-      </div>
-    );
-  }
-
-  if (!userInfo) {
-    return (
-      <div className="p-8 text-center text-white font-semibold animate-pulse">
-        Cargando datos del usuario...
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-600 text-white font-sans">
-      <h2 className="text-4xl font-extrabold mb-8 text-center">Conversor de monedas</h2>
+    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-blue-800 text-white font-sans">
+      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">Conversor de monedas</h2>
 
-      <p className="text-center mb-4 font-medium text-white/80">
-        Usuario: <span className="font-bold">{userInfo.nombre}</span>
-      </p>
+      {userInfo?.nombre && (
+        <p className="text-center mb-4 font-medium text-white/80">
+          Usuario: <span className="font-bold">{userInfo.nombre}</span>
+        </p>
+      )}
 
       <form onSubmit={handleConvert} className="space-y-6">
         <div className="flex gap-4">
           <select
             value={fromCurrency}
             onChange={(e) => setFromCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold"
+            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
           >
             {currencies.map((cur) => (
               <option key={cur} value={cur}>
@@ -155,7 +100,7 @@ const Exchange: React.FC = () => {
           <select
             value={toCurrency}
             onChange={(e) => setToCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold"
+            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
           >
             {currencies.map((cur) => (
               <option key={cur} value={cur}>
@@ -173,13 +118,15 @@ const Exchange: React.FC = () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           required
-          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold"
+          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md placeholder:text-gray-400"
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 rounded-xl font-extrabold bg-white text-indigo-600 hover:bg-indigo-100"
+          className={`w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300 ${
+            loading ? "animate-pulse" : ""
+          }`}
         >
           {loading ? "Convirtiendo..." : "Convertir"}
         </button>
@@ -187,7 +134,7 @@ const Exchange: React.FC = () => {
 
       {message && (
         <p
-          className={`mt-6 text-center text-lg font-bold ${
+          className={`mt-6 text-center text-lg font-bold drop-shadow-lg ${
             message.includes("✅") ? "text-green-300" : "text-yellow-300"
           }`}
         >
@@ -201,20 +148,22 @@ const Exchange: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-8">
-        <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
-        <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
-          {Object.entries(balances).map(([cur, bal]) => (
-            <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
-              {cur}: {bal.toFixed(4)}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {balances && (
+        <div className="mt-8">
+          <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
+          <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
+            {Object.entries(balances).map(([cur, bal]) => (
+              <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
+                {cur}: {bal.toFixed(4)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <button
         onClick={() => navigate("/home")}
-        className="mt-10 w-full py-4 rounded-xl font-extrabold bg-white text-indigo-600 hover:bg-indigo-100"
+        className="mt-10 w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300"
       >
         Volver al Inicio
       </button>
