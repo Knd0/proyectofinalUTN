@@ -17,15 +17,14 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
   const [balances, setBalances] = useState<Record<string, number> | null>(null);
   const navigate = useNavigate();
 
-  console.log("✅ Componente Exchange montado");
-  console.log("👤 userInfo recibido:", userInfo);
-
   useEffect(() => {
-    if (userInfo?.COD) {
-      console.log("💰 Seteando balances desde userInfo.COD:", userInfo.COD);
+    console.log("userInfo recibido en Exchange:", userInfo);
+    if (userInfo?.COD && typeof userInfo.COD === "object") {
+      console.log("Estableciendo balances:", userInfo.COD);
       setBalances(userInfo.COD);
     } else {
-      console.log("⚠️ No se encontraron balances en userInfo.COD");
+      console.warn("userInfo.COD es inválido o no existe");
+      setBalances(null);
     }
   }, [userInfo]);
 
@@ -34,26 +33,24 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
     setMessage(null);
     setResult(null);
 
-    console.log("🔄 Intentando convertir:", amount, fromCurrency, "→", toCurrency);
-
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setMessage("Ingrese un monto válido mayor a 0");
-      console.log("❌ Monto inválido");
       return;
     }
+
     if (fromCurrency === toCurrency) {
       setMessage("Las monedas deben ser diferentes");
-      console.log("❌ Monedas iguales");
       return;
     }
+
     if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
-      console.log("❌ Saldo insuficiente o balances no cargados");
       return;
     }
 
     setLoading(true);
+
     try {
       const res = await fetch("https://proyectofinalutn-production.up.railway.app/exchange", {
         method: "POST",
@@ -69,28 +66,29 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
       });
 
       const data = await res.json();
-      console.log("🌐 Respuesta de la API:", data);
+      console.log("Respuesta del backend:", data);
 
       if (!res.ok) {
         setMessage(data.message || "Error inesperado");
-        console.log("❌ Error de API:", data.message);
       } else {
         setResult(data.convertedAmount);
         setBalances(data.balances);
         setMessage("✅ Conversión realizada con éxito");
         setAmount("");
-        console.log("✅ Conversión OK. Nuevo saldo:", data.balances);
       }
     } catch (error) {
-      console.log("❌ Error de conexión:", error);
+      console.error("Error de red:", error);
       setMessage("Error al conectar con el servidor");
     }
+
     setLoading(false);
   };
 
   return (
     <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-blue-800 text-white font-sans">
-      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">Conversor de monedas</h2>
+      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
+        Conversor de monedas
+      </h2>
 
       {userInfo?.nombre && (
         <p className="text-center mb-4 font-medium text-white/80">
@@ -163,7 +161,7 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
         </div>
       )}
 
-      {balances && (
+      {balances && typeof balances === "object" ? (
         <div className="mt-8">
           <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
           <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
@@ -174,6 +172,10 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
             ))}
           </ul>
         </div>
+      ) : (
+        <p className="text-center mt-4 text-red-300 font-semibold">
+          No se pudieron cargar los saldos.
+        </p>
       )}
 
       <button
