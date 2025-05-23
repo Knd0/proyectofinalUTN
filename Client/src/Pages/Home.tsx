@@ -92,14 +92,13 @@ const Home = () => {
               ))}
             </select>
             {/* Botón Exchange junto al dropdown */}
-            <button
-              onClick={() => navigate("/exchange", { state: { userInfo } })}
+            <Link
+              to="/exchange"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition ml-3"
-              title="Ir a Exchange"
             >
              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
-              Convertir 
-            </button>
+              Convertir.
+            </Link>
           </p>
 
           <div className="flex justify-between items-center w-full mt-6">
