@@ -2,6 +2,11 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import conexion from "../Images/conexion.jpg"
+import finanzas from "../Images/finanzas-digitales.jpg"
+import graficos from "../Images/graficos-financieros.jpg"
+import historial from "../Images/historial-financiero.jpg"
+import transacciones from "../Images/transacciones.jpg"
 
 const Landing: React.FC = () => {
   useEffect(() => {
@@ -38,7 +43,7 @@ const Landing: React.FC = () => {
         </div>
         <div className="md:w-1/2 mt-10 md:mt-0" data-aos="fade-left">
           <img
-            src="/images/finanzas-digitales.jpg"
+            src={finanzas}
             alt="Finanzas Digitales"
             className="rounded-lg shadow-lg"
           />
@@ -54,7 +59,7 @@ const Landing: React.FC = () => {
               Cargá saldo en pesos, dólares, euros y criptomonedas como Bitcoin o Ethereum. Todo en una sola cuenta.
             </p>
             <img
-              src="/images/transacciones.jpg"
+              src={transacciones}
               alt="Transacciones"
               className="mt-4 rounded-lg shadow-md"
             />
@@ -65,7 +70,7 @@ const Landing: React.FC = () => {
               Convertí entre monedas al instante usando los valores de mercado actualizados minuto a minuto.
             </p>
             <img
-              src="/images/graficos-financieros.jpg"
+              src={graficos}
               alt="Gráficos Financieros"
               className="mt-4 rounded-lg shadow-md"
             />
@@ -76,7 +81,7 @@ const Landing: React.FC = () => {
               Enviá y recibí dinero con otros usuarios de forma rápida y segura, sin intermediarios.
             </p>
             <img
-              src="/images/conexion.jpg"
+              src={conexion}
               alt="Conexión"
               className="mt-4 rounded-lg shadow-md"
             />
@@ -87,7 +92,7 @@ const Landing: React.FC = () => {
       <section className="max-w-6xl mx-auto px-6 py-20 fade-in grid md:grid-cols-2 gap-10 items-center" data-aos="fade-up">
         <div>
           <img
-            src="/images/historial-financiero.jpg"
+            src={historial}
             alt="Historial Financiero"
             className="rounded-lg shadow-lg"
           />

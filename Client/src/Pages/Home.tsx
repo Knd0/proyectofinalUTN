@@ -7,7 +7,6 @@ import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 
-
 const Home = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [balance, setBalance] = useState<any>({
