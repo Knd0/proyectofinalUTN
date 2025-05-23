@@ -8,6 +8,7 @@ import { sequelize } from './db';
 import { Usuario } from './models/Usuario';
 import  jwt  from 'jsonwebtoken';
 import transactionRoutes from './Routes/transactionRoutes';
+import exchangeRoutes from './Routes/exchangeRoutes';
 
 
 
@@ -31,6 +32,7 @@ app.use(bodyParser.json());
 // Rutas de autenticación
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
+app.use('/exchange', exchangeRoutes);
 
 // Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
