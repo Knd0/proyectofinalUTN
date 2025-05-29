@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Usuario } from "../models/Usuario";
 import jwt from "jsonwebtoken";
 
-// 🎯 Cambio de moneda dentro del mismo usuario
+// 🪙 Cambiar saldo entre monedas del mismo usuario
 export const exchangeCurrency = async (req: Request, res: Response): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -13,9 +13,9 @@ export const exchangeCurrency = async (req: Request, res: Response): Promise<voi
 
   let userId: number;
   try {
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "secret");
     userId = decoded.id;
-  } catch (error) {
+  } catch {
     res.status(401).json({ error: "Token inválido" });
     return;
   }
@@ -27,7 +27,7 @@ export const exchangeCurrency = async (req: Request, res: Response): Promise<voi
     typeof toCurrency !== "string" ||
     typeof amount !== "number"
   ) {
-    res.status(400).json({ error: "Parámetros inválidos" });
+    res.status(400).json({ error: "Datos inválidos" });
     return;
   }
 
@@ -48,35 +48,35 @@ export const exchangeCurrency = async (req: Request, res: Response): Promise<voi
   }
 
   try {
-    const user = await Usuario.findOne({ where: { id: userId } });
-
+    const user = await Usuario.findByPk(userId);
     if (!user) {
       res.status(404).json({ error: "Usuario no encontrado" });
       return;
     }
 
-    const saldoOrigen = user.COD[fromCurrency] ?? 0;
-    const saldoDestino = user.COD[toCurrency] ?? 0;
+    const cod = user.COD || {};
+
+    const saldoOrigen = cod[fromCurrency] ?? 0;
+    const saldoDestino = cod[toCurrency] ?? 0;
 
     if (saldoOrigen < amount) {
-      res.status(400).json({ error: "Saldo insuficiente en " + fromCurrency });
+      res.status(400).json({ error: `Saldo insuficiente en ${fromCurrency}` });
       return;
     }
 
-    const updatedCOD = {
-      ...user.COD,
-      [fromCurrency]: saldoOrigen - amount,
-      [toCurrency]: saldoDestino + amount,
-    };
+    // Restamos y sumamos los saldos
+    cod[fromCurrency] = parseFloat((saldoOrigen - amount).toFixed(6));
+    cod[toCurrency] = parseFloat((saldoDestino + amount).toFixed(6));
 
-    await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
+    // Actualizamos el usuario
+    await Usuario.update({ COD: cod }, { where: { id: userId } });
 
     res.status(200).json({
-      message: "Cambio realizado con éxito",
-      nuevoSaldo: updatedCOD,
+      message: "Conversión realizada con éxito",
+      nuevoSaldo: cod,
     });
   } catch (error) {
-    console.error("🔥 Error en exchangeCurrency:", error);
+    console.error("Error en exchangeCurrency:", error);
     res.status(500).json({ error: "Error del servidor" });
   }
 };

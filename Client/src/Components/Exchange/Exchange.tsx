@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-interface Props {
-  balances?: { [key: string]: number };
-  onBalanceUpdate?: () => void;
-}
-
-const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }) => {
+const Exchange: React.FC = () => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState<number>(0);
@@ -17,7 +12,27 @@ const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }
   const [convertedValue, setConvertedValue] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [balances, setBalances] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
+
+  const fetchBalances = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get("https://proyectofinalutn-production.up.railway.app/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setBalances(res.data.usuario.COD || {});
+    } catch (err) {
+      console.error("Error al obtener balances:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalances();
+  }, []);
 
   useEffect(() => {
     const fetchExchangeRate = async () => {
@@ -27,7 +42,7 @@ const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }
       }
 
       try {
-        const res = await axios.get(`https://api.currencyapi.com/v3/latest`, {
+        const res = await axios.get("https://api.currencyapi.com/v3/latest", {
           params: {
             apikey: "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX",
             base_currency: fromCurrency,
@@ -53,35 +68,33 @@ const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }
   }, [amount, exchangeRate]);
 
   const handleSwap = async () => {
+    const token = localStorage.getItem("token");
+
     if (fromCurrency === toCurrency) return alert("Las monedas deben ser diferentes");
     if (amount <= 0) return alert("La cantidad debe ser mayor que cero");
-    if ((balances[fromCurrency] || 0) < amount) return alert(`Saldo insuficiente en ${fromCurrency}`);
+
+    if ((balances[fromCurrency] || 0) < amount) {
+      return alert(`Saldo insuficiente en ${fromCurrency}`);
+    }
 
     setLoading(true);
     setMessage("");
 
-    const token = localStorage.getItem("token");
-
     try {
-      const res = await axios.post(`https://proyectofinalutn-production.up.railway.app/convert`, {
-        fromCurrency,
-        toCurrency,
-        amount,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.post(
+        "https://proyectofinalutn-production.up.railway.app/convert",
+        { fromCurrency, toCurrency, amount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setMessage(`✅ Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}. Redirigiendo...`);
       setAmount(0);
       setConvertedValue(null);
-      onBalanceUpdate();
+      await fetchBalances(); // Refrescar balances
 
       setTimeout(() => {
-        navigate('/home');
+        navigate("/home");
       }, 3000);
-
     } catch (err: any) {
       console.error(err);
       setMessage(err.response?.data?.message || "Error al realizar la conversión");
@@ -109,7 +122,7 @@ const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }
             shadow-md transition duration-300 placeholder:text-gray-400"
           value={amount}
           onChange={(e) => setAmount(parseFloat(e.target.value))}
-          placeholder="Cantidad"
+          placeholder={`Cantidad disponible: ${balances[fromCurrency] ?? 0}`}
           min="0"
           disabled={loading}
         />
