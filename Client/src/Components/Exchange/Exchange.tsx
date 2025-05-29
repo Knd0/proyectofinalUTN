@@ -28,6 +28,8 @@ const Exchange: React.FC = () => {
       });
       console.log("Datos recibidos:", res.data);
       setBalances(res.data?.user.balance?.COD || {});
+      console.log(balances);
+      
     } catch (err) {
       console.error("Error al obtener balances:", err);
     }
