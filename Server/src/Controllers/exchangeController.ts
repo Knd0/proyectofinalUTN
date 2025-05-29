@@ -8,7 +8,7 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
 
   console.log("🔁 Datos recibidos:", { fromCurrency, toCurrency, amount });
 
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1]; 
   console.log("🔑 Token recibido:", token ? "Sí" : "No");
 
   if (
@@ -76,13 +76,13 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
       return res.status(500).json({ error: "No se pudo obtener la tasa de cambio" });
     }
 
-    const converted = parseFloat((amount * rate).toFixed(6));
+    const converted = parseFloat((amount * rate).toFixed(2));
 
     // Calcular nuevo balance
     const updatedCOD = {
       ...currentCOD,
-      [fromCurrency]: parseFloat((saldoOrigen - amount).toFixed(6)),
-      [toCurrency]: parseFloat((saldoDestino + converted).toFixed(6)),
+      [fromCurrency]: parseFloat((saldoOrigen - amount).toFixed(2)),
+      [toCurrency]: parseFloat((saldoDestino + converted).toFixed(2)),
     };
 
     console.log("🧮 Nuevo balance tras conversión:", updatedCOD);
