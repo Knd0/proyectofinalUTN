@@ -78,7 +78,7 @@ const Home = () => {
           <h3 className="text-3xl font-semibold mb-4">Balance Actual</h3>
           <p className="text-lg mb-4">
             <span className="text-4xl font-extrabold text-green-600">
-              $ {balance[selectedCurrency]?.toFixed(4) ?? "0.00"}
+              $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
             </span>{" "}
             <select
               value={selectedCurrency}
