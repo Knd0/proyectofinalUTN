@@ -18,7 +18,7 @@ const Exchange: React.FC = () => {
   const fetchBalances = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("https://proyectofinalutn-production.up.railway.app/user", {
+      const res = await axios.get("https://proyectofinalutn-production.up.railway.app/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
