@@ -4,8 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
+
 const Exchange: React.FC = () => {
+
   const [fromCurrency, setFromCurrency] = useState("ARS");
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState<number>(0);
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
@@ -24,7 +27,9 @@ const Exchange: React.FC = () => {
         },
       });
       console.log("Datos recibidos:", res.data);
-      setBalances(res.data?.usuario?.COD || {});
+      setBalances(res.data?.user.balance?.COD || {});
+      console.log(balances);
+      
     } catch (err) {
       console.error("Error al obtener balances:", err);
     }
