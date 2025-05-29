@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-
 const Exchange: React.FC = () => {
-
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [userInfo, setUserInfo] = useState<any>(null);
   const [toCurrency, setToCurrency] = useState("USD");
@@ -27,9 +25,7 @@ const Exchange: React.FC = () => {
         },
       });
       console.log("Datos recibidos:", res.data);
-      setBalances(res.data?.user.balance?.COD || {});
-      console.log(balances);
-      
+      setBalances(res.data?.user.balance || {});
     } catch (err) {
       console.error("Error al obtener balances:", err);
     }
@@ -95,7 +91,7 @@ const Exchange: React.FC = () => {
       setMessage(`✅ Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}. Redirigiendo...`);
       setAmount(0);
       setConvertedValue(null);
-      await fetchBalances(); // Refrescar balances
+      await fetchBalances();
 
       setTimeout(() => {
         navigate("/home");
@@ -109,99 +105,101 @@ const Exchange: React.FC = () => {
   };
 
   return (
-      <div
-        className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-          bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
-          animate-gradient-x text-white font-sans"
-        style={{ backgroundSize: "200% 200%" }}
-      >
-        <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-          Convertir Saldo
-        </h2>
+    <div
+      className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
+        bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
+        animate-gradient-x text-white font-sans"
+      style={{ backgroundSize: "200% 200%" }}
+    >
+      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
+        Convertir Saldo
+      </h2>
 
-        <div className="space-y-6">
-          <input
-            type="number"
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+      <div className="space-y-6">
+        <input
+          type="number"
+          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+            focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+            shadow-md transition duration-300 placeholder:text-gray-400"
+          value={amount}
+          onChange={(e) => setAmount(parseFloat(e.target.value))}
+          placeholder={`Cantidad disponible: ${balances[fromCurrency] ?? 0}`}
+          min="0"
+          disabled={loading}
+        />
+
+        <div className="flex gap-4">
+          <select
+            value={fromCurrency}
+            onChange={(e) => setFromCurrency(e.target.value)}
+            className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
               focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-              shadow-md transition duration-300 placeholder:text-gray-400"
-            value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value))}
-            placeholder={`Cantidad disponible: ${balances[fromCurrency] ?? 0}`}
-            min="0"
+              shadow-md transition duration-300"
             disabled={loading}
-          />
+          >
+            {currencies.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
 
-          <div className="flex gap-4">
-            <select
-              value={fromCurrency}
-              onChange={(e) => setFromCurrency(e.target.value)}
-              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
-                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-                shadow-md transition duration-300"
-              disabled={loading}
-            >
-              {currencies.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+          <select
+            value={toCurrency}
+            onChange={(e) => setToCurrency(e.target.value)}
+            className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
+              focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+              shadow-md transition duration-300"
+            disabled={loading}
+          >
+            {currencies.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
 
-            <select
-              value={toCurrency}
-              onChange={(e) => setToCurrency(e.target.value)}
-              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
-                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-                shadow-md transition duration-300"
-              disabled={loading}
-            >
-              {currencies.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+        {exchangeRate !== null && amount > 0 && (
+          <div className="text-white/80 text-center text-sm font-medium drop-shadow-md">
+            <p>Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong></p>
+            <p>Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong></p>
           </div>
+        )}
 
-          {exchangeRate !== null && amount > 0 && (
-            <div className="text-white/80 text-center text-sm font-medium drop-shadow-md">
-              <p>Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong></p>
-              <p>Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong></p>
-            </div>
-          )}
-
-          {/* BLOQUE AGREGADO PARA MOSTRAR EL BALANCE TOTAL */}
-          <div className="mb-4">
-            <h3 className="font-bold mb-2">Balances disponibles:</h3>
-            <ul className="text-sm text-white/80">
-              {currencies.map((c) => (
-                <li key={c}>
-                  {c}: {balances[c]?.toFixed(2) ?? "0.00"}
+        {/* LISTA DE BALANCES DEL USUARIO */}
+        {Object.keys(balances).length > 0 && (
+          <div className="mt-4 bg-white/10 p-4 rounded-xl shadow-inner">
+            <h3 className="font-bold mb-2 text-white">Balances disponibles:</h3>
+            <ul className="text-sm text-white/90 space-y-1">
+              {Object.entries(balances).map(([currency, value]) => (
+                <li key={currency}>
+                  {currency}: {Number(value).toFixed(2)}
                 </li>
               ))}
             </ul>
           </div>
+        )}
 
-          <button
-            onClick={handleSwap}
-            disabled={loading}
-            className={`w-full py-4 rounded-xl font-extrabold
-              text-blue-600 bg-white hover:bg-blue-50 transition duration-300
-              disabled:opacity-50 disabled:cursor-not-allowed
-              ${loading ? "animate-pulse" : ""}`}
+        <button
+          onClick={handleSwap}
+          disabled={loading}
+          className={`w-full py-4 rounded-xl font-extrabold
+            text-blue-600 bg-white hover:bg-blue-50 transition duration-300
+            disabled:opacity-50 disabled:cursor-not-allowed
+            ${loading ? "animate-pulse" : ""}`}
+        >
+          {loading ? "Procesando..." : "Convertir"}
+        </button>
+
+        {message && (
+          <p
+            className={`mt-6 text-center text-lg font-bold drop-shadow-lg
+              ${message.includes("✅") ? "text-green-300 animate-fadeIn" : "text-yellow-300 animate-fadeIn"}`}
+            style={{ animationDuration: "1s" }}
           >
-            {loading ? "Procesando..." : "Convertir"}
-          </button>
-
-          {message && (
-            <p
-              className={`mt-6 text-center text-lg font-bold drop-shadow-lg
-                ${message.includes("✅") ? "text-green-300 animate-fadeIn" : "text-yellow-300 animate-fadeIn"}`}
-              style={{ animationDuration: "1s" }}
-            >
-              {message}
-            </p>
-          )}
-        </div>
+            {message}
+          </p>
+        )}
       </div>
-);
+    </div>
+  );
 };
 
 export default Exchange;
