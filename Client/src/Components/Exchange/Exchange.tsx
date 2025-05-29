@@ -9,16 +9,14 @@ interface Props {
   onBalanceUpdate?: () => void;
 }
 
-const Exchange: React.FC<Props> = ({
-  balances = {},
-  onBalanceUpdate = () => {}
-}) => {
+const Exchange: React.FC<Props> = ({ balances = {}, onBalanceUpdate = () => {} }) => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState<number>(0);
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [convertedValue, setConvertedValue] = useState<number | null>(null);
-  const [redirecting, setRedirecting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,7 +55,10 @@ const Exchange: React.FC<Props> = ({
   const handleSwap = async () => {
     if (fromCurrency === toCurrency) return alert("Las monedas deben ser diferentes");
     if (amount <= 0) return alert("La cantidad debe ser mayor que cero");
-    if ((balances[fromCurrency] ?? 0) < amount) return alert(`Saldo insuficiente en ${fromCurrency}`);
+    if ((balances[fromCurrency] || 0) < amount) return alert(`Saldo insuficiente en ${fromCurrency}`);
+
+    setLoading(true);
+    setMessage("");
 
     const token = localStorage.getItem("token");
 
@@ -72,48 +73,69 @@ const Exchange: React.FC<Props> = ({
         },
       });
 
-      alert(`Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}`);
+      setMessage(`✅ Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}. Redirigiendo...`);
       setAmount(0);
       setConvertedValue(null);
       onBalanceUpdate();
 
-      setRedirecting(true);
       setTimeout(() => {
         navigate('/home');
       }, 3000);
+
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || "Error al realizar la conversión");
+      setMessage(err.response?.data?.message || "Error al realizar la conversión");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (redirecting) {
-    return (
-      <div className="p-4 bg-white shadow rounded-xl w-full max-w-md mx-auto text-center text-lg font-semibold">
-        Redirigiendo...
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4 bg-white shadow rounded-xl w-full max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Convertir Saldo</h2>
-      <div className="flex flex-col gap-3">
+    <div
+      className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
+        bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
+        animate-gradient-x text-white font-sans"
+      style={{ backgroundSize: "200% 200%" }}
+    >
+      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
+        Convertir Saldo
+      </h2>
+
+      <div className="space-y-6">
         <input
           type="number"
-          className="border p-2 rounded"
+          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+            focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+            shadow-md transition duration-300 placeholder:text-gray-400"
           value={amount}
           onChange={(e) => setAmount(parseFloat(e.target.value))}
           placeholder="Cantidad"
           min="0"
+          disabled={loading}
         />
-        <div className="flex gap-2">
-          <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)} className="border p-2 rounded w-1/2">
+
+        <div className="flex gap-4">
+          <select
+            value={fromCurrency}
+            onChange={(e) => setFromCurrency(e.target.value)}
+            className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
+              focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+              shadow-md transition duration-300"
+            disabled={loading}
+          >
             {currencies.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
-          <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)} className="border p-2 rounded w-1/2">
+
+          <select
+            value={toCurrency}
+            onChange={(e) => setToCurrency(e.target.value)}
+            className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
+              focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+              shadow-md transition duration-300"
+            disabled={loading}
+          >
             {currencies.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -121,18 +143,32 @@ const Exchange: React.FC<Props> = ({
         </div>
 
         {exchangeRate !== null && amount > 0 && (
-          <div className="text-sm text-gray-600">
-            Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong><br />
-            Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong>
+          <div className="text-white/80 text-center text-sm font-medium drop-shadow-md">
+            <p>Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong></p>
+            <p>Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong></p>
           </div>
         )}
 
         <button
           onClick={handleSwap}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          disabled={loading}
+          className={`w-full py-4 rounded-xl font-extrabold
+            text-blue-600 bg-white hover:bg-blue-50 transition duration-300
+            disabled:opacity-50 disabled:cursor-not-allowed
+            ${loading ? "animate-pulse" : ""}`}
         >
-          Convertir
+          {loading ? "Procesando..." : "Convertir"}
         </button>
+
+        {message && (
+          <p
+            className={`mt-6 text-center text-lg font-bold drop-shadow-lg
+              ${message.includes("✅") ? "text-green-300 animate-fadeIn" : "text-yellow-300 animate-fadeIn"}`}
+            style={{ animationDuration: "1s" }}
+          >
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
