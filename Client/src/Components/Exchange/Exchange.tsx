@@ -7,24 +7,53 @@ type ExchangeProps = {
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
+const Exchange: React.FC<ExchangeProps> = () => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [toCurrency, setToCurrency] = useState("USD");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<number | null>(null);
-  const [balances, setBalances] = useState<Record<string, number> | null>(null);
+  const [balance, setBalance] = useState<Record<string, number> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del usuario");
+        }
+
+        const data = await response.json();
+        setUserInfo(data.user);
+        setBalance(data.user.balance || data.user.COD || {}); // Por si el balance está en otro campo
+        setLoading(false);
+      } catch (err) {
+        
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
     console.log("userInfo recibido en Exchange:", userInfo);
     if (userInfo?.COD && typeof userInfo.COD === "object") {
       console.log("Estableciendo balances:", userInfo.COD);
-      setBalances(userInfo.COD);
+      setBalance(userInfo.COD);
     } else {
       console.warn("userInfo.COD es inválido o no existe");
-      setBalances(null);
+      setBalance(null);
     }
   }, [userInfo]);
 
@@ -44,7 +73,7 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
       return;
     }
 
-    if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
+    if (!balance || parsedAmount > (balance[fromCurrency] || 0)) {
       setMessage("Saldo insuficiente");
       return;
     }
@@ -72,7 +101,7 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
         setMessage(data.message || "Error inesperado");
       } else {
         setResult(data.convertedAmount);
-        setBalances(data.balances);
+        setBalance(data.balances);
         setMessage("✅ Conversión realizada con éxito");
         setAmount("");
       }
@@ -161,11 +190,11 @@ const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
         </div>
       )}
 
-      {balances && typeof balances === "object" ? (
+      {balance && typeof balance === "object" ? (
         <div className="mt-8">
           <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
           <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
-            {Object.entries(balances).map(([cur, bal]) => (
+            {Object.entries(balance).map(([cur, bal]) => (
               <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
                 {cur}: {bal.toFixed(4)}
               </li>
