@@ -12,7 +12,7 @@ import Success from './Components/LoadBalance/Success';
 import Fail from './Components/LoadBalance/Fail';
 import Transaction from "./Components/Transaction/Transaction";
 import FakeCheckout from './Components/LoadBalance/FakeCheckout';
-import Exchange from './Components/Exchange/Exchange';
+import  Exchange from './Components/Exchange/Exchange';
 
 
 

@@ -1,189 +1,139 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-type ExchangeProps = {
-  userInfo?: any;
-};
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-const Exchange: React.FC<ExchangeProps> = ({ userInfo }) => {
+interface Props {
+  balances?: { [key: string]: number };
+  onBalanceUpdate?: () => void;
+}
+
+const Exchange: React.FC<Props> = ({
+  balances = {},
+  onBalanceUpdate = () => {}
+}) => {
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
-  const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [result, setResult] = useState<number | null>(null);
-  const [balances, setBalances] = useState<Record<string, number> | null>(null);
+  const [amount, setAmount] = useState<number>(0);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [convertedValue, setConvertedValue] = useState<number | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("userInfo recibido en Exchange:", userInfo);
-    if (userInfo?.COD && typeof userInfo.COD === "object") {
-      console.log("Estableciendo balances:", userInfo.COD);
-      setBalances(userInfo.COD);
-    } else {
-      console.warn("userInfo.COD es inválido o no existe");
-      setBalances(null);
+    const fetchExchangeRate = async () => {
+      if (fromCurrency === toCurrency) {
+        setExchangeRate(1);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`https://api.currencyapi.com/v3/latest`, {
+          params: {
+            apikey: "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX",
+            base_currency: fromCurrency,
+            currencies: toCurrency,
+          },
+        });
+
+        const rate = res.data?.data?.[toCurrency]?.value;
+        setExchangeRate(rate);
+      } catch (err) {
+        console.error("Error al obtener tasa de cambio", err);
+        setExchangeRate(null);
+      }
+    };
+
+    fetchExchangeRate();
+  }, [fromCurrency, toCurrency]);
+
+  useEffect(() => {
+    if (exchangeRate !== null) {
+      setConvertedValue(amount * exchangeRate);
     }
-  }, [userInfo]);
+  }, [amount, exchangeRate]);
 
-  const handleConvert = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage(null);
-    setResult(null);
+  const handleSwap = async () => {
+    if (fromCurrency === toCurrency) return alert("Las monedas deben ser diferentes");
+    if (amount <= 0) return alert("La cantidad debe ser mayor que cero");
+    if ((balances[fromCurrency] ?? 0) < amount) return alert(`Saldo insuficiente en ${fromCurrency}`);
 
-    const parsedAmount = parseFloat(amount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setMessage("Ingrese un monto válido mayor a 0");
-      return;
-    }
-
-    if (fromCurrency === toCurrency) {
-      setMessage("Las monedas deben ser diferentes");
-      return;
-    }
-
-    if (!balances || parsedAmount > (balances[fromCurrency] || 0)) {
-      setMessage("Saldo insuficiente");
-      return;
-    }
-
-    setLoading(true);
+    const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("https://proyectofinalutn-production.up.railway.app/exchange", {
-        method: "POST",
+      const res = await axios.post(`https://proyectofinalutn-production.up.railway.app/convert`, {
+        fromCurrency,
+        toCurrency,
+        amount,
+      }, {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          fromCurrency,
-          toCurrency,
-          amount: parsedAmount,
-        }),
       });
 
-      const data = await res.json();
-      console.log("Respuesta del backend:", data);
+      alert(`Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}`);
+      setAmount(0);
+      setConvertedValue(null);
+      onBalanceUpdate();
 
-      if (!res.ok) {
-        setMessage(data.message || "Error inesperado");
-      } else {
-        setResult(data.convertedAmount);
-        setBalances(data.balances);
-        setMessage("✅ Conversión realizada con éxito");
-        setAmount("");
-      }
-    } catch (error) {
-      console.error("Error de red:", error);
-      setMessage("Error al conectar con el servidor");
+      setRedirecting(true);
+      setTimeout(() => {
+        navigate('/home');
+      }, 3000);
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error al realizar la conversión");
     }
-
-    setLoading(false);
   };
 
+  if (redirecting) {
+    return (
+      <div className="p-4 bg-white shadow rounded-xl w-full max-w-md mx-auto text-center text-lg font-semibold">
+        Redirigiendo...
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-blue-800 text-white font-sans">
-      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-        Conversor de monedas
-      </h2>
-
-      {userInfo?.nombre && (
-        <p className="text-center mb-4 font-medium text-white/80">
-          Usuario: <span className="font-bold">{userInfo.nombre}</span>
-        </p>
-      )}
-
-      <form onSubmit={handleConvert} className="space-y-6">
-        <div className="flex gap-4">
-          <select
-            value={fromCurrency}
-            onChange={(e) => setFromCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
-          >
-            {currencies.map((cur) => (
-              <option key={cur} value={cur}>
-                {cur}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={toCurrency}
-            onChange={(e) => setToCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
-          >
-            {currencies.map((cur) => (
-              <option key={cur} value={cur}>
-                {cur}
-              </option>
-            ))}
-          </select>
-        </div>
-
+    <div className="p-4 bg-white shadow rounded-xl w-full max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">Convertir Saldo</h2>
+      <div className="flex flex-col gap-3">
         <input
           type="number"
-          min="0.01"
-          step="0.01"
-          placeholder="Monto a convertir"
+          className="border p-2 rounded"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md placeholder:text-gray-400"
+          onChange={(e) => setAmount(parseFloat(e.target.value))}
+          placeholder="Cantidad"
+          min="0"
         />
+        <div className="flex gap-2">
+          <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)} className="border p-2 rounded w-1/2">
+            {currencies.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)} className="border p-2 rounded w-1/2">
+            {currencies.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        {exchangeRate !== null && amount > 0 && (
+          <div className="text-sm text-gray-600">
+            Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong><br />
+            Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong>
+          </div>
+        )}
 
         <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300 ${
-            loading ? "animate-pulse" : ""
-          }`}
+          onClick={handleSwap}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
-          {loading ? "Convirtiendo..." : "Convertir"}
+          Convertir
         </button>
-      </form>
-
-      {message && (
-        <p
-          className={`mt-6 text-center text-lg font-bold drop-shadow-lg ${
-            message.includes("✅") ? "text-green-300" : "text-yellow-300"
-          }`}
-        >
-          {message}
-        </p>
-      )}
-
-      {result !== null && (
-        <div className="mt-6 text-center text-2xl font-bold text-white/90">
-          {amount} {fromCurrency} = {result.toFixed(4)} {toCurrency}
-        </div>
-      )}
-
-      {balances && typeof balances === "object" ? (
-        <div className="mt-8">
-          <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
-          <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
-            {Object.entries(balances).map(([cur, bal]) => (
-              <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
-                {cur}: {bal.toFixed(4)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p className="text-center mt-4 text-red-300 font-semibold">
-          No se pudieron cargar los saldos.
-        </p>
-      )}
-
-      <button
-        onClick={() => navigate("/home")}
-        className="mt-10 w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300"
-      >
-        Volver al Inicio
-      </button>
+      </div>
     </div>
   );
 };

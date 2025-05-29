@@ -1,79 +1,63 @@
-import { Request, Response, NextFunction } from 'express';
-import { Usuario } from '../models/Usuario';
-import { getExchangeRate } from '../utils/exchangeRates';
-import jwt from 'jsonwebtoken';
+import { Request, Response } from "express";
+import axios from "axios";
+import { Usuario } from "../models/Usuario";
 
-// Aquí le indicamos que el handler puede recibir next para compatibilidad TS
-export const convertBalance = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+const API_KEY = "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX";
+
+export const convertCurrency = async (req: Request, res: Response): Promise<void> => {
+  const { fromCurrency, toCurrency, amount } = req.body;
+  const userId = (req as any).user?.id;
+
+  if (!userId || !fromCurrency || !toCurrency || !amount) {
+    res.status(400).json({ message: "Datos incompletos o usuario no autenticado" });
+    return;
+  }
+
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      res.status(401).json({ message: 'No autorizado' });
+    const usuario = await Usuario.findByPk(userId);
+    if (!usuario) {
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
 
-    let userId: number;
-    try {
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
-      userId = decoded.id;
-    } catch {
-      res.status(401).json({ message: 'Token inválido' });
+    if (usuario.COD[fromCurrency] < amount) {
+      res.status(400).json({ message: `Saldo insuficiente en ${fromCurrency}` });
       return;
     }
 
-    const { fromCurrency, toCurrency, amount } = req.body;
+    const response = await axios.get(`https://api.currencyapi.com/v3/latest`, {
+      params: {
+        apikey: API_KEY,
+        base_currency: fromCurrency,
+        currencies: toCurrency,
+      },
+    });
 
-    if (!fromCurrency || !toCurrency || !amount) {
-      res.status(400).json({ message: 'Faltan datos' });
-      return;
-    }
-    if (amount <= 0) {
-      res.status(400).json({ message: 'El monto debe ser mayor a 0' });
-      return;
-    }
+    const rate = response.data?.data?.[toCurrency]?.value;
 
-    const user = await Usuario.findOne({ where: { id: userId } });
-    if (!user) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
-      return;
-    }
-
-    if (!user.COD[fromCurrency]) {
-      res.status(400).json({ message: `Moneda origen inválida: ${fromCurrency}` });
-      return;
-    }
-    if (!user.COD[toCurrency]) {
-      res.status(400).json({ message: `Moneda destino inválida: ${toCurrency}` });
+    if (!rate) {
+      res.status(500).json({ message: "Error obteniendo tasa de cambio" });
       return;
     }
 
-    if (user.COD[fromCurrency] < amount) {
-      res.status(400).json({ message: 'Saldo insuficiente' });
-      return;
-    }
+    const converted = amount * rate;
 
-    const rate = await getExchangeRate(fromCurrency, toCurrency);
-    const convertedAmount = amount * rate;
+    usuario.COD[fromCurrency] -= amount;
+    usuario.COD[toCurrency] += converted;
 
-    const updatedCOD = {
-      ...user.COD,
-      [fromCurrency]: user.COD[fromCurrency] - amount,
-      [toCurrency]: user.COD[toCurrency] + convertedAmount,
-    };
+    await usuario.save();
 
-    await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
-
-    res.json({
-      message: 'Saldo convertido con éxito',
-      convertedAmount,
-      balances: updatedCOD,
+    res.status(200).json({
+      message: "Conversión exitosa",
+      fromCurrency,
+      toCurrency,
+      amount,
+      converted,
+      rate,
+      COD: usuario.COD,
     });
   } catch (error) {
-    console.error("❌ Error en conversión:", error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error("Error al convertir moneda:", error);
+    res.status(500).json({ message: "Error del servidor", error });
   }
 };
