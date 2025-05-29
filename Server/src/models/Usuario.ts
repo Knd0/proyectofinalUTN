@@ -58,12 +58,12 @@ Usuario.init(
       type: DataTypes.JSON,
       allowNull: false,
       defaultValue: {
-        ars: 0,
-        usd: 0,
-        eur: 0,
-        btc: 0,
-        eth: 0,
-        usdt: 0,
+        ARS: 0,
+        USD: 0,
+        EUR: 0,
+        BTC: 0,
+        ETH: 0,
+        USDT: 0,
       },
     },
 
