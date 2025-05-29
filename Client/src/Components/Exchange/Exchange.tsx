@@ -1,220 +1,205 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-type ExchangeProps = {
-  userInfo?: any;
-};
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-const Exchange: React.FC<ExchangeProps> = () => {
+
+const Exchange: React.FC = () => {
+
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [userInfo, setUserInfo] = useState<any>(null);
   const [toCurrency, setToCurrency] = useState("USD");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState<number>(0);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [convertedValue, setConvertedValue] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [result, setResult] = useState<number | null>(null);
-  const [balance, setBalance] = useState<Record<string, number> | null>(null);
+  const [message, setMessage] = useState("");
+  const [balances, setBalances] = useState<{ [key: string]: number }>({});
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchBalances = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
+    try {
+      const res = await axios.get("https://proyectofinalutn-production.up.railway.app/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Datos recibidos:", res.data);
+      setBalances(res.data?.user.balance?.COD || {});
+    } catch (err) {
+      console.error("Error al obtener balances:", err);
     }
+  };
 
-    const fetchUserData = async () => {
+  useEffect(() => {
+    fetchBalances();
+  }, []);
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      if (fromCurrency === toCurrency) {
+        setExchangeRate(1);
+        return;
+      }
+
       try {
-        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axios.get("https://api.currencyapi.com/v3/latest", {
+          params: {
+            apikey: "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX",
+            base_currency: fromCurrency,
+            currencies: toCurrency,
+          },
         });
 
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos del usuario");
-        }
-
-        const data = await response.json();
-        setUserInfo(data.user);
-        setBalance(data.user.balance || data.user.COD || {}); // Por si el balance está en otro campo
-        setLoading(false);
+        const rate = res.data?.data?.[toCurrency]?.value;
+        setExchangeRate(rate);
       } catch (err) {
-        
-        setLoading(false);
+        console.error("Error al obtener tasa de cambio", err);
+        setExchangeRate(null);
       }
     };
 
-    fetchUserData();
-    console.log("userInfo recibido en Exchange:", userInfo);
-    if (userInfo?.COD && typeof userInfo.COD === "object") {
-      console.log("Estableciendo balances:", userInfo.COD);
-      setBalance(userInfo.COD);
-    } else {
-      console.warn("userInfo.COD es inválido o no existe");
-      setBalance(null);
+    fetchExchangeRate();
+  }, [fromCurrency, toCurrency]);
+
+  useEffect(() => {
+    if (exchangeRate !== null) {
+      setConvertedValue(amount * exchangeRate);
     }
-  }, [userInfo]);
+  }, [amount, exchangeRate]);
 
-  const handleConvert = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage(null);
-    setResult(null);
+  const handleSwap = async () => {
+    const token = localStorage.getItem("token");
 
-    const parsedAmount = parseFloat(amount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setMessage("Ingrese un monto válido mayor a 0");
-      return;
-    }
+    if (fromCurrency === toCurrency) return alert("Las monedas deben ser diferentes");
+    if (amount <= 0) return alert("La cantidad debe ser mayor que cero");
 
-    if (fromCurrency === toCurrency) {
-      setMessage("Las monedas deben ser diferentes");
-      return;
-    }
-
-    if (!balance || parsedAmount > (balance[fromCurrency] || 0)) {
-      setMessage("Saldo insuficiente");
-      return;
+    if ((balances[fromCurrency] || 0) < amount) {
+      return alert(`Saldo insuficiente en ${fromCurrency}`);
     }
 
     setLoading(true);
+    setMessage("");
 
     try {
-      const res = await fetch("https://proyectofinalutn-production.up.railway.app/exchange", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify({
-          fromCurrency,
-          toCurrency,
-          amount: parsedAmount,
-        }),
-      });
+      const res = await axios.post(
+        "https://proyectofinalutn-production.up.railway.app/auth/exchange",
+        { fromCurrency, toCurrency, amount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      const data = await res.json();
-      console.log("Respuesta del backend:", data);
+      setMessage(`✅ Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}. Redirigiendo...`);
+      setAmount(0);
+      setConvertedValue(null);
+      await fetchBalances(); // Refrescar balances
 
-      if (!res.ok) {
-        setMessage(data.message || "Error inesperado");
-      } else {
-        setResult(data.convertedAmount);
-        setBalance(data.balances);
-        setMessage("✅ Conversión realizada con éxito");
-        setAmount("");
-      }
-    } catch (error) {
-      console.error("Error de red:", error);
-      setMessage("Error al conectar con el servidor");
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
+    } catch (err: any) {
+      console.error(err);
+      setMessage(err.response?.data?.message || "Error al realizar la conversión");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-blue-800 text-white font-sans">
-      <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-        Conversor de monedas
-      </h2>
-
-      {userInfo?.nombre && (
-        <p className="text-center mb-4 font-medium text-white/80">
-          Usuario: <span className="font-bold">{userInfo.nombre}</span>
-        </p>
-      )}
-
-      <form onSubmit={handleConvert} className="space-y-6">
-        <div className="flex gap-4">
-          <select
-            value={fromCurrency}
-            onChange={(e) => setFromCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
-          >
-            {currencies.map((cur) => (
-              <option key={cur} value={cur}>
-                {cur}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={toCurrency}
-            onChange={(e) => setToCurrency(e.target.value)}
-            className="flex-1 px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md"
-          >
-            {currencies.map((cur) => (
-              <option key={cur} value={cur}>
-                {cur}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <input
-          type="number"
-          min="0.01"
-          step="0.01"
-          placeholder="Monto a convertir"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-          className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md placeholder:text-gray-400"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300 ${
-            loading ? "animate-pulse" : ""
-          }`}
-        >
-          {loading ? "Convirtiendo..." : "Convertir"}
-        </button>
-      </form>
-
-      {message && (
-        <p
-          className={`mt-6 text-center text-lg font-bold drop-shadow-lg ${
-            message.includes("✅") ? "text-green-300" : "text-yellow-300"
-          }`}
-        >
-          {message}
-        </p>
-      )}
-
-      {result !== null && (
-        <div className="mt-6 text-center text-2xl font-bold text-white/90">
-          {amount} {fromCurrency} = {result.toFixed(4)} {toCurrency}
-        </div>
-      )}
-
-      {balance && typeof balance === "object" ? (
-        <div className="mt-8">
-          <h3 className="text-white/70 font-semibold mb-3">Saldos actuales:</h3>
-          <ul className="grid grid-cols-3 gap-3 text-white/80 font-semibold">
-            {Object.entries(balance).map(([cur, bal]) => (
-              <li key={cur} className="bg-white/10 rounded-xl py-2 text-center">
-                {cur}: {bal.toFixed(4)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p className="text-center mt-4 text-red-300 font-semibold">
-          No se pudieron cargar los saldos.
-        </p>
-      )}
-
-      <button
-        onClick={() => navigate("/home")}
-        className="mt-10 w-full py-4 rounded-xl font-extrabold bg-white text-blue-700 hover:bg-blue-100 transition duration-300"
+      <div
+        className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
+          bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
+          animate-gradient-x text-white font-sans"
+        style={{ backgroundSize: "200% 200%" }}
       >
-        Volver al Inicio
-      </button>
-    </div>
-  );
+        <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
+          Convertir Saldo
+        </h2>
+
+        <div className="space-y-6">
+          <input
+            type="number"
+            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
+              focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+              shadow-md transition duration-300 placeholder:text-gray-400"
+            value={amount}
+            onChange={(e) => setAmount(parseFloat(e.target.value))}
+            placeholder={`Cantidad disponible: ${balances[fromCurrency] ?? 0}`}
+            min="0"
+            disabled={loading}
+          />
+
+          <div className="flex gap-4">
+            <select
+              value={fromCurrency}
+              onChange={(e) => setFromCurrency(e.target.value)}
+              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
+                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+                shadow-md transition duration-300"
+              disabled={loading}
+            >
+              {currencies.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+
+            <select
+              value={toCurrency}
+              onChange={(e) => setToCurrency(e.target.value)}
+              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
+                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
+                shadow-md transition duration-300"
+              disabled={loading}
+            >
+              {currencies.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          {exchangeRate !== null && amount > 0 && (
+            <div className="text-white/80 text-center text-sm font-medium drop-shadow-md">
+              <p>Tasa actual: <strong>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</strong></p>
+              <p>Recibirás: <strong>{convertedValue?.toFixed(2)} {toCurrency}</strong></p>
+            </div>
+          )}
+
+          {/* BLOQUE AGREGADO PARA MOSTRAR EL BALANCE TOTAL */}
+          <div className="mb-4">
+            <h3 className="font-bold mb-2">Balances disponibles:</h3>
+            <ul className="text-sm text-white/80">
+              {currencies.map((c) => (
+                <li key={c}>
+                  {c}: {balances[c]?.toFixed(2) ?? "0.00"}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <button
+            onClick={handleSwap}
+            disabled={loading}
+            className={`w-full py-4 rounded-xl font-extrabold
+              text-blue-600 bg-white hover:bg-blue-50 transition duration-300
+              disabled:opacity-50 disabled:cursor-not-allowed
+              ${loading ? "animate-pulse" : ""}`}
+          >
+            {loading ? "Procesando..." : "Convertir"}
+          </button>
+
+          {message && (
+            <p
+              className={`mt-6 text-center text-lg font-bold drop-shadow-lg
+                ${message.includes("✅") ? "text-green-300 animate-fadeIn" : "text-yellow-300 animate-fadeIn"}`}
+              style={{ animationDuration: "1s" }}
+            >
+              {message}
+            </p>
+          )}
+        </div>
+      </div>
+);
 };
 
 export default Exchange;
