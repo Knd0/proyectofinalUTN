@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { Usuario } from "../models/Usuario";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 
-// 🪙 Cambiar saldo entre monedas del mismo usuario
 export const exchangeCurrency = async (req: Request, res: Response): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -64,15 +64,30 @@ export const exchangeCurrency = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Restamos y sumamos los saldos
-    cod[fromCurrency] = parseFloat((saldoOrigen - amount).toFixed(6));
-    cod[toCurrency] = parseFloat((saldoDestino + amount).toFixed(6));
+    // Obtener tasa de cambio real
+    const apiKey = process.env.CURRENCY_API_KEY || "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX";
+    const url = `https://api.currencyapi.com/v3/latest?apikey=${apiKey}&base_currency=${fromCurrency}&currencies=${toCurrency}`;
 
-    // Actualizamos el usuario
+    const response = await axios.get(url);
+    const rate = response.data?.data?.[toCurrency]?.value;
+
+    if (!rate || typeof rate !== "number") {
+      res.status(500).json({ error: "No se pudo obtener la tasa de cambio" });
+      return;
+    }
+
+    const convertedAmount = parseFloat((amount * rate).toFixed(6));
+
+    // Restar y sumar saldo con la tasa aplicada
+    cod[fromCurrency] = parseFloat((saldoOrigen - amount).toFixed(6));
+    cod[toCurrency] = parseFloat((saldoDestino + convertedAmount).toFixed(6));
+
+    // Actualizar en la DB
     await Usuario.update({ COD: cod }, { where: { id: userId } });
 
     res.status(200).json({
       message: "Conversión realizada con éxito",
+      converted: convertedAmount,
       nuevoSaldo: cod,
     });
   } catch (error) {

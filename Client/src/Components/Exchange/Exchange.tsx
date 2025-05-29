@@ -82,7 +82,7 @@ const Exchange: React.FC = () => {
 
     try {
       const res = await axios.post(
-        "https://proyectofinalutn-production.up.railway.app/exchange",
+        "https://proyectofinalutn-production.up.railway.app/auth/exchange",
         { fromCurrency, toCurrency, amount },
         { headers: { Authorization: `Bearer ${token}` } }
       );
