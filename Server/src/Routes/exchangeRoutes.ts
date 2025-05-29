@@ -4,6 +4,7 @@ import { authenticateToken } from "../Middlewares/authMiddleware";  // el middle
 
 const router = Router();
 
-router.post('/exchange', authenticateToken, exchangeCurrency);
-
+router.post('/me', authenticateToken, async (req, res, next) => {
+  await exchangeCurrency(req, res, next);
+});
 export default router;
