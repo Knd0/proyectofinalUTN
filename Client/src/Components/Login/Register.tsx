@@ -5,6 +5,8 @@ import "./style.css"
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [dni, setDni] = useState('');
+  const [nacionalidad, setNac] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate ();
@@ -18,7 +20,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, nombre: name }),
+        body: JSON.stringify({ email, password, dni, nacionalidad, nombre: name }),
         credentials: 'include'
       });
 
@@ -63,6 +65,24 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
+              required
+            />
+          </div>
+          <div className="input-box">
+            <input
+              type="number"
+              value={dni}
+              onChange={(e) => setDni(e.target.value)}
+              placeholder="DNI"
+              required
+            />
+          </div>
+          <div className="input-box">
+            <input
+              type="text"
+              value={nacionalidad}
+              onChange={(e) => setNac(e.target.value)}
+              placeholder="Nacionalidad"
               required
             />
           </div>
