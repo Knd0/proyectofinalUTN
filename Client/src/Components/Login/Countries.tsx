@@ -4,13 +4,13 @@ interface PaisesProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     required?: boolean;
-    className: string;
+    
   }
 
-  export const Paises: React.FC<PaisesProps> = ({name, value, onChange, required, className}) => {
+  export const Paises: React.FC<PaisesProps> = ({name, value, onChange, required}) => {
   return (
     <>
-      <select>
+      <select className="w-full px-4 py-2 rounded-md bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
         <option>select country</option>
         <option value="AF">Afghanistan</option>
         <option value="AX">Åland Islands</option>
