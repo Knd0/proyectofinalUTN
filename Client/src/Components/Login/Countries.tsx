@@ -4,9 +4,10 @@ interface PaisesProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     required?: boolean;
+    className: string;
   }
 
-  export const Paises: React.FC<PaisesProps> = ({name, value, onChange, required}) => {
+  export const Paises: React.FC<PaisesProps> = ({name, value, onChange, required, className}) => {
   return (
     <>
       <select>
