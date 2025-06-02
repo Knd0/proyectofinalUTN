@@ -68,9 +68,9 @@ export const authController = {
     res: Response,
     next: NextFunction
   ): Promise<Response> => {
-    const { nombre, email, password } = req.body;
+    const { nombre, email, password, dni, nacionalidad } = req.body;
 
-    if (!nombre || !email || !password) {
+    if (!nombre || !email || !password || !dni || !nacionalidad) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
@@ -91,8 +91,8 @@ export const authController = {
         imagen:
           "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg",
         descripcion: "",
-        nacionalidad: "",
-        dni: null,
+        nacionalidad,
+        dni,
         COD: {
           ARS: 0,
           USD: 0,

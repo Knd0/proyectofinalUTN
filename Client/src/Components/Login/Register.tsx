@@ -1,38 +1,48 @@
-import React, { useState } from 'react';
-import { useNavigate  } from 'react-router-dom';
-import "./style.css"
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./style.css";
+import { Paises } from "./Countries";
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [dni, setDni] = useState('');
-  const [nacionalidad, setNac] = useState('');
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate ();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [dni, setDni] = useState("");
+  const [nacionalidad, setNac] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://proyectofinalutn-production.up.railway.app/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, dni, nacionalidad, nombre: name }),
-        credentials: 'include'
-      });
+      const response = await fetch(
+        "https://proyectofinalutn-production.up.railway.app/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            dni,
+            nacionalidad,
+            nombre: name,
+          }),
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        navigate('/login');
+        navigate("/login");
       } else {
-        setError(data.error || 'Error de registro');
+        setError(data.error || "Error de registro");
       }
     } catch (err) {
-      setError('Error de conexión');
+      setError("Error de conexión");
     }
   };
 
@@ -78,18 +88,23 @@ const Register = () => {
             />
           </div>
           <div className="input-box">
-            <input
-              type="text"
+            <Paises
+              name="country"
               value={nacionalidad}
-              onChange={(e) => setNac(e.target.value)}
-              placeholder="Nacionalidad"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setNac(e.target.value)
+              }
               required
             />
           </div>
-          <button className="btn" type="submit">Register</button>
+          <button className="btn" type="submit">
+            Register
+          </button>
           {error && <p className="error-message">{error}</p>}
           <div className="register-link">
-            <p>Already have an account? <a href="/login">Login</a></p>
+            <p>
+              Already have an account? <a href="/login">Login</a>
+            </p>
           </div>
         </form>
       </div>
