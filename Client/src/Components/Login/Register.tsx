@@ -26,8 +26,8 @@ const Register = () => {
           body: JSON.stringify({
             email,
             password,
-            dni,
-            nacionalidad,
+            dni: dni,
+            nacionalidad: nacionalidad,
             nombre: name,
           }),
           credentials: "include",
