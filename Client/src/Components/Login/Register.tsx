@@ -113,7 +113,7 @@ const Register = () => {
               onChange={(e) => setNac(e.target.value)}
               required
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white max-h-48 overflow-y-auto"
-              size={5} // Este atributo define cuántos elementos se ven a la vez
+              
             >
               {countries?.map((c, i) => (
                 <option key={i} value={c.name.official} className="text-black">
