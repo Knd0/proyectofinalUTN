@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./style.css";
-import { Paises } from "./Countries";
+
+interface Country {
+  name: { official: string };
+}
 
 const Register = () => {
+  const [countries, setCountries] = useState<Country[]>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dni, setDni] = useState("");
@@ -11,6 +15,22 @@ const Register = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch("https://restcountries.com/v3.1/all");
+        const data = await response.json();
+        const sorted = data.sort((a: Country, b: Country) =>
+          a.name.official.localeCompare(b.name.official)
+        );
+        setCountries(sorted);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCountries();
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,16 +107,20 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="input-box">
-            <Paises
-              name="country"
-              value={nacionalidad}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setNac(e.target.value)
-              }
-              
+            <select
+              onChange={(e) => setNac(e.target.value)}
               required
-            />
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white max-h-48 overflow-y-auto"
+              size={5} // Este atributo define cuántos elementos se ven a la vez
+            >
+              {countries?.map((c, i) => (
+                <option key={i} value={c.name.official} className="text-black">
+                  {c.name.official}
+                </option>
+              ))}
+            </select>
           </div>
           <button className="btn" type="submit">
             Register
