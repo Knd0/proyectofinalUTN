@@ -112,8 +112,7 @@ const Register = () => {
             <select
               onChange={(e) => setNac(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white max-h-48 overflow-y-auto"
-              
+              className="block w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white max-h-48 overflow-y-auto text-gray-700"
             >
               {countries?.map((c, i) => (
                 <option key={i} value={c.name.official} className="text-black">
