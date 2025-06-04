@@ -3,6 +3,7 @@ import { Transaction } from "../models/Transaction";
 import { Usuario } from "../models/Usuario";
 import { sequelize } from "../db";
 import jwt from "jsonwebtoken";
+import { sendTransactionEmail } from "../utils/emailService";
 
 // 🔁 Obtener transacciones del usuario actual
 export const getMyTransactions = async (req: Request, res: Response) => {
@@ -36,14 +37,13 @@ export const getMyTransactions = async (req: Request, res: Response) => {
       include: [
         {
           model: Usuario,
-          as: "fromUser", // Asegurate de tener esta relación en el modelo
+          as: "fromUser",
           attributes: ["nombre", "cvu"],
         },
       ],
       order: [["date", "DESC"]],
     });
 
-    // Agregar tipo de transacción para diferenciar en el frontend
     const formattedSent = sentTransactions.map(tx => ({
       ...tx.toJSON(),
       type: "sent",
@@ -64,7 +64,6 @@ export const getMyTransactions = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al obtener las transacciones" });
   }
 };
-
 
 // 💸 Crear una nueva transacción
 export const createTransaction = async (req: Request, res: Response) => {
@@ -130,13 +129,11 @@ export const createTransaction = async (req: Request, res: Response) => {
     }
 
     await sequelize.transaction(async (t) => {
-      // Resta al remitente
       const updatedSenderCOD = {
         ...fromUser.COD,
         [currency]: senderBalance - amount,
       };
 
-      // Suma al destinatario
       const updatedReceiverCOD = {
         ...toUser.COD,
         [currency]: receiverBalance + amount,
@@ -158,6 +155,19 @@ export const createTransaction = async (req: Request, res: Response) => {
         { transaction: t }
       );
     });
+
+    // Enviar emails de notificación
+    await sendTransactionEmail(
+      fromUser.email,
+      "Notificación: Transferencia enviada",
+      `<p>Hola ${fromUser.nombre},</p><p>Has enviado <strong>${amount} ${currency}</strong> a <strong>${toUser.nombre}</strong> (CVU: ${toUser.cvu}).</p>`
+    );
+
+    await sendTransactionEmail(
+      toUser.email,
+      "Notificación: Transferencia recibida",
+      `<p>Hola ${toUser.nombre},</p><p>Has recibido <strong>${amount} ${currency}</strong> de <strong>${fromUser.nombre}</strong> (CVU: ${fromUser.cvu}).</p>`
+    );
 
     console.log("✅ Transacción exitosa");
     return res.status(201).json({ message: "Transacción exitosa" });
