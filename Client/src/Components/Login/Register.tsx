@@ -16,15 +16,6 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-
-  useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        // Si ya hay token, redirigir a /home
-        navigate("/home");
-      }
-    }, [navigate]);
-
   useEffect(() => {
     const fetchCountries = async () => {
       try {
