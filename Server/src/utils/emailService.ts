@@ -9,7 +9,9 @@ export const transporter = nodemailer.createTransport({
 });
 
 export const sendTransactionEmail = async (to: string, subject: string, html: string) => {
-  await transporter.sendMail({
+    console.log("📨 Enviando a:", to);
+    console.log("📨 Asunto:", subject);
+    await transporter.sendMail({
     from: "Wamoney", 
     to,
     subject,
