@@ -15,6 +15,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.6.0",
+    "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
     "react-toastify": "^11.0.5",
@@ -27,6 +28,7 @@
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.4.2",
+    "@types/nodemailer": "^6.4.17",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
     "typescript": "^5.8.3"

@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import { Usuario } from "../models/Usuario";
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import { sendTransactionEmail } from "../utils/emailService"; 
 
 export const exchangeCurrency = async (req: Request, res: Response, next: NextFunction) => {
   const { fromCurrency, toCurrency, amount } = req.body;
 
   console.log("🔁 Datos recibidos:", { fromCurrency, toCurrency, amount });
 
-  const token = req.headers.authorization?.split(" ")[1]; 
+  const token = req.headers.authorization?.split(" ")[1];
   console.log("🔑 Token recibido:", token ? "Sí" : "No");
 
   if (
@@ -67,7 +68,7 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
     // Obtener tasa de cambio
     const apiKey = process.env.CURRENCY_API_KEY || "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX";
     const url = `https://api.currencyapi.com/v3/latest?apikey=${apiKey}&base_currency=${fromCurrency}&currencies=${toCurrency}`;
-    
+
     const exchangeResponse = await axios.get(url);
     const rate = exchangeResponse.data?.data?.[toCurrency]?.value;
 
@@ -89,6 +90,25 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
 
     // Actualizar usuario
     await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
+
+    // Enviar email de confirmación
+    const emailHtml = `
+      <h2>Confirmación de conversión de moneda</h2>
+      <p>Hola ${user.nombre || "usuario"},</p>
+      <p>Se ha realizado una conversión en tu cuenta:</p>
+      <p>
+        Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.
+      </p>
+      <p>Gracias por usar Wallet App.</p>
+    `;
+
+    try {
+      await sendTransactionEmail(user.email, "Confirmación de conversión", emailHtml);
+      console.log("📧 Email de conversión enviado correctamente");
+    } catch (emailError) {
+      console.error("❌ Error al enviar email de conversión:", emailError);
+      // No frenamos el flujo por fallo en email, solo logueamos
+    }
 
     console.log("✅ Conversión realizada con éxito");
 

@@ -5,6 +5,7 @@ import { Usuario } from "../models/Usuario";
 import { generateUniqueCVU } from "../utils/GenerateCVU";
 import axios from "axios";
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
+import { sendTransactionEmail } from "../utils/emailService";
 
 const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -206,8 +207,21 @@ export const authController = {
 
       await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
 
-      console.log("✅ Balance actualizado correctamente");
+      const subject = "Tu cuenta fue acreditada ✔️";
+      const html = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2 style="color: #2e86de;">¡Hola ${user.nombre}!</h2>
+        <p>Tu cuenta fue <strong>acreditada</strong> con:</p>
+        <p style="font-size: 20px; font-weight: bold;">
+        ${amount} ${currency}
+        </p>
+        <p>Gracias por usar <strong>Wamoney</strong> 💸</p>
+        </div>
+        `;
+        await sendTransactionEmail(user.email, subject, html);
 
+      console.log("✅ Balance actualizado correctamente");
+      
       return res.json({
         message: `Balance de ${currency} actualizado correctamente`,
         balance: updatedCOD,
