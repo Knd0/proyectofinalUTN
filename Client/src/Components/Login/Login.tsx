@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import './style.css';
@@ -8,6 +8,14 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Si ya hay token, redirigir a /home
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
