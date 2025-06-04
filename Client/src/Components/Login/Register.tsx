@@ -19,7 +19,7 @@ const Register = () => {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch("https://restcountries.com/v3.1/all");
+        const response = await fetch("https://restcountries.com/v3.1/all?fields=name");
         const data = await response.json();
         const sorted = data.sort((a: Country, b: Country) =>
           a.name.official.localeCompare(b.name.official)
@@ -110,11 +110,15 @@ const Register = () => {
 
           <div className="input-box">
             <select
+              value={nacionalidad}
               onChange={(e) => setNac(e.target.value)}
               required
               className="block w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white max-h-48 overflow-y-auto text-gray-700"
             >
-              <option>Nacionalidad</option>{countries?.map((c, i) => (
+              <option value="" disabled hidden>
+                Nacionalidad
+              </option>
+              {countries?.map((c, i) => (
                 <option key={i} value={c.name.official} className="text-black">
                   {c.name.official}
                 </option>
