@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CryptoJS from 'crypto-js';
 import './style.css';
 
 const Login = () => {
@@ -8,14 +7,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Si ya hay token, redirigir a /home
-      navigate("/home");
-    }
-  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +26,8 @@ const Login = () => {
       if (response.ok) {
         const secretKey = 'default_secret_key'; // Vite
         // const secretKey = process.env.REACT_APP_SECRET_KEY || 'default_secret_key'; // CRA (Create React App)
-        const encryptedId = CryptoJS.AES.encrypt(String(data.user.id), secretKey).toString();
 
         localStorage.setItem('token', data.token);
-        localStorage.setItem('encryptedId', encryptedId);
 
         navigate('/home');
       } else {
