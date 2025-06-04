@@ -1,222 +1,186 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Typography from "@mui/material/Typography";
-import Card from "@mui/material/Card";
-import Chip from "@mui/material/Chip";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Collapse from "@mui/material/Collapse";
-import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Typography,
+  Chip,
+  Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Collapse,
+  Box,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import tableStyles from "@core/styles/table.module.css";
-import classnames from "classnames";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 interface User {
   id: number;
   nombre: string;
   username: string;
   email: string;
-  imagen: string;
-  admin: boolean;
-  sentTransactions: any[];
-  receivedTransactions: any[];
+  role: string;
+  status: string;
+  avatarSrc?: string;
+  transactions?: Transaction[];
+}
+
+interface Transaction {
+  id: number;
+  amount: number;
+  description: string;
+  date: string;
 }
 
 const Dashboard = () => {
-  const [expandedRows, setExpandedRows] = useState<number[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [editingUserId, setEditingUserId] = useState<number | null>(null);
-  const [editedUserData, setEditedUserData] = useState<Partial<User>>({});
-
-  const token = localStorage.getItem("token"); // O donde lo tengas guardado
-
-  const fetchUsers = async () => {
-    const res = await axios.get(
-      "https://proyectofinalutn-production.up.railway.app/admin/users",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setUsers(res.data.users);
-  };
+  const [expandedUserIds, setExpandedUserIds] = useState<number[]>([]);
 
   useEffect(() => {
-    fetchUsers();
+    // Aquí deberías llamar a tu backend para traer los usuarios con transacciones
+    fetch("/admin/users", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data.users);
+      });
   }, []);
 
-  const toggleExpand = (id: number) => {
-    setExpandedRows((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+  const toggleExpand = (userId: number) => {
+    setExpandedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
     );
   };
 
-  const handleEditClick = (user: any) => {
-    setEditingUserId(user.id);
-    setEditedUserData(user);
-  };
+  const handleDelete = (id: number) => {
+    if (!confirm("¿Seguro que querés eliminar este usuario?")) return;
 
-  const handleSave = async () => {
-    await axios.put(
-      `https://proyectofinalutn-production.up.railway.app/admin/users/${editingUserId}`,
-      editedUserData,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+    fetch(`/admin/users/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    }).then((res) => {
+      if (res.ok) {
+        setUsers(users.filter((user) => user.id !== id));
       }
-    );
-    setEditingUserId(null);
-    fetchUsers();
+    });
   };
 
-  const handleDelete = async (id: number) => {
-    await axios.delete(
-      `https://proyectofinalutn-production.up.railway.app/admin/users/${id}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    fetchUsers();
-  };
-
-  const handleChange = (field: string, value: any) => {
-    setEditedUserData((prev: any) => ({ ...prev, [field]: value }));
+  const handleEdit = (id: number) => {
+    // Aquí podés implementar un modal o inline editing
+    alert(`Editar usuario con id: ${id}`);
   };
 
   return (
-    <Card>
-      <div className="overflow-x-auto">
-        <table className={tableStyles.table}>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Status</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((row) => {
-              const isEditing = editingUserId === row.id;
-              return (
-                <tr key={row.id}>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <Avatar src={row.imagen} sx={{ width: 34, height: 34 }} />
-                      <div className="flex flex-col">
-                        {isEditing ? (
-                          <>
-                            <TextField
-                              size="small"
-                              value={editedUserData.nombre}
-                              onChange={(e) =>
-                                handleChange("nombre", e.target.value)
-                              }
-                            />
-                            <TextField
-                              size="small"
-                              value={editedUserData.username}
-                              onChange={(e) =>
-                                handleChange("username", e.target.value)
-                              }
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <Typography className="font-medium">
-                              {row.nombre}
-                            </Typography>
-                            <Typography variant="body2">
-                              {row.username}
-                            </Typography>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <TextField
-                        size="small"
-                        value={editedUserData.email}
-                        onChange={(e) => handleChange("email", e.target.value)}
-                      />
-                    ) : (
-                      <Typography>{row.email}</Typography>
-                    )}
-                  </td>
-                  <td>
-                    <Typography>{row.admin ? "Admin" : "Usuario"}</Typography>
-                  </td>
-                  <td>
-                    <Chip label="Activo" variant="filled" color="success" />
-                  </td>
-                  <td>
-                    {isEditing ? (
-                      <IconButton onClick={handleSave}>
-                        <SaveIcon />
-                      </IconButton>
-                    ) : (
-                      <IconButton onClick={() => handleEditClick(row)}>
-                        <EditIcon />
-                      </IconButton>
-                    )}
-                    <IconButton onClick={() => handleDelete(row.id)}>
+    <Card sx={{ padding: 2 }}>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>User</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
+              <TableCell>Details</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {users.map((user) => (
+              <React.Fragment key={user.id}>
+                <TableRow>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Avatar src={user.avatarSrc} />
+                      <Box>
+                        <Typography fontWeight="medium">{user.nombre}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {user.username}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.status === "active" ? "Activo" : "Inactivo"}
+                      color={user.status === "active" ? "success" : "default"}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleEdit(user.id)} color="primary">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(user.id)} color="error">
                       <DeleteIcon />
                     </IconButton>
-                    <IconButton onClick={() => toggleExpand(row.id)}>
-                      <ExpandMoreIcon
-                        style={{
-                          transform: expandedRows.includes(row.id)
-                            ? "rotate(180deg)"
-                            : "rotate(0deg)",
-                        }}
-                      />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => toggleExpand(user.id)}>
+                      {expandedUserIds.includes(user.id) ? (
+                        <ExpandLessIcon />
+                      ) : (
+                        <ExpandMoreIcon />
+                      )}
                     </IconButton>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </TableCell>
+                </TableRow>
 
-        {users.map((row) => (
-          <Collapse
-            in={expandedRows.includes(row.id)}
-            timeout="auto"
-            unmountOnExit
-            key={`detail-${row.id}`}
-          >
-            <div className="p-4 border-t border-gray-200">
-              <Typography variant="h6">Movimientos de {row.nombre}</Typography>
-              {row.sentTransactions.length === 0 &&
-              row.receivedTransactions.length === 0 ? (
-                <Typography>No hay movimientos</Typography>
-              ) : (
-                <ul className="mt-2">
-                  {row.sentTransactions.map((tx: any) => (
-                    <li key={`sent-${tx.id}`}>
-                      Enviado → CVU: {tx.destinatarioCVU} | Monto: {tx.monto}{" "}
-                      {tx.moneda}
-                    </li>
-                  ))}
-                  {row.receivedTransactions.map((tx: any) => (
-                    <li key={`rec-${tx.id}`}>
-                      Recibido ← CVU: {tx.remitenteCVU} | Monto: {tx.monto}{" "}
-                      {tx.moneda}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </Collapse>
-        ))}
-      </div>
+                {/* Fila expandida con detalles */}
+                <TableRow>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={expandedUserIds.includes(user.id)} timeout="auto" unmountOnExit>
+                      <Box margin={2}>
+                        <Typography variant="subtitle1" gutterBottom>
+                          Transacciones de {user.nombre}
+                        </Typography>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>ID</TableCell>
+                              <TableCell>Monto</TableCell>
+                              <TableCell>Descripción</TableCell>
+                              <TableCell>Fecha</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {user.transactions && user.transactions.length > 0 ? (
+                              user.transactions.map((tx) => (
+                                <TableRow key={tx.id}>
+                                  <TableCell>{tx.id}</TableCell>
+                                  <TableCell>{tx.amount}</TableCell>
+                                  <TableCell>{tx.description}</TableCell>
+                                  <TableCell>{new Date(tx.date).toLocaleDateString()}</TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={4} align="center">
+                                  No hay transacciones.
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Card>
   );
 };
