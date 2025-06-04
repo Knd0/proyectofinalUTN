@@ -84,10 +84,7 @@ const Navbar: React.FC = () => {
   const drawer = (
     <Box onClick={toggleDrawer} sx={{ width: 250 }}>
       <List>
-        <ListItem component={Link} to="/home">
-          <HomeIcon sx={{ mr: 1 }} />
-          <ListItemText primary="Inicio" />
-        </ListItem>
+        {/* Ya no mostramos Inicio aquí */}
         {userInfo.admin && (
           <ListItem component={Link} to="/admin">
             <AdminPanelSettingsIcon sx={{ mr: 1 }} />
@@ -143,7 +140,7 @@ const Navbar: React.FC = () => {
               color="primary"
               fontWeight="bold"
             >
-              Mi Billetera
+              Wamoney
             </Typography>
           </Box>
 
@@ -155,15 +152,7 @@ const Navbar: React.FC = () => {
               gap: 3,
             }}
           >
-            <Button
-              component={Link}
-              to="/home"
-              color="primary"
-              variant="outlined"
-              startIcon={<HomeIcon />}
-            >
-              Inicio
-            </Button>
+            {/* Sacamos botón Inicio */}
 
             {userInfo.admin && (
               <Button
@@ -195,11 +184,16 @@ const Navbar: React.FC = () => {
             </Button>
 
             <Tooltip title={userInfo.nombre} arrow>
-              <Avatar
-                alt={userInfo.nombre}
-                src={userInfo.perfil.imagen}
-                sx={{ ml: 2, width: 40, height: 40 }}
-              />
+              <Box sx={{ display: "flex", alignItems: "center", ml: 2, gap: 1 }}>
+                <Avatar
+                  alt={userInfo.nombre}
+                  src={userInfo.perfil.imagen}
+                  sx={{ width: 40, height: 40 }}
+                />
+                <Typography variant="body1" color="textPrimary">
+                  {userInfo.nombre}
+                </Typography>
+              </Box>
             </Tooltip>
           </Box>
         </Toolbar>
