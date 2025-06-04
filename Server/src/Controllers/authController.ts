@@ -47,6 +47,7 @@ export const authController = {
           id: user.id,
           nombre: user.nombre,
           email: user.email,
+          admin: user.admin,
           perfil: {
             imagen: user.imagen,
             descripcion: user.descripcion,
