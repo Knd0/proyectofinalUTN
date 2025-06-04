@@ -15,12 +15,11 @@ import {
   Button,
   CircularProgress,
   Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Collapse,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Navbar from "Components/Navbar/Navbar";
 
 interface Transaction {
@@ -59,6 +58,7 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [expandedUserId, setExpandedUserId] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -137,6 +137,10 @@ const Dashboard = () => {
     setUserToDelete(null);
   };
 
+  const toggleExpand = (id: number) => {
+    setExpandedUserId((prev) => (prev === id ? null : id));
+  };
+
   if (loading) return <CircularProgress sx={{ mt: 4 }} />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!userInfo || !userInfo.admin)
@@ -161,14 +165,28 @@ const Dashboard = () => {
           <TableBody>
             {users.map((user) => (
               <React.Fragment key={user.id}>
-                <TableRow>
-                  <TableCell>{user.nombre}</TableCell>
+                <TableRow
+                  hover
+                  onClick={() => toggleExpand(user.id)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <TableCell>
+                    {expandedUserId === user.id ? (
+                      <KeyboardArrowUpIcon fontSize="small" />
+                    ) : (
+                      <KeyboardArrowDownIcon fontSize="small" />
+                    )}{" "}
+                    {user.nombre}
+                  </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <IconButton
                       aria-label="eliminar"
                       color="error"
-                      onClick={() => handleDeleteClick(user.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(user.id);
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -176,51 +194,44 @@ const Dashboard = () => {
                 </TableRow>
 
                 <TableRow>
-                  <TableCell colSpan={3}>
-                    <Accordion>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        Transacciones de {user.nombre}
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography variant="subtitle1">
-                          📤 Enviadas:
+                  <TableCell colSpan={3} sx={{ paddingBottom: 0, paddingTop: 0 }}>
+                    <Collapse in={expandedUserId === user.id} timeout="auto" unmountOnExit>
+                      <Typography variant="subtitle1" mt={2}>
+                        📤 Enviadas:
+                      </Typography>
+                      {user.sentTransactions?.length ? (
+                        <ul>
+                          {user.sentTransactions.map((t) => (
+                            <li key={t.id}>
+                              A {t.toUser.nombre} (ID {t.toUser.id}) - ${t.amount}{" "}
+                              {t.currency} - {new Date(t.date).toLocaleString()}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <Typography variant="body2">
+                          No hay transacciones enviadas
                         </Typography>
-                        {user.sentTransactions?.length ? (
-                          <ul>
-                            {user.sentTransactions.map((t) => (
-                              <li key={t.id}>
-                                A {t.toUser.nombre} (ID {t.toUser.id}) - $
-                                {t.amount} {t.currency} -{" "}
-                                {new Date(t.date).toLocaleString()}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <Typography variant="body2">
-                            No hay transacciones enviadas
-                          </Typography>
-                        )}
+                      )}
 
-                        <Typography variant="subtitle1" mt={2}>
-                          📥 Recibidas:
+                      <Typography variant="subtitle1" mt={2}>
+                        📥 Recibidas:
+                      </Typography>
+                      {user.receivedTransactions?.length ? (
+                        <ul>
+                          {user.receivedTransactions.map((t) => (
+                            <li key={t.id}>
+                              De {t.fromUser.nombre} (ID {t.fromUser.id}) - ${t.amount}{" "}
+                              {t.currency} - {new Date(t.date).toLocaleString()}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <Typography variant="body2">
+                          No hay transacciones recibidas
                         </Typography>
-                        {user.receivedTransactions?.length ? (
-                          <ul>
-                            {user.receivedTransactions.map((t) => (
-                              <li key={t.id}>
-                                De {t.fromUser.nombre} (ID {t.fromUser.id}) - $
-                                {t.amount} {t.currency} -{" "}
-                                {new Date(t.date).toLocaleString()}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <Typography variant="body2">
-                            No hay transacciones recibidas
-                          </Typography>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
+                      )}
+                    </Collapse>
                   </TableCell>
                 </TableRow>
               </React.Fragment>
@@ -232,7 +243,9 @@ const Dashboard = () => {
       <Dialog open={confirmOpen} onClose={handleCancelDelete}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
-          ¿Estás seguro que querés eliminar este usuario?
+          <Typography>
+            ¿Estás seguro de que deseas eliminar este usuario?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Cancelar</Button>
