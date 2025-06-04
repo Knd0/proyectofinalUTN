@@ -15,7 +15,6 @@ import {
   Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import HomeIcon from "@mui/icons-material/Home";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -78,27 +77,26 @@ const Navbar: React.FC = () => {
   };
 
   if (!userInfo) {
-    return null; // o loader si querés
+    return null;
   }
 
   const drawer = (
-    <Box onClick={toggleDrawer} sx={{ width: 250 }}>
+    <Box onClick={toggleDrawer} sx={{ width: 250, bgcolor: "#1f2937", height: "100%" }}>
       <List>
-        {/* Ya no mostramos Inicio aquí */}
         {userInfo.admin && (
-          <ListItem component={Link} to="/admin">
+          <ListItem component={Link} to="/admin" sx={{ color: "white" }}>
             <AdminPanelSettingsIcon sx={{ mr: 1 }} />
             <ListItemText primary="Admin" />
           </ListItem>
         )}
 
-        <ListItem component={Link} to="/profile">
+        <ListItem component={Link} to="/profile" sx={{ color: "white" }}>
           <AccountCircleIcon sx={{ mr: 1 }} />
           <ListItemText primary="Mi Perfil" />
         </ListItem>
-        <ListItem onClick={handleLogout}>
-          <LogoutIcon sx={{ mr: 1, color: "red" }} />
-          <ListItemText primary="Cerrar sesión" sx={{ color: "red" }} />
+        <ListItem onClick={handleLogout} sx={{ color: "red" }}>
+          <LogoutIcon sx={{ mr: 1 }} />
+          <ListItemText primary="Cerrar sesión" />
         </ListItem>
       </List>
     </Box>
@@ -108,8 +106,10 @@ const Navbar: React.FC = () => {
     <>
       <AppBar
         position="static"
-        color="default"
-        sx={{ boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}
+        sx={{
+          bgcolor: "#1f2937", // gris oscuro similar bg-gray-800
+          boxShadow: "0 2px 8px rgba(0,0,0,0.7)",
+        }}
       >
         <Toolbar className="max-w-6xl mx-auto w-full px-4">
           {/* Mobile menu button */}
@@ -133,12 +133,14 @@ const Navbar: React.FC = () => {
             }}
             onClick={() => navigate("/home")}
           >
-            <HomeIcon color="primary" sx={{ mr: 1 }} />
+            {/* Home icon blanco */}
+            <AdminPanelSettingsIcon
+              sx={{ mr: 1, color: "#3b82f6" }} // azul intenso
+            />
             <Typography
               variant="h6"
               component="div"
-              color="primary"
-              fontWeight="bold"
+              sx={{ color: "white", fontWeight: "bold" }}
             >
               Wamoney
             </Typography>
@@ -149,17 +151,23 @@ const Navbar: React.FC = () => {
             sx={{
               display: { xs: "none", sm: "flex" },
               alignItems: "center",
-              gap: 3,
+              gap: 2,
             }}
           >
-            {/* Sacamos botón Inicio */}
-
             {userInfo.admin && (
               <Button
                 component={Link}
                 to="/admin"
-                color="secondary"
                 variant="outlined"
+                sx={{
+                  color: "#3b82f6",
+                  borderColor: "#3b82f6",
+                  "&:hover": {
+                    backgroundColor: "#2563eb",
+                    borderColor: "#2563eb",
+                    color: "white",
+                  },
+                }}
                 startIcon={<AdminPanelSettingsIcon />}
               >
                 Admin
@@ -170,6 +178,7 @@ const Navbar: React.FC = () => {
               component={Link}
               to="/profile"
               variant="text"
+              sx={{ color: "white" }}
               startIcon={<AccountCircleIcon />}
             >
               Mi Perfil
@@ -177,22 +186,32 @@ const Navbar: React.FC = () => {
 
             <Button
               onClick={handleLogout}
-              color="error"
+              sx={{
+                color: "white",
+                bgcolor: "#dc2626",
+                "&:hover": { bgcolor: "#b91c1c" },
+              }}
               startIcon={<LogoutIcon />}
             >
               Cerrar sesión
             </Button>
 
             <Tooltip title={userInfo.nombre} arrow>
-              <Box sx={{ display: "flex", alignItems: "center", ml: 2, gap: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  ml: 2,
+                  gap: 1,
+                  color: "white",
+                }}
+              >
                 <Avatar
                   alt={userInfo.nombre}
                   src={userInfo.perfil.imagen}
                   sx={{ width: 40, height: 40 }}
                 />
-                <Typography variant="body1" color="textPrimary">
-                  {userInfo.nombre}
-                </Typography>
+                <Typography variant="body1">{userInfo.nombre}</Typography>
               </Box>
             </Tooltip>
           </Box>
@@ -207,7 +226,12 @@ const Navbar: React.FC = () => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 250 },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: 250,
+            bgcolor: "#1f2937",
+            color: "white",
+          },
         }}
       >
         {drawer}
