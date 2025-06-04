@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -20,22 +22,50 @@ interface User {
   id: number;
   nombre: string;
   email: string;
-  // agrega otros campos que uses
+  admin?: boolean;
 }
 
 const Dashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    // Cargar usuarios desde backend
-    fetch("/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error(err));
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error("Error al obtener los datos del usuario");
+
+        const data = await response.json();
+        setUserInfo(data.user);
+
+        if (data.user.admin === true) fetchUsers();
+      } catch (err) {
+        setError("No se pudo cargar la información del usuario");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUsers = () => {
+      fetch("/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setUsers(data))
+        .catch((err) => console.error("Error al cargar usuarios:", err));
+    };
+
+    fetchUserData();
   }, []);
 
   const handleDeleteClick = (id: number) => {
@@ -48,7 +78,7 @@ const Dashboard = () => {
 
     fetch(`/admin/users/${userToDelete}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("Error al eliminar usuario");
@@ -65,6 +95,10 @@ const Dashboard = () => {
     setConfirmOpen(false);
     setUserToDelete(null);
   };
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
+  if (!userInfo || userInfo.admin !== true) return <Typography>No autorizado</Typography>;
 
   return (
     <>
