@@ -15,15 +15,30 @@ import {
   Button,
   CircularProgress,
   Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { log } from "console";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Navbar from "Components/Navbar/Navbar";
+
+interface Transaction {
+  id: number;
+  monto: number;
+  descripcion: string;
+  createdAt: string;
+  emisorId?: number;
+  receptorId?: number;
+}
 
 interface User {
   id: number;
   nombre: string;
   email: string;
   admin?: boolean;
+  sentTransactions?: Transaction[];
+  receivedTransactions?: Transaction[];
 }
 
 const Dashboard = () => {
@@ -35,13 +50,11 @@ const Dashboard = () => {
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
-  console.log(token);
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
-          method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -49,8 +62,7 @@ const Dashboard = () => {
 
         const data = await response.json();
         setUserInfo(data.user);
-        console.log(userInfo);
-        
+
         if (data.user.admin === true) fetchUsers();
       } catch (err) {
         setError("No se pudo cargar la información del usuario");
@@ -59,13 +71,18 @@ const Dashboard = () => {
       }
     };
 
-    const fetchUsers = () => {
-      fetch("/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => setUsers(data))
-        .catch((err) => console.error("Error al cargar usuarios:", err));
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/admin/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+        setUsers(data.users);
+      } catch (err) {
+        console.error("Error al cargar usuarios:", err);
+        setError("Error al cargar los usuarios");
+      }
     };
 
     fetchUserData();
@@ -76,22 +93,24 @@ const Dashboard = () => {
     setConfirmOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (userToDelete === null) return;
 
-    fetch(`/admin/users/${userToDelete}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al eliminar usuario");
-        setUsers(users.filter((u) => u.id !== userToDelete));
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        setConfirmOpen(false);
-        setUserToDelete(null);
+    try {
+      const response = await fetch(`https://proyectofinalutn-production.up.railway.app/admin/users/${userToDelete}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!response.ok) throw new Error("Error al eliminar usuario");
+
+      setUsers(users.filter((u) => u.id !== userToDelete));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConfirmOpen(false);
+      setUserToDelete(null);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -99,12 +118,18 @@ const Dashboard = () => {
     setUserToDelete(null);
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress sx={{ mt: 4 }} />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (!userInfo || userInfo.admin !== true) return <Typography>No autorizado</Typography>;
+  if (!userInfo || !userInfo.admin) return <Typography>No autorizado</Typography>;
 
   return (
     <>
+      <Navbar />
+
+      <Typography variant="h4" align="center" mt={2} mb={3}>
+        Panel de Administración
+      </Typography>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -116,19 +141,58 @@ const Dashboard = () => {
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.nombre}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <IconButton
-                    aria-label="eliminar"
-                    color="error"
-                    onClick={() => handleDeleteClick(user.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+              <React.Fragment key={user.id}>
+                <TableRow>
+                  <TableCell>{user.nombre}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      aria-label="eliminar"
+                      color="error"
+                      onClick={() => handleDeleteClick(user.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        Transacciones de {user.nombre}
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography variant="subtitle1">📤 Enviadas:</Typography>
+                        {user.sentTransactions?.length ? (
+                          <ul>
+                            {user.sentTransactions.map((t) => (
+                              <li key={t.id}>
+                                A ID {t.receptorId} - ${t.monto} - "{t.descripcion}" - {new Date(t.createdAt).toLocaleString()}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <Typography variant="body2">No hay transacciones enviadas</Typography>
+                        )}
+
+                        <Typography variant="subtitle1" mt={2}>📥 Recibidas:</Typography>
+                        {user.receivedTransactions?.length ? (
+                          <ul>
+                            {user.receivedTransactions.map((t) => (
+                              <li key={t.id}>
+                                De ID {t.emisorId} - ${t.monto} - "{t.descripcion}" - {new Date(t.createdAt).toLocaleString()}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <Typography variant="body2">No hay transacciones recibidas</Typography>
+                        )}
+                      </AccordionDetails>
+                    </Accordion>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
