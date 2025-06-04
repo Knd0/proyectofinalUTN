@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { log } from "console";
 
 interface User {
   id: number;
@@ -34,7 +35,8 @@ const Dashboard = () => {
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
-
+  console.log(token);
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -47,7 +49,8 @@ const Dashboard = () => {
 
         const data = await response.json();
         setUserInfo(data.user);
-
+        console.log(userInfo);
+        
         if (data.user.admin === true) fetchUsers();
       } catch (err) {
         setError("No se pudo cargar la información del usuario");
