@@ -20,7 +20,7 @@ const Landing: React.FC = () => {
     <div className="bg-gray-900 text-white min-h-screen">
       
       <header className="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center fade-in" data-aos="fade-down">
-        <h1 className="text-2xl font-bold">Billetera Virtual</h1>
+        <h1 className="text-2xl font-bold">Wamoney</h1>
         
       </header>
 
