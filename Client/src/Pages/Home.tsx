@@ -6,21 +6,15 @@ import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBillTransfer, faDownload, faExchangeAlt  } from '@fortawesome/free-solid-svg-icons';
+import { faMoneyBillTransfer, faDownload, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
+import { useUser, Balance } from "../Components/Context/UserContext";
+
+type Currency = keyof Balance;
 
 const Home = () => {
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [balance, setBalance] = useState<any>({
-    ARS: 0,
-    USD: 0,
-    EUR: 0,
-    BTC: 0,
-    ETH: 0,
-    USDT: 0,
-  });
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const { userInfo, balance, fetchUserData } = useUser();
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,38 +28,22 @@ const Home = () => {
       return;
     }
 
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos del usuario");
-        }
-
-        const data = await response.json();
-        setUserInfo(data.user);
-        setBalance(data.user.balance || data.user.COD || {}); // Por si el balance está en otro campo
-        setLoading(false);
-      } catch (err) {
-        setError("No se pudo cargar la información del usuario");
-        setLoading(false);
-      }
+    const loadData = async () => {
+      await fetchUserData();
+      setLoading(false);
     };
 
-    fetchUserData();
-  }, [navigate]);
+    loadData();
+  }, [navigate, fetchUserData]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCurrency(e.target.value);
+    setSelectedCurrency(e.target.value as Currency);
   };
 
-  const currencyOptions = Object.keys(balance);
+  const currencyOptions = Object.keys(balance) as Currency[];
 
   if (loading) return <Loader />;
-  if (!userInfo) return null; // o un mensaje de error
+  if (!userInfo) return null;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
@@ -91,13 +69,13 @@ const Home = () => {
                 </option>
               ))}
             </select>
-            {/* Botón Exchange junto al dropdown */}
+
             <Link
               to="/exchange"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition ml-3"
             >
-             <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
-              Convertir.
+              <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+              Convertir
             </Link>
           </p>
 
@@ -119,8 +97,6 @@ const Home = () => {
             </Link>
           </div>
         </div>
-
-        {error && <p className="text-red-500">{error}</p>}
 
         <TransactionHistory />
       </main>

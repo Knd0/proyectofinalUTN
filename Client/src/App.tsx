@@ -14,7 +14,7 @@ import Transaction from "./Components/Transaction/Transaction";
 import FakeCheckout from "./Components/LoadBalance/FakeCheckout";
 import Exchange from "./Components/Exchange/Exchange";
 import Dashboard from "Pages/Dashboard";
-import AdminRoute from "AdminRoute";
+import AdminRoute from "Pages/AdminRoute";
 
 const App: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token"); // o tu lógica real
@@ -35,11 +35,7 @@ const App: React.FC = () => {
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/fake-checkout" element={<FakeCheckout />} />
         <Route path="/exchange" element={<Exchange />} />
-        <Route
-          element={
-            <AdminRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
-          }
-        >
+        <Route element={<AdminRoute />}>
           <Route path="/admin" element={<Dashboard />} />
         </Route>
       </Route>
