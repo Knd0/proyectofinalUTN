@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbar from "Components/Navbar/Navbar";
 
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
@@ -105,6 +106,8 @@ const Exchange: React.FC = () => {
   };
 
   return (
+    <>
+    <Navbar/>
     <div
       className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
         bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
@@ -199,6 +202,7 @@ const Exchange: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

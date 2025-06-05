@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "Components/Navbar/Navbar";
 
 type TransactionProps = {
   userInfo?: any;
@@ -51,6 +52,8 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
   };
 
   return (
+    <>
+    <Navbar/>
     <div
       className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
       bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
@@ -140,6 +143,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
         Volver al Inicio
       </button>
     </div>
+    </>
   );
 };
 
