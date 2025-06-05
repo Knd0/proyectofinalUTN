@@ -71,6 +71,11 @@ Usuario.init(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    isConfirmed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
 
   {
