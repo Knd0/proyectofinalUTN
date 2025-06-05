@@ -41,10 +41,29 @@ const Register = () => {
     
         
       }, [navigate]);
+
+      function emailresponse(){  fetch(
+        "https://proyectofinalutn-production.up.railway.app/email/send-confirmation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+          }),
+        }
+      );
+
+   
+  
+    }
+  
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      emailresponse();
       const response = await fetch(
         "https://proyectofinalutn-production.up.railway.app/auth/register",
         {
