@@ -15,6 +15,7 @@ export interface User {
   email: string;
   cvu: string;
   balance: Balance;
+  isconfirmed: boolean;
   perfil?: {
     descripcion: string;
     nacionalidad: string;

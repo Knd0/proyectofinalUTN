@@ -18,8 +18,6 @@ import AdminRoute from "Pages/AdminRoute";
 
 const App: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token"); // o tu lógica real
-  const isAdmin =
-    JSON.parse(localStorage.getItem("user") || "{}")?.admin === true; // suponiendo que guardás esto
 
   return (
     <Routes>
