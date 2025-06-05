@@ -103,7 +103,7 @@ export const authController = {
           ETH: 0,
           USDT: 0,
         },
-        isConfirmed: false
+        isconfirmed: false
       });
 
       return res

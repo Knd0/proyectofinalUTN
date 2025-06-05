@@ -37,7 +37,7 @@ export const confirmAccount = async (req: Request, res: Response) => {
 
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    await user.update({ isConfirmed: true });
+    await user.update({ isconfirmed: true });
     return res.redirect("https://proyectofinalutn2025.vercel.app/confirmado"); // O una pantalla de éxito
   } catch (err) {
     return res.status(400).json({ error: "Token inválido o expirado" });

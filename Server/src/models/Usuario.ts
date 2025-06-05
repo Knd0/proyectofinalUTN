@@ -17,7 +17,7 @@ export class Usuario extends Model {
     [key: string]: number; // Esto permite el acceso a las propiedades mediante una cadena.
   };
   public admin!: boolean;
-  public isConfirmed!: boolean;
+  public isconfirmed!: boolean;
 }
 
 Usuario.init(
@@ -72,7 +72,7 @@ Usuario.init(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    isConfirmed: {
+    isconfirmed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
