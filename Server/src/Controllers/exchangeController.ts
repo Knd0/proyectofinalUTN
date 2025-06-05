@@ -94,7 +94,7 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
     // Enviar email de confirmación
     const mensaje = `
     Se ha realizado una conversión en tu cuenta:<br/>
-    Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.`;
+    Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.¡Gracias por usar Wamoney! 💸`;
 
     try {
     await sendTransactionEmail(user.email, user.nombre || "usuario", mensaje);

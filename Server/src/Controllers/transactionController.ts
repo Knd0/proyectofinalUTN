@@ -158,11 +158,11 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     // Enviar emails de notificación
     const mensajeEnviada = `
-     Has enviado <strong>${amount} ${currency}</strong> a <strong>${toUser.nombre}</strong> (CVU: ${toUser.cvu}). `;
+     Has enviado <strong>${amount} ${currency}</strong> a <strong>${toUser.nombre}</strong> (CVU: ${toUser.cvu}).¡Gracias por usar Wamoney! 💸 `;
     await sendTransactionEmail(fromUser.email, fromUser.nombre, mensajeEnviada);
 
     const mensajeRecibida = `
-     Has recibido <strong>${amount} ${currency}</strong> de <strong>${fromUser.nombre}</strong>.`;
+     Has recibido <strong>${amount} ${currency}</strong> de <strong>${fromUser.nombre}</strong>.¡Gracias por usar Wamoney! 💸`;
 
     await sendTransactionEmail(toUser.email, toUser.nombre, mensajeRecibida);
 
