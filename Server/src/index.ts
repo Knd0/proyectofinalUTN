@@ -32,7 +32,7 @@ app.use("/auth", authRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/exchange", exchangeRoutes);
 app.use("/admin", adminRoutes);
-app.use("/api/confirm", confirmedRoutes);
+app.use("/email", confirmedRoutes);
 // Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err);
