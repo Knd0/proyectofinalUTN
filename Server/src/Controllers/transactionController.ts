@@ -157,17 +157,15 @@ export const createTransaction = async (req: Request, res: Response) => {
     });
 
     // Enviar emails de notificación
-    await sendTransactionEmail(
-      fromUser.email,
-      "Notificación: Transferencia enviada",
-      `<p>Hola ${fromUser.nombre},</p><p>Has enviado <strong>${amount} ${currency}</strong> a <strong>${toUser.nombre}</strong> (CVU: ${toUser.cvu}).</p>`
-    );
+    const mensajeEnviada = `
+     Has enviado <strong>${amount} ${currency}</strong> a <strong>${toUser.nombre}</strong> (CVU: ${toUser.cvu}). `;
+    await sendTransactionEmail(fromUser.email, fromUser.nombre, mensajeEnviada);
 
-    await sendTransactionEmail(
-      toUser.email,
-      "Notificación: Transferencia recibida",
-      `<p>Hola ${toUser.nombre},</p><p>Has recibido <strong>${amount} ${currency}</strong> de <strong>${fromUser.nombre}</strong> (CVU: ${fromUser.cvu}).</p>`
-    );
+    const mensajeRecibida = `
+     Has recibido <strong>${amount} ${currency}</strong> de <strong>${fromUser.nombre}</strong>.`;
+
+    await sendTransactionEmail(toUser.email, toUser.nombre, mensajeRecibida);
+
 
     console.log("✅ Transacción exitosa");
     return res.status(201).json({ message: "Transacción exitosa" });
