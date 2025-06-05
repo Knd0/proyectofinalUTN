@@ -92,23 +92,17 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
     await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
 
     // Enviar email de confirmación
-    const emailHtml = `
-      <h2>Confirmación de conversión de moneda</h2>
-      <p>Hola ${user.nombre || "usuario"},</p>
-      <p>Se ha realizado una conversión en tu cuenta:</p>
-      <p>
-        Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.
-      </p>
-      <p>Gracias por usar Wallet App.</p>
-    `;
+    const mensaje = `
+    Se ha realizado una conversión en tu cuenta:<br/>
+    Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.`;
 
     try {
-      await sendTransactionEmail(user.email, "Confirmación de conversión", emailHtml);
-      console.log("📧 Email de conversión enviado correctamente");
+    await sendTransactionEmail(user.email, user.nombre || "usuario", mensaje);
+    console.log("📧 Email de conversión enviado correctamente");
     } catch (emailError) {
-      console.error("❌ Error al enviar email de conversión:", emailError);
-      // No frenamos el flujo por fallo en email, solo logueamos
+    console.error("❌ Error al enviar email de conversión:", emailError);
     }
+
 
     console.log("✅ Conversión realizada con éxito");
 
