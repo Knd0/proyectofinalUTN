@@ -17,6 +17,7 @@ export class Usuario extends Model {
     [key: string]: number; // Esto permite el acceso a las propiedades mediante una cadena.
   };
   public admin!: boolean;
+  public isConfirmed!: boolean;
 }
 
 Usuario.init(
