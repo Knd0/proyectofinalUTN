@@ -70,9 +70,9 @@ export const authController = {
     res: Response,
     next: NextFunction
   ): Promise<Response> => {
-    const { nombre, email, password, dni, nacionalidad, isConfirmed } = req.body;
+    const { nombre, email, password, dni, nacionalidad} = req.body;
 
-    if (!nombre || !email || !password || !dni || !nacionalidad || !isConfirmed) {
+    if (!nombre || !email || !password || !dni || !nacionalidad) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
