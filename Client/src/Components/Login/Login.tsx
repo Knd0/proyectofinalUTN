@@ -22,6 +22,7 @@ const Login = () => {
       });
 
       const data = await response.json();
+      console.log(data)
 
       if (response.ok) {
         const secretKey = 'default_secret_key'; // Vite
@@ -32,8 +33,11 @@ const Login = () => {
         navigate('/home');
       } else {
         setError(data.error || 'Error de login');
+        console.log(data.error)
       }
     } catch (err) {
+      console.log(err);
+      
       setError('Error de conexión');
     }
   };
