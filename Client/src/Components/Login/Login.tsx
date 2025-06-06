@@ -11,7 +11,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/home");
+      navigate("/home", { replace: true });
       return;
     }
   }, [navigate]);
@@ -41,7 +41,7 @@ const Login = () => {
 
         localStorage.setItem("token", data.token);
 
-        navigate("/home");
+        navigate("/home", { replace: true });
       } else {
         setError(data.error || "Error de login");
         console.log(data.error);
