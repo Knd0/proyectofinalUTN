@@ -28,11 +28,6 @@ const Home = () => {
       return;
     }
 
-    const loadData = async () => {
-      await fetchUserData();
-      setLoading(false);
-    };
-
     loadData();
   }, [navigate, fetchUserData]);
 
