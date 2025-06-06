@@ -28,7 +28,7 @@ const Home = () => {
       return;
     }
 
-    loadData();
+    
   }, [navigate, fetchUserData]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
