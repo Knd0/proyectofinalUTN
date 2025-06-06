@@ -35,7 +35,7 @@ const Register = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/home");
+      navigate("/home", { replace: true });
     }
   }, [navigate]);
 
@@ -77,7 +77,7 @@ const Register = () => {
 
       if (response.ok) {
         await sendConfirmationEmail(email);
-        navigate("/login");
+        navigate("/login", { replace: true });
       } else {
         setError(data.error || "Error de registro");
       }
