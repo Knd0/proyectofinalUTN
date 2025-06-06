@@ -8,14 +8,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/home", { replace: true });
-      return;
-    }
-  }, [navigate]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
