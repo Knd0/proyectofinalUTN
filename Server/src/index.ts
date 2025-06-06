@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken";
 import transactionRoutes from "./Routes/transactionRoutes";
 import exchangeRoutes from "./Routes/exchangeRoutes";
 import adminRoutes from "./Routes/adminRoutes";
-import confirmedRoutes from "./Routes/confirmationRoutes";
+import confirmationRoutes from "./Routes/confirmationRoutes";
 const app = express();
 
 // Configura CORSS
@@ -32,7 +32,9 @@ app.use("/auth", authRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/exchange", exchangeRoutes);
 app.use("/admin", adminRoutes);
-app.use("/email", confirmedRoutes);
+app.use("/email", confirmationRoutes as express.Router); 
+
+
 // Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err);
