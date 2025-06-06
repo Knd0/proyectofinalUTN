@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react"; // Iconos opcionales
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck, faCircleXmark, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 const ConfirmAccount = () => {
   const { token } = useParams();
@@ -39,15 +40,15 @@ const ConfirmAccount = () => {
 
         {loading ? (
           <div className="flex flex-col items-center gap-2">
-            <Loader2 className="animate-spin w-8 h-8 text-blue-500" />
+            <FontAwesomeIcon icon={faSpinner} spin className="text-blue-500 text-3xl" />
             <p className="text-blue-600 text-sm">Cargando...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
             {success ? (
-              <CheckCircle className="w-12 h-12 text-green-500" />
+              <FontAwesomeIcon icon={faCircleCheck} className="text-green-500 text-4xl" />
             ) : (
-              <XCircle className="w-12 h-12 text-red-500" />
+              <FontAwesomeIcon icon={faCircleXmark} className="text-red-500 text-4xl" />
             )}
             <p className="text-gray-700 font-medium">{message}</p>
             {!success && (
