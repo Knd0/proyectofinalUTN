@@ -7,7 +7,7 @@ interface Country {
 }
 
 const Register = () => {
-  const [countries, setCountries] = useState<Country[]>();
+  const [countries, setCountries] = useState<Country[]>([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dni, setDni] = useState("");
@@ -26,65 +26,57 @@ const Register = () => {
         );
         setCountries(sorted);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching countries:", err);
       }
     };
     fetchCountries();
   }, []);
 
   useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-          navigate("/home");
-          return;
-        }
-    
-        
-      }, [navigate]);
-
-      function emailresponse(){  fetch(
-        "https://proyectofinalutn-production.up.railway.app/email/send-confirmation",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-          }),
-        }
-      );
-
-   
-  
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
     }
-  
+  }, [navigate]);
+
+  const sendConfirmationEmail = async (email: string) => {
+    try {
+      await fetch("https://proyectofinalutn-production.up.railway.app/email/send-confirmation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+    } catch (err) {
+      console.error("Error sending confirmation email:", err);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     try {
-      emailresponse();
-      const response = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            dni: dni,
-            nacionalidad: nacionalidad,
-            nombre: name,
-          }),
-          credentials: "include",
-        }
-      );
+      const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          dni,
+          nacionalidad,
+          nombre: name,
+        }),
+        credentials: "include",
+      });
 
       const data = await response.json();
 
       if (response.ok) {
+        await sendConfirmationEmail(email);
         navigate("/login");
       } else {
         setError(data.error || "Error de registro");
@@ -99,6 +91,7 @@ const Register = () => {
       <div className="wrapper">
         <form onSubmit={handleRegister}>
           <p className="form-login">Register</p>
+
           <div className="input-box">
             <input
               type="text"
@@ -108,6 +101,7 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="input-box">
             <input
               type="email"
@@ -117,6 +111,7 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="input-box">
             <input
               type="password"
@@ -126,6 +121,7 @@ const Register = () => {
               required
             />
           </div>
+
           <div className="input-box">
             <input
               type="number"
@@ -146,17 +142,20 @@ const Register = () => {
               <option value="" disabled hidden>
                 Nacionalidad
               </option>
-              {countries?.map((c, i) => (
+              {countries.map((c, i) => (
                 <option key={i} value={c.name.official} className="text-black">
                   {c.name.official}
                 </option>
               ))}
             </select>
           </div>
+
           <button className="btn" type="submit">
             Register
           </button>
+
           {error && <p className="error-message">{error}</p>}
+
           <div className="register-link">
             <p>
               Already have an account? <a href="/login">Login</a>
