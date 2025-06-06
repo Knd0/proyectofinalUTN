@@ -23,12 +23,18 @@ const Home = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       navigate("/login");
       return;
     }
 
-    
+    const loadUser = async () => {
+      await fetchUserData();
+      setLoading(false); // ✅ aseguramos que se desactive el loader después de traer datos
+    };
+
+    loadUser();
   }, [navigate, fetchUserData]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
