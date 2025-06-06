@@ -12,7 +12,7 @@ const ConfirmAccount = () => {
   useEffect(() => {
     const confirm = async () => {
       try {
-        const response = await fetch(`https://tu-backend.com/email/confirm/${token}`);
+        const response = await fetch(`https://proyectofinalutn-production.up.railway.app/email/confirm/${token}`);
         const data = await response.json();
         if (response.ok) {
           setSuccess(true);
