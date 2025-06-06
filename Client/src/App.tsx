@@ -15,6 +15,7 @@ import FakeCheckout from "./Components/LoadBalance/FakeCheckout";
 import Exchange from "./Components/Exchange/Exchange";
 import Dashboard from "Pages/Dashboard";
 import AdminRoute from "Pages/AdminRoute";
+import ConfirmAccount from "./Pages/ConfirmAccount";
 
 const App: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token"); // o tu lógica real
@@ -24,6 +25,7 @@ const App: React.FC = () => {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/confirm/:token" element={<ConfirmAccount />} /> 
       <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
         <Route path="/home" element={<Home />} />
         <Route path="/loadbalance" element={<LoadBalance />} />
