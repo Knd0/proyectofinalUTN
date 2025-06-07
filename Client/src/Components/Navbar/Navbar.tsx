@@ -62,6 +62,8 @@ const Navbar: React.FC = () => {
 
         const data = await response.json();
         setUserInfo(data.user);
+        console.log(data.user);
+        
       } catch (error) {
         console.error("Error al cargar usuario:", error);
         localStorage.removeItem("token");
@@ -76,6 +78,8 @@ const Navbar: React.FC = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
+  console.log(userInfo);
+
 
   const toggleDrawer = () => {
     setMobileOpen(!mobileOpen);
