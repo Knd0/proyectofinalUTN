@@ -29,12 +29,11 @@ const Home = () => {
       return;
     }
 
-    const loadUser = async () => {
-      await fetchUserData();
-      setLoading(false); // ✅ aseguramos que se desactive el loader después de traer datos
-    };
+    
+    fetchUserData();
+      
 
-    loadUser();
+  
   }, [navigate]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -43,8 +42,7 @@ const Home = () => {
 
   const currencyOptions = Object.keys(balance) as Currency[];
 
-  if (loading) return <Loader />;
-  if (!userInfo) return null;
+  if (!userInfo) return <Loader />;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
