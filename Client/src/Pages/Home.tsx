@@ -5,8 +5,12 @@ import "aos/dist/aos.css";
 import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBillTransfer, faDownload, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMoneyBillTransfer,
+  faDownload,
+  faExchangeAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import { useUser, Balance } from "../Components/Context/UserContext";
 
 type Currency = keyof Balance;
@@ -44,8 +48,13 @@ const Home = () => {
     <div className="bg-gray-900 text-white min-h-screen">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center" data-aos="fade-up">
-        <h2 className="text-4xl font-bold mb-6">Bienvenido, {userInfo.nombre}</h2>
+      <main
+        className="max-w-6xl mx-auto px-6 py-20 flex flex-col items-center"
+        data-aos="fade-up"
+      >
+        <h2 className="text-4xl font-bold mb-6">
+          Bienvenido, {userInfo.nombre}
+        </h2>
 
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full md:w-1/2 flex flex-col items-center mb-8">
           <h3 className="text-3xl font-semibold mb-4">Balance Actual</h3>
@@ -64,7 +73,6 @@ const Home = () => {
                 </option>
               ))}
             </select>
-
             <button
               disabled={isDisabled}
               onClick={() => navigate("/exchange")}
@@ -79,7 +87,7 @@ const Home = () => {
             </button>
             {isDisabled && (
               <p className="text-yellow-400 text-sm mt-2">
-                Verificá tu correo para activar esta función.
+                Verificá tu correo para activar estas funciones.
               </p>
             )}
           </p>
@@ -98,11 +106,6 @@ const Home = () => {
                 <FontAwesomeIcon icon={faDownload} className="mr-2" />
                 Ingresar Dinero
               </button>
-              {isDisabled && (
-                <span className="text-yellow-400 text-sm mt-2 text-center">
-                  Función bloqueada hasta confirmar tu email.
-                </span>
-              )}
             </div>
 
             <div className="flex flex-col items-center w-full md:w-auto">
@@ -118,11 +121,6 @@ const Home = () => {
                 <FontAwesomeIcon icon={faMoneyBillTransfer} className="mr-2" />
                 Transferir Dinero
               </button>
-              {isDisabled && (
-                <span className="text-yellow-400 text-sm mt-2 text-center">
-                  Necesitás verificar tu correo.
-                </span>
-              )}
             </div>
           </div>
         </div>
