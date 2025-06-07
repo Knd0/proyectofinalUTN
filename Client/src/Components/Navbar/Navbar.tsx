@@ -13,15 +13,19 @@ import {
   ListItemText,
   Box,
   Button,
+  Alert,
+  Collapse,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface UserInfo {
   nombre: string;
   admin: boolean;
+  isconfirmed: boolean;
   perfil: {
     imagen: string;
   };
@@ -30,6 +34,7 @@ interface UserInfo {
 const Navbar: React.FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showVerificationAlert, setShowVerificationAlert] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,9 +81,7 @@ const Navbar: React.FC = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  if (!userInfo) {
-    return null;
-  }
+  if (!userInfo) return null;
 
   const drawer = (
     <Box onClick={toggleDrawer} sx={{ width: 250, bgcolor: "#1f2937", height: "100%" }}>
@@ -89,7 +92,6 @@ const Navbar: React.FC = () => {
             <ListItemText primary="Admin" />
           </ListItem>
         )}
-
         <ListItem component={Link} to="/profile" sx={{ color: "white" }}>
           <AccountCircleIcon sx={{ mr: 1 }} />
           <ListItemText primary="Mi Perfil" />
@@ -107,12 +109,11 @@ const Navbar: React.FC = () => {
       <AppBar
         position="static"
         sx={{
-          bgcolor: "#1f2937", // gris oscuro similar bg-gray-800
+          bgcolor: "#1f2937",
           boxShadow: "0 2px 8px rgba(0,0,0,0.7)",
         }}
       >
         <Toolbar className="max-w-6xl mx-auto w-full px-4">
-          {/* Mobile menu button */}
           <IconButton
             color="inherit"
             edge="start"
@@ -123,7 +124,6 @@ const Navbar: React.FC = () => {
             <MenuIcon />
           </IconButton>
 
-          {/* Logo / Nombre */}
           <Box
             sx={{
               display: "flex",
@@ -133,10 +133,7 @@ const Navbar: React.FC = () => {
             }}
             onClick={() => navigate("/home")}
           >
-            {/* Home icon blanco */}
-            <AdminPanelSettingsIcon
-              sx={{ mr: 1, color: "#3b82f6" }} // azul intenso
-            />
+            <AdminPanelSettingsIcon sx={{ mr: 1, color: "#3b82f6" }} />
             <Typography
               variant="h6"
               component="div"
@@ -146,7 +143,6 @@ const Navbar: React.FC = () => {
             </Typography>
           </Box>
 
-          {/* Desktop menu */}
           <Box
             sx={{
               display: { xs: "none", sm: "flex" },
@@ -218,7 +214,43 @@ const Navbar: React.FC = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer para mobile */}
+      {!userInfo.isconfirmed && showVerificationAlert && (
+        <Collapse in={showVerificationAlert}>
+          <Alert
+            severity="warning"
+            variant="filled"
+            action={
+              <IconButton
+                aria-label="cerrar"
+                color="inherit"
+                size="small"
+                onClick={() => setShowVerificationAlert(false)}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            sx={{
+              position: "fixed",
+              top: 80,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1400,
+              bgcolor: "#facc15",
+              color: "#1f2937",
+              fontWeight: "bold",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+              borderRadius: 2,
+              px: 3,
+              py: 2,
+              maxWidth: 500,
+              textAlign: "center",
+            }}
+          >
+            Verificá tu correo para poder navegar completamente por Wamoney.
+          </Alert>
+        </Collapse>
+      )}
+
       <Drawer
         anchor="left"
         open={mobileOpen}
