@@ -35,7 +35,7 @@ const Home = () => {
     };
 
     loadUser();
-  }, [navigate, fetchUserData]);
+  }, [navigate]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCurrency(e.target.value as Currency);
