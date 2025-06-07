@@ -23,17 +23,11 @@ const Home = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/login");
       return;
     }
-
-    
     fetchUserData();
-      
-
-  
   }, [navigate]);
 
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -43,6 +37,8 @@ const Home = () => {
   const currencyOptions = Object.keys(balance) as Currency[];
 
   if (!userInfo) return <Loader />;
+
+  const isDisabled = !userInfo.isconfirmed;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
@@ -69,31 +65,65 @@ const Home = () => {
               ))}
             </select>
 
-            <Link
-              to="/exchange"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition ml-3"
+            <button
+              disabled={isDisabled}
+              onClick={() => navigate("/exchange")}
+              className={`px-4 py-2 rounded-lg shadow transition ml-3 flex items-center ${
+                isDisabled
+                  ? "bg-gray-600 cursor-not-allowed text-gray-300"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
               Convertir
-            </Link>
+            </button>
+            {isDisabled && (
+              <p className="text-yellow-400 text-sm mt-2">
+                Verificá tu correo para activar esta función.
+              </p>
+            )}
           </p>
 
-          <div className="flex justify-between items-center w-full mt-6">
-            <Link
-              to="/loadbalance"
-              className="bg-blue-600 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition flex items-center"
-            >
-              <FontAwesomeIcon icon={faDownload} className="mr-2" />
-              Ingresar Dinero
-            </Link>
+          <div className="flex justify-between items-center w-full mt-6 flex-col md:flex-row gap-4 md:gap-0">
+            <div className="flex flex-col items-center w-full md:w-auto">
+              <button
+                disabled={isDisabled}
+                onClick={() => navigate("/loadbalance")}
+                className={`w-full px-6 py-3 rounded-lg shadow flex items-center justify-center ${
+                  isDisabled
+                    ? "bg-gray-600 cursor-not-allowed text-gray-300"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                Ingresar Dinero
+              </button>
+              {isDisabled && (
+                <span className="text-yellow-400 text-sm mt-2 text-center">
+                  Función bloqueada hasta confirmar tu email.
+                </span>
+              )}
+            </div>
 
-            <Link
-              to="/transaction"
-              className="bg-blue-500 px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition text-white font-semibold ml-5 flex items-center"
-            >
-              <FontAwesomeIcon icon={faMoneyBillTransfer} className="mr-2" />
-              Transferir Dinero
-            </Link>
+            <div className="flex flex-col items-center w-full md:w-auto">
+              <button
+                disabled={isDisabled}
+                onClick={() => navigate("/transaction")}
+                className={`w-full px-6 py-3 rounded-lg shadow flex items-center justify-center ${
+                  isDisabled
+                    ? "bg-gray-600 cursor-not-allowed text-gray-300"
+                    : "bg-blue-500 hover:bg-blue-700 text-white"
+                }`}
+              >
+                <FontAwesomeIcon icon={faMoneyBillTransfer} className="mr-2" />
+                Transferir Dinero
+              </button>
+              {isDisabled && (
+                <span className="text-yellow-400 text-sm mt-2 text-center">
+                  Necesitás verificar tu correo.
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
