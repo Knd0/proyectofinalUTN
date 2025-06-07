@@ -85,13 +85,12 @@ const Home = () => {
               <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
               Convertir
             </button>
-            {isDisabled && (
-              <p className="text-yellow-400 text-sm mt-2">
-                Verificá tu correo para activar estas funciones.
-              </p>
-            )}
           </p>
-
+          {isDisabled && (
+            <p className="text-yellow-400 text-sm mt-2">
+              Verificá tu correo para activar estas funciones.
+            </p>
+          )}
           <div className="flex justify-between items-center w-full mt-6 flex-col md:flex-row gap-4 md:gap-0">
             <div className="flex flex-col items-center w-full md:w-auto">
               <button
