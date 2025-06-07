@@ -48,6 +48,7 @@ export const authController = {
           nombre: user.nombre,
           email: user.email,
           admin: user.admin,
+          isconfirmed: user.isconfirmed,
           perfil: {
             imagen: user.imagen,
             descripcion: user.descripcion,
