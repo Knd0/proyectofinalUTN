@@ -35,6 +35,7 @@ const FakeCheckout = () => {
     }
 
     setLoading(true);
+    
 
     try {
       await axios.post(
@@ -59,16 +60,13 @@ const FakeCheckout = () => {
       setLoading(false);
     }
   };
-
+  if (loading) {
+    return <Loader />
+  }
   return (
     <>
     <Navbar/>
     <div className="container max-w-md mx-auto mt-10 p-6 border rounded shadow-lg bg-white relative">
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
-          <Loader />
-        </div>
-      )}
 
       <h2 className="text-2xl font-bold mb-4">Simulación de Pago</h2>
 
