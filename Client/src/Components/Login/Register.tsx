@@ -1,107 +1,56 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
+import React, { useState } from "react";
 import {
-  Box,
+  Avatar,
   Button,
+  Container,
+  CssBaseline,
+  Grid,
+  Link,
+  Paper,
   TextField,
   Typography,
-  Container,
-  Paper,
-  Link,
-  Alert,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
+  Box,
   MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
-import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
-
-interface Country {
-  name: { official: string };
-}
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
-  const [countries, setCountries] = useState<Country[]>([]);
+  const navigate = useNavigate();
+
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dni, setDni] = useState("");
   const [nacionalidad, setNacionalidad] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [countriesLoading, setCountriesLoading] = useState(true);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchCountries() {
-      setCountriesLoading(true);
-      try {
-        const res = await fetch(
-          "https://restcountries.com/v3.1/all?fields=name"
-        );
-        if (!res.ok) throw new Error("Error fetching countries");
-        const data: Country[] = await res.json();
-        data.sort((a, b) => a.name.official.localeCompare(b.name.official));
-        setCountries(data);
-      } catch {
-        setError("No se pudo cargar la lista de países.");
-      } finally {
-        setCountriesLoading(false);
-      }
-    }
-    fetchCountries();
-  }, []);
-
-  const sendConfirmationEmail = async (userEmail: string) => {
-    try {
-      const res = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/email/send-confirmation",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: userEmail }),
-        }
-      );
-      if (!res.ok) {
-        console.error("Error enviando email de confirmación");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
+
+    if (!nombre || !email || !password || !dni || !nacionalidad) {
+      toast.error("Por favor completá todos los campos");
+      return;
+    }
+
     try {
-      const res = await fetch(
-        "https://proyectofinalutn-production.up.railway.app/auth/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            password,
-            dni,
-            nacionalidad,
-            nombre: name,
-          }),
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      if (res.ok) {
-        await sendConfirmationEmail(email);
-        navigate("/login", { replace: true });
-      } else {
-        setError(data.error || "Error en el registro. Revisa tus datos.");
-      }
-    } catch {
-      setError("Error de conexión. Intenta nuevamente.");
-    } finally {
-      setLoading(false);
+      await axios.post("https://proyectofinalutn-production.up.railway.app/auth/register", {
+        nombre,
+        email,
+        password,
+        dni,
+        nacionalidad,
+      });
+      toast.success("✅ Registro exitoso");
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (error) {
+      console.error(error);
+      toast.error("❌ Error al registrar");
     }
   };
 
@@ -112,168 +61,124 @@ const Register = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "background.default",
-        backgroundImage:
-          "url('https://source.unsplash.com/random?finance-signup&orientation=landscape')",
+        backgroundImage: "url('https://source.unsplash.com/featured/?finance,bank')",
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        bgcolor: "rgba(0, 0, 0, 0.7)",
+        backgroundBlendMode: "darken",
       }}
     >
       <Container component="main" maxWidth="xs">
+        <CssBaseline />
         <Paper
-          elevation={10}
+          elevation={12}
           sx={{
             p: 4,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             borderRadius: 3,
-            bgcolor: "background.paper",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+            backdropFilter: "blur(8px)",
+            bgcolor: "rgba(17, 24, 39, 0.85)",
+            color: "white",
           }}
         >
-          <PersonAddAltOutlinedIcon
-            sx={{ fontSize: 48, color: "secondary.main", mb: 2 }}
-            aria-label="Icono de registro"
-          />
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ mb: 3, fontWeight: "bold", color: "text.primary" }}
-          >
-            Registrarse
+          <Avatar sx={{ m: 1, bgcolor: "success.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" fontWeight="bold" mb={2}>
+            Crear cuenta
           </Typography>
 
-          <Box
-            component="form"
-            onSubmit={handleRegister}
-            noValidate
-            sx={{ mt: 1, width: "100%" }}
-          >
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
-              label="Nombre Completo"
-              required
-              fullWidth
               margin="normal"
-              autoComplete="name"
-              autoFocus
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              variant="outlined"
-              sx={{ mb: 2 }}
+              fullWidth
+              label="Nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              sx={muiInputStyle}
             />
             <TextField
-              label="Correo Electrónico"
-              type="email"
-              required
-              fullWidth
               margin="normal"
-              autoComplete="email"
+              fullWidth
+              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              variant="outlined"
-              sx={{ mb: 2 }}
+              sx={muiInputStyle}
             />
             <TextField
+              margin="normal"
+              fullWidth
               label="Contraseña"
               type="password"
-              required
-              fullWidth
-              margin="normal"
-              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              variant="outlined"
-              sx={{ mb: 2 }}
+              sx={muiInputStyle}
             />
             <TextField
-              label="DNI"
-              type="number"
-              required
-              fullWidth
               margin="normal"
-              inputProps={{ pattern: "[0-9]*" }}
+              fullWidth
+              label="DNI"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              variant="outlined"
-              sx={{ mb: 2 }}
+              sx={muiInputStyle}
             />
-
-            <FormControl fullWidth margin="normal" sx={{ mb: 3 }}>
-              <InputLabel id="nacionalidad-label">Nacionalidad</InputLabel>
+            <FormControl fullWidth sx={muiInputStyle}>
+              <InputLabel sx={{ color: "#9ca3af" }}>Nacionalidad</InputLabel>
               <Select
-                labelId="nacionalidad-label"
-                id="nacionalidad"
                 value={nacionalidad}
-                onChange={(e) => setNacionalidad(e.target.value)}
                 label="Nacionalidad"
-                disabled={countriesLoading}
+                onChange={(e) => setNacionalidad(e.target.value)}
+                sx={{
+                  color: "white",
+                  ".MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#60a5fa" },
+                }}
               >
-                {!countriesLoading && (
-                  <MenuItem value="" disabled>
-                    Selecciona tu nacionalidad
-                  </MenuItem>
-                )}
-
-                {countriesLoading ? (
-                  <MenuItem disabled>Cargando países...</MenuItem>
-                ) : (
-                  countries.map((country, idx) => (
-                    <MenuItem key={idx} value={country.name.official}>
-                      {country.name.official}
-                    </MenuItem>
-                  ))
-                )}
+                <MenuItem value="Argentina">Argentina</MenuItem>
+                <MenuItem value="Uruguay">Uruguay</MenuItem>
+                <MenuItem value="Chile">Chile</MenuItem>
+                <MenuItem value="Paraguay">Paraguay</MenuItem>
               </Select>
             </FormControl>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 2, width: "100%" }}>
-                {error}
-              </Alert>
-            )}
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              color="secondary"
-              sx={{
-                mt: 3,
-                mb: 2,
-                py: 1.5,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-                borderRadius: 2,
-              }}
-              disabled={loading}
+              color="success"
+              sx={{ mt: 3, mb: 2, py: 1.5, fontWeight: "bold", fontSize: "1rem" }}
             >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Registrarse"
-              )}
+              Registrarse
             </Button>
 
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                ¿Ya tienes una cuenta?{" "}
-                <Link
-                  component={RouterLink}
-                  to="/login"
-                  variant="body2"
-                  color="primary.main"
-                  sx={{ fontWeight: "bold" }}
-                >
-                  Inicia sesión aquí
+            <Grid container justifyContent="flex-end">
+              <Grid >
+                <Link href="/login" variant="body2" color="secondary">
+                  ¿Ya tenés cuenta? Iniciá sesión
                 </Link>
-              </Typography>
-            </Box>
+              </Grid>
+            </Grid>
           </Box>
         </Paper>
       </Container>
+      <ToastContainer />
     </Box>
   );
+};
+
+const muiInputStyle = {
+  mb: 2,
+  input: { color: "white" },
+  label: { color: "#9ca3af" },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "#3b82f6" },
+    "&:hover fieldset": { borderColor: "#60a5fa" },
+    "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+  },
 };
 
 export default Register;
