@@ -164,7 +164,7 @@ const Login = () => {
                   </Typography>
                 }
               />
-              <Link href="#" variant="body2" sx={{ color: "#3b82f6" }}>
+              <Link href="/forgot-password" variant="body2" sx={{ color: "#3b82f6" }}>
                 ¿Olvidaste tu contraseña?
               </Link>
             </Box>

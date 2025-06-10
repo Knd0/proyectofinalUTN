@@ -11,6 +11,7 @@ import transactionRoutes from "./Routes/transactionRoutes";
 import exchangeRoutes from "./Routes/exchangeRoutes";
 import adminRoutes from "./Routes/adminRoutes";
 import confirmationRoutes from "./Routes/confirmationRoutes";
+import forgotPasswordRoutes from "./Routes/forgotPasswordRoutes";
 const app = express();
 
 // Configura CORSS
@@ -33,7 +34,7 @@ app.use("/transactions", transactionRoutes);
 app.use("/exchange", exchangeRoutes);
 app.use("/admin", adminRoutes);
 app.use("/email", confirmationRoutes as express.Router); 
-
+app.use("auth", forgotPasswordRoutes);
 
 // Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
