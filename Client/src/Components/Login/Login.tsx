@@ -11,21 +11,21 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
-  CircularProgress, // For loading state
+  CircularProgress,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined"; // Example icon for login form
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null); // Use null for no error
-  const [loading, setLoading] = useState(false); // New loading state
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
-    setLoading(true); // Set loading to true
+    setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -36,31 +36,25 @@ const Login = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
-          credentials: "include", // Ensure cookies are sent
+          credentials: "include",
         }
       );
 
       const data = await response.json();
       console.log(data);
 
-      if (response.ok) {
-        // Ensure data.token exists before setting
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          navigate("/home", { replace: true });
-        } else {
-          // Handle case where token is missing but response is ok
-          setError("Login exitoso pero no se recibió el token de autenticación.");
-        }
+      if (response.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        navigate("/home", { replace: true });
       } else {
-        setError(data.error || "Error al iniciar sesión. Por favor, verifica tus credenciales.");
+        setError(data.error || "Error al iniciar sesión. Verifica tus credenciales.");
         console.error("Login Error:", data.error);
       }
     } catch (err) {
       console.error("Connection Error:", err);
       setError("Error de conexión. No se pudo conectar con el servidor.");
     } finally {
-      setLoading(false); // Always set loading to false
+      setLoading(false);
     }
   };
 
@@ -71,31 +65,44 @@ const Login = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "background.default", // Use theme background color
-        backgroundImage: "url('https://source.unsplash.com/random?money-transfer&orientation=landscape')", // Example background image
+        backgroundImage: "url('https://source.unsplash.com/featured/?digital-wallet')",
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        bgcolor: "rgba(0,0,0,0.7)",
+        backgroundBlendMode: "darken",
       }}
     >
-      <Container component="main" maxWidth="xs">
+      <Container maxWidth="xs">
         <Paper
-          elevation={10} // Stronger shadow for the form
+          elevation={12}
           sx={{
             p: 4,
+            borderRadius: 3,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            borderRadius: 3, // Rounded corners
-            bgcolor: "background.paper", // Use theme paper background color
-            boxShadow: '0 8px 30px rgba(0,0,0,0.3)', // More pronounced shadow
+            backdropFilter: "blur(8px)",
+            bgcolor: "rgba(17, 24, 39, 0.85)",
+            color: "white",
           }}
         >
-          <LockOutlinedIcon sx={{ fontSize: 48, color: "primary.main", mb: 2 }} /> {/* Icon at the top */}
-          <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: "bold", color: 'text.primary' }}>
+          <LockOutlinedIcon sx={{ fontSize: 48, color: "#3b82f6", mb: 2 }} />
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ mb: 3, fontWeight: "bold", color: "white" }}
+          >
             Iniciar Sesión
           </Typography>
-          <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1, width: "100%" }}>
+          <Box
+            component="form"
+            onSubmit={handleLogin}
+            noValidate
+            sx={{ width: "100%" }}
+          >
             <TextField
+              variant="outlined"
               margin="normal"
               required
               fullWidth
@@ -106,10 +113,19 @@ const Login = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              variant="outlined" // Consistent outlined style
-              sx={{ mb: 2 }} // Margin bottom
+              sx={{
+                mb: 2,
+                input: { color: "white" },
+                label: { color: "#9ca3af" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#3b82f6" },
+                  "&:hover fieldset": { borderColor: "#60a5fa" },
+                  "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                },
+              }}
             />
             <TextField
+              variant="outlined"
               margin="normal"
               required
               fullWidth
@@ -120,49 +136,68 @@ const Login = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              variant="outlined" // Consistent outlined style
-              sx={{ mb: 2 }} // Margin bottom
+              sx={{
+                mb: 2,
+                input: { color: "white" },
+                label: { color: "#9ca3af" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#3b82f6" },
+                  "&:hover fieldset": { borderColor: "#60a5fa" },
+                  "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                },
+              }}
             />
+
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 mb: 2,
-                width: "100%",
               }}
             >
               <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
+                control={<Checkbox value="remember" sx={{ color: "#3b82f6" }} />}
                 label={
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#d1d5db" }}>
                     Recordarme
                   </Typography>
                 }
               />
-              <Link href="#" variant="body2" color="primary.main" sx={{ fontWeight: 'medium' }}>
+              <Link href="#" variant="body2" sx={{ color: "#3b82f6" }}>
                 ¿Olvidaste tu contraseña?
               </Link>
             </Box>
+
             {error && (
-              <Alert severity="error" sx={{ mb: 2, width: "100%" }}>
+              <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
               </Alert>
             )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
-              sx={{ mt: 3, mb: 2, py: 1.5, fontSize: '1.1rem', fontWeight: 'bold', borderRadius: 2 }}
-              disabled={loading} // Disable button when loading
+              disabled={loading}
+              sx={{
+                mt: 3,
+                mb: 2,
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: "bold",
+                borderRadius: 2,
+                backgroundColor: "#3b82f6",
+                "&:hover": { backgroundColor: "#2563eb" },
+              }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : "Iniciar Sesión"}
             </Button>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
+
+            <Box sx={{ mt: 2, textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: "#d1d5db" }}>
                 ¿No tienes una cuenta?{" "}
-                <Link href="/register" variant="body2" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                <Link href="/register" sx={{ color: "#3b82f6", fontWeight: "bold" }}>
                   Regístrate aquí
                 </Link>
               </Typography>
