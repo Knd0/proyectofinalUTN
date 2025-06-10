@@ -7,6 +7,9 @@
 }
 
 .main {
+  max-width: 100%;
+  max-width: 600px;
+  max-width: 960px;
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
@@ -14,27 +17,10 @@
   padding-right: 16px;
   padding-top: 64px;
   padding-bottom: 64px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   flex-grow: 1;
-}
-
-@media (min-width: 600px) {
-  .main {
-    max-width: 600px;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-}
-
-@media (min-width: 960px) {
-  .main {
-    max-width: 960px;
-    padding-left: 32px;
-    padding-right: 32px;
-  }
 }
 
 .title {
@@ -55,12 +41,10 @@
   padding: 32px;
   margin-bottom: 48px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
-
   border: 1px solid #333;
 }
 
@@ -72,7 +56,6 @@
 .cardContent {
   padding: 0;
   width: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,7 +63,7 @@
 
 .walletIcon {
   font-size: 48px !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 16px;
   color: #90caf9 !important;
 }
 
@@ -116,22 +99,6 @@
   border-radius: 4px !important;
 }
 
-.select .MuiOutlinedInput-notchedOutline {
-  border-color: #333 !important;
-}
-
-.select.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #90caf9 !important;
-}
-
-.select:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #b0bec5 !important;
-}
-
-.select .MuiSvgIcon-root {
-  color: #b0bec5 !important;
-}
-
 .selectMenuPaper {
   background-color: #1e1e1e !important;
   color: #e0e0e0 !important;
@@ -165,7 +132,7 @@
   color: #b0bec5;
   font-weight: 500;
   font-size: 0.9rem;
-  word-break: break-word;
+  word-break: break-all;
 }
 
 .copyButton {
@@ -173,67 +140,41 @@
 }
 
 .chipWarning {
-  margin-top: 24px !important;
-  font-size: 0.9rem !important;
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  padding-left: 8px !important;
-  height: auto !important;
-  font-weight: 500 !important;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 600px;
+  font-weight: 500;
+  background-color: #f57c00 !important;
+  color: #fff !important;
 }
 
 .actionButtons {
   width: 100%;
   max-width: 600px;
-  padding: 24px;
-  margin-bottom: 64px;
-  border-radius: 12px;
-  background-color: #1e1e1e;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  border: 1px solid #333;
-
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
+  justify-content: center;
   gap: 16px;
-}
-
-@media (min-width: 600px) {
-  .actionButtons {
-    flex-direction: row;
-    gap: 24px;
-  }
+  margin-bottom: 48px;
+  flex-wrap: wrap;
 }
 
 .actionButton {
-  flex-grow: 1;
-  padding-top: 14px !important;
-  padding-bottom: 14px !important;
-  border-radius: 16px !important;
-  font-size: 1rem !important;
-  font-weight: bold !important;
-  box-shadow: 4 !important;
-  background-color: #1976d2 !important;
-  color: #fff !important;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+  background-color: #90caf9 !important;
+  color: #121212 !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  min-width: 120px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  border-radius: 8px !important;
+  transition: background-color 0.3s ease;
 }
 
 .actionButton:hover {
-  box-shadow: 8 !important;
-  transform: translateY(-2px);
-  background-color: #1565c0 !important;
-}
-
-@media (max-width: 600px) {
-  .actionButton {
-    font-size: 0.9rem !important;
-  }
+  background-color: #64b5f6 !important;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.6);
 }
 
 .transactionHistoryBox {
   width: 100%;
-  max-width: 900px;
-  border-radius: 12px;
-  padding: 0;
+  max-width: 960px;
 }

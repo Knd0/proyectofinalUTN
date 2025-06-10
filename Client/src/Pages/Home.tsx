@@ -80,11 +80,7 @@ const Home = () => {
   return (
     <Box className={styles.container}>
       <Navbar />
-      <Box
-        component="main"
-        className={styles.main}
-        data-aos="fade-up"
-      >
+      <Box component="main" className={styles.main} data-aos="fade-up">
         <Typography variant="h3" component="h1" className={styles.title}>
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
@@ -176,6 +172,16 @@ const Home = () => {
             className={styles.actionButton}
           >
             Transferir
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => navigate("/convert")}
+            disabled={isDisabled}
+            startIcon={<AccountBalanceIcon />}
+            className={styles.actionButton}
+          >
+            Convertir
           </Button>
         </Paper>
 
