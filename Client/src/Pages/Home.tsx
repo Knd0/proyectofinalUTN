@@ -27,7 +27,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import AutorenewIcon from "@mui/icons-material/AutorenewIcon";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import { useUser, Balance } from "../Components/Context/UserContext";
@@ -353,7 +353,22 @@ const Home = () => {
             onClick={() => navigate("/exchange")}
             disabled={isDisabled}
             startIcon={<AutorenewIcon />}
-            className={styles.actionButton}
+            sx={{
+              flexGrow: 1,
+              py: 1.8,
+              borderRadius: 2,
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              fontWeight: "bold",
+              boxShadow: 4,
+              backgroundColor: "#1976d2",
+              color: "#fff",
+              "&:hover": {
+                boxShadow: 8,
+                transform: "translateY(-2px)",
+                backgroundColor: "#1565c0",
+              },
+              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+            }}
           >
             Convertir
           </Button>
