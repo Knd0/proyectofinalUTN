@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -9,13 +9,13 @@ import {
   Paper,
   Link,
   Alert,
-  CircularProgress, // For loading state
-  FormControl, // For select input
-  InputLabel, // For select input label
-  Select, // For select input
-  MenuItem, // For select options
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined"; // Example icon for register form
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 
 interface Country {
   name: { official: string };
@@ -26,89 +26,74 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dni, setDni] = useState("");
-  const [nacionalidad, setNacionalidad] = useState(""); // Renamed for clarity, was 'nacionalidad'
+  const [nacionalidad, setNacionalidad] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false); // New loading state for registration
-  const [countriesLoading, setCountriesLoading] = useState(true); // New loading state for countries
+  const [loading, setLoading] = useState(false);
+  const [countriesLoading, setCountriesLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCountries = async () => {
+    async function fetchCountries() {
       setCountriesLoading(true);
       try {
-        const response = await fetch("https://restcountries.com/v3.1/all?fields=name");
-        if (!response.ok) {
-          throw new Error("Failed to fetch countries.");
-        }
-        const data: Country[] = await response.json();
-        const sorted = data.sort((a: Country, b: Country) =>
-          a.name.official.localeCompare(b.name.official)
-        );
-        setCountries(sorted);
-      } catch (err) {
-        console.error("Error fetching countries:", err);
-        setError("Error al cargar la lista de países.");
+        const res = await fetch("https://restcountries.com/v3.1/all?fields=name");
+        if (!res.ok) throw new Error("Error fetching countries");
+        const data: Country[] = await res.json();
+        data.sort((a, b) => a.name.official.localeCompare(b.name.official));
+        setCountries(data);
+      } catch {
+        setError("No se pudo cargar la lista de países.");
       } finally {
         setCountriesLoading(false);
       }
-    };
+    }
     fetchCountries();
   }, []);
 
-  const sendConfirmationEmail = async (userEmail: string) => { // Renamed param to avoid shadowing
+  const sendConfirmationEmail = async (userEmail: string) => {
     try {
-      const response = await fetch("https://proyectofinalutn-production.up.railway.app/email/send-confirmation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: userEmail }),
-      });
-      if (!response.ok) {
-        console.error("Failed to send confirmation email:", await response.json());
+      const res = await fetch(
+        "https://proyectofinalutn-production.up.railway.app/email/send-confirmation",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail }),
+        }
+      );
+      if (!res.ok) {
+        console.error("Error enviando email de confirmación");
       }
     } catch (err) {
-      console.error("Error sending confirmation email:", err);
+      console.error(err);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
-    setLoading(true); // Set loading to true
-
+    setError(null);
+    setLoading(true);
     try {
-      const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          dni,
-          nacionalidad, // Use the state variable
-          nombre: name,
-        }),
-        credentials: "include",
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (response.ok) {
-        await sendConfirmationEmail(email); // Pass the email state
+      const res = await fetch(
+        "https://proyectofinalutn-production.up.railway.app/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, dni, nacionalidad, nombre: name }),
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        await sendConfirmationEmail(email);
         navigate("/login", { replace: true });
       } else {
-        setError(data.error || "Error de registro. Por favor, verifica tus datos.");
-        console.error("Registration Error:", data.error);
+        setError(data.error || "Error en el registro. Revisa tus datos.");
       }
-    } catch (err) {
-      console.error("Connection Error:", err);
-      setError("Error de conexión. No se pudo conectar con el servidor.");
+    } catch {
+      setError("Error de conexión. Intenta nuevamente.");
     } finally {
-      setLoading(false); // Always set loading to false
+      setLoading(false);
     }
   };
 
@@ -120,7 +105,7 @@ const Register = () => {
         alignItems: "center",
         justifyContent: "center",
         bgcolor: "background.default",
-        backgroundImage: "url('https://source.unsplash.com/random?finance-signup&orientation=landscape')", // Different background image
+        backgroundImage: "url('https://source.unsplash.com/random?finance-signup&orientation=landscape')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -135,21 +120,32 @@ const Register = () => {
             alignItems: "center",
             borderRadius: 3,
             bgcolor: "background.paper",
-            boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+            boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
           }}
         >
-          <PersonAddAltOutlinedIcon sx={{ fontSize: 48, color: "secondary.main", mb: 2 }} />
-          <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: "bold", color: 'text.primary' }}>
+          <PersonAddAltOutlinedIcon
+            sx={{ fontSize: 48, color: "secondary.main", mb: 2 }}
+            aria-label="Icono de registro"
+          />
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ mb: 3, fontWeight: "bold", color: "text.primary" }}
+          >
             Registrarse
           </Typography>
-          <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1, width: "100%" }}>
+
+          <Box
+            component="form"
+            onSubmit={handleRegister}
+            noValidate
+            sx={{ mt: 1, width: "100%" }}
+          >
             <TextField
-              margin="normal"
+              label="Nombre Completo"
               required
               fullWidth
-              id="name"
-              label="Nombre Completo"
-              name="name"
+              margin="normal"
               autoComplete="name"
               autoFocus
               value={name}
@@ -158,12 +154,11 @@ const Register = () => {
               sx={{ mb: 2 }}
             />
             <TextField
-              margin="normal"
+              label="Correo Electrónico"
+              type="email"
               required
               fullWidth
-              id="email"
-              label="Correo Electrónico"
-              name="email"
+              margin="normal"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -171,13 +166,11 @@ const Register = () => {
               sx={{ mb: 2 }}
             />
             <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
               label="Contraseña"
               type="password"
-              id="password"
+              required
+              fullWidth
+              margin="normal"
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -185,19 +178,18 @@ const Register = () => {
               sx={{ mb: 2 }}
             />
             <TextField
-              margin="normal"
+              label="DNI"
+              type="number"
               required
               fullWidth
-              id="dni"
-              label="DNI"
-              name="dni"
-              type="number" // Set type to number for DNI
-              inputProps={{ pattern: "[0-9]*" }} // Restrict to numbers
+              margin="normal"
+              inputProps={{ pattern: "[0-9]*" }}
               value={dni}
               onChange={(e) => setDni(e.target.value)}
               variant="outlined"
               sx={{ mb: 2 }}
             />
+
             <FormControl fullWidth margin="normal" sx={{ mb: 3 }}>
               <InputLabel id="nacionalidad-label">Nacionalidad</InputLabel>
               <Select
@@ -205,8 +197,8 @@ const Register = () => {
                 id="nacionalidad"
                 value={nacionalidad}
                 label="Nacionalidad"
-                onChange={(e) => setNacionalidad(e.target.value as string)}
-                disabled={countriesLoading} // Disable until countries are loaded
+                onChange={(e) => setNacionalidad(e.target.value)}
+                disabled={countriesLoading}
               >
                 {countriesLoading ? (
                   <MenuItem disabled>Cargando países...</MenuItem>
@@ -215,9 +207,9 @@ const Register = () => {
                     <MenuItem value="" disabled>
                       Selecciona tu nacionalidad
                     </MenuItem>
-                    {countries.map((c, i) => (
-                      <MenuItem key={i} value={c.name.official}>
-                        {c.name.official}
+                    {countries.map((country, idx) => (
+                      <MenuItem key={idx} value={country.name.official}>
+                        {country.name.official}
                       </MenuItem>
                     ))}
                   </>
@@ -230,20 +222,35 @@ const Register = () => {
                 {error}
               </Alert>
             )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              color="secondary" // Changed color for distinction from login
-              sx={{ mt: 3, mb: 2, py: 1.5, fontSize: '1.1rem', fontWeight: 'bold', borderRadius: 2 }}
-              disabled={loading} // Disable button when loading
+              color="secondary"
+              sx={{
+                mt: 3,
+                mb: 2,
+                py: 1.5,
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                borderRadius: 2,
+              }}
+              disabled={loading}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : "Registrarse"}
             </Button>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
                 ¿Ya tienes una cuenta?{" "}
-                <Link href="/login" variant="body2" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                <Link
+                  component={RouterLink}
+                  to="/login"
+                  variant="body2"
+                  color="primary.main"
+                  sx={{ fontWeight: "bold" }}
+                >
                   Inicia sesión aquí
                 </Link>
               </Typography>
