@@ -19,13 +19,15 @@ import {
   InputLabel,
   Grid,
   Chip, // For the verification alert
+  Paper, // Added for grouping action buttons
+  Divider, // For visual separation
 } from "@mui/material";
 
 // Material-UI Icons
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"; // For overall balance
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; // For converting currency
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // For loading money (deposit)
+import SendIcon from "@mui/icons-material/Send"; // For transferring money (send)
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"; // For the alert
 
 import { useUser, Balance } from "../Components/Context/UserContext";
@@ -54,14 +56,14 @@ const Home = () => {
     setSelectedCurrency(event.target.value as Currency);
   };
 
-  const currencyOptions = Object.keys(balance) as Currency[];
+  const currencyOptions = balance ? (Object.keys(balance) as Currency[]) : [];
 
   if (!userInfo) return <Loader />;
 
   const isDisabled = !userInfo.isconfirmed;
 
   return (
-    <Box sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#121212", color: "#ffffff", minHeight: "100vh" }}>
       <Navbar />
 
       <Box
@@ -77,22 +79,21 @@ const Home = () => {
         }}
         data-aos="fade-up"
       >
-        <Typography variant="h3" component="h1" sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: 'primary.main' }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "#90caf9" }}>
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
-        {/* Balance Card */}
         <Card
           sx={{
             width: "100%",
             maxWidth: 600,
-            bgcolor: "primary.dark",
-            color: "white",
+            bgcolor: "#1e1e1e",
+            color: "#ffffff",
             borderRadius: 3,
             boxShadow: 8,
             p: 4,
             mb: 6,
-            transition: "transform 0.3s ease-in-out",
+            transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
             "&:hover": {
               transform: "translateY(-5px) scale(1.01)",
               boxShadow: 12,
@@ -101,33 +102,44 @@ const Home = () => {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 3,
+            border: '1px solid #333',
           }}
         >
           <CardContent sx={{ p: 0, '&:last-child': { pb: 0 }, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="h5" component="h3" sx={{ fontWeight: "medium", mb: 3, color: 'text.secondary' }}>
+            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "#90caf9" }} />
+            <Typography variant="h5" sx={{ fontWeight: "medium", mb: 1, color: "#b0bec5" }}>
               Balance Actual
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Typography variant="h4" component="span" sx={{ fontWeight: "bold", color: "success.main" }}>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 3 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", color: "#66bb6a" }}>
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
               <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="currency-select-label" sx={{ color: 'white' }}>Moneda</InputLabel>
+                <InputLabel id="currency-select-label" sx={{ color: "#b0bec5" }}>Moneda</InputLabel>
                 <Select
                   labelId="currency-select-label"
                   value={selectedCurrency}
                   onChange={handleCurrencyChange}
                   label="Moneda"
                   sx={{
-                    color: "white",
-                    ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "secondary.main" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" },
-                    ".MuiSvgIcon-root": { color: "white" },
+                    color: "#ffffff",
+                    ".MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#90caf9" },
+                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#777" },
+                    ".MuiSvgIcon-root": { color: "#b0bec5" },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: "#1e1e1e",
+                        color: "#ffffff",
+                        border: '1px solid #333',
+                      }
+                    }
                   }}
                 >
                   {currencyOptions.map((currency) => (
-                    <MenuItem key={currency} value={currency}>
+                    <MenuItem key={currency} value={currency} sx={{ '&:hover': { bgcolor: "#2a2a2a" } }}>
                       {currency}
                     </MenuItem>
                   ))}
@@ -138,93 +150,106 @@ const Home = () => {
             {isDisabled && (
               <Chip
                 icon={<WarningAmberIcon />}
-                label="Verificá tu correo para activar estas funciones."
+                label="Verifica tu correo para activar todas las funciones."
                 color="warning"
                 variant="filled"
-                sx={{ mb: 3, fontSize: '0.9rem', py: 1.5, px: 1, height: 'auto' }}
+                sx={{ mb: 3, fontSize: '0.9rem', py: 1.5, px: 1, height: 'auto', fontWeight: 'medium' }}
               />
             )}
-
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => navigate("/exchange")}
-              disabled={isDisabled}
-              startIcon={<CurrencyExchangeIcon />}
-              sx={{
-                width: "100%",
-                mt: isDisabled ? 1 : 0,
-                py: 1.5,
-                borderRadius: 2,
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                  boxShadow: 6,
-                },
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-              }}
-            >
-              Convertir Moneda
-            </Button>
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
-        <Grid container spacing={4} sx={{ width: "100%", maxWidth: 800, mb: 8 }}>
-          {/* FIX: Add component="div" to Grid items */}
-          <Grid component="div">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/loadbalance")}
-              disabled={isDisabled}
-              startIcon={<ArrowDownwardIcon />}
-              sx={{
-                width: "100%",
-                py: 2,
-                borderRadius: 2,
-                fontSize: '1.1rem',
-                fontWeight: 'bold',
-                boxShadow: 4,
-                '&:hover': {
-                  boxShadow: 8,
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-              }}
-            >
-              Ingresar Dinero
-            </Button>
-          </Grid>
-          {/* FIX: Add component="div" to Grid items */}
-          <Grid component="div">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/transaction")}
-              disabled={isDisabled}
-              startIcon={<ArrowUpwardIcon />}
-              sx={{
-                width: "100%",
-                py: 2,
-                borderRadius: 2,
-                fontSize: '1.1rem',
-                fontWeight: 'bold',
-                boxShadow: 4,
-                '&:hover': {
-                  boxShadow: 8,
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-              }}
-            >
-              Transferir Dinero
-            </Button>
-          </Grid>
-        </Grid>
+        <Paper
+          elevation={6}
+          sx={{
+            width: "100%",
+            maxWidth: 600,
+            p: 3,
+            mb: 8,
+            borderRadius: 3,
+            bgcolor: "#1e1e1e",
+            boxShadow: 8,
+            border: '1px solid #333',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            gap: { xs: 2, sm: 3 },
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => navigate("/loadbalance")}
+            disabled={isDisabled}
+            startIcon={<AccountBalanceIcon />}
+            sx={{
+              flexGrow: 1,
+              py: 1.8,
+              borderRadius: 2,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              fontWeight: 'bold',
+              bgcolor: "#2d2d2d",
+              color: "#fff",
+              boxShadow: 4,
+              '&:hover': {
+                boxShadow: 8,
+                bgcolor: "#3a3a3a",
+                transform: 'translateY(-2px)',
+              },
+            }}
+          >
+            Ingresar
+          </Button>
 
-        {/* Transaction History */}
+          <Button
+            variant="contained"
+            onClick={() => navigate("/transaction")}
+            disabled={isDisabled}
+            startIcon={<SendIcon />}
+            sx={{
+              flexGrow: 1,
+              py: 1.8,
+              borderRadius: 2,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              fontWeight: 'bold',
+              bgcolor: "#2d2d2d",
+              color: "#fff",
+              boxShadow: 4,
+              '&:hover': {
+                boxShadow: 8,
+                bgcolor: "#3a3a3a",
+                transform: 'translateY(-2px)',
+              },
+            }}
+          >
+            Transferir
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => navigate("/exchange")}
+            disabled={isDisabled}
+            startIcon={<CurrencyExchangeIcon />}
+            sx={{
+              flexGrow: 1,
+              py: 1.8,
+              borderRadius: 2,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              fontWeight: 'bold',
+              bgcolor: "#2d2d2d",
+              color: "#fff",
+              boxShadow: 4,
+              '&:hover': {
+                boxShadow: 8,
+                bgcolor: "#3a3a3a",
+                transform: 'translateY(-2px)',
+              },
+            }}
+          >
+            Convertir
+          </Button>
+        </Paper>
+
         <Box sx={{ width: "100%", maxWidth: 900 }} data-aos="fade-up" data-aos-delay="200">
           <TransactionHistory />
         </Box>
