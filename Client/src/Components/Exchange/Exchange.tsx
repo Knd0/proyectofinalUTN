@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import {
+  Box,
+  Button,
+  Container,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Navbar from "Components/Navbar/Navbar";
 
@@ -108,86 +118,139 @@ const Exchange: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div
-        className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-          bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
-          animate-gradient-x text-white font-sans"
-        style={{ backgroundSize: "200% 200%" }}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundImage: "url('https://source.unsplash.com/featured/?exchange,crypto')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          bgcolor: "rgba(0,0,0,0.7)",
+          backgroundBlendMode: "darken",
+        }}
       >
-        <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-          Convertir Saldo
-        </h2>
-
-        <div className="space-y-6">
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-              focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-              shadow-md transition duration-300 placeholder:text-gray-400"
-            value={amount || ""}
-            onChange={e => setAmount(parseFloat(e.target.value) || 0)}
-            placeholder={`Cantidad disponible: ${balances[fromCurrency] ?? 0}`}
-            disabled={loading}
-          />
-
-          <div className="flex gap-4">
-            <select
-              value={fromCurrency}
-              onChange={e => setFromCurrency(e.target.value)}
-              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
-                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-                shadow-md transition duration-300"
-              disabled={loading}
-            >
-              {currencies.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-
-            <select
-              value={toCurrency}
-              onChange={e => setToCurrency(e.target.value)}
-              className="w-1/2 px-5 py-4 rounded-xl text-gray-900 font-semibold
-                focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-                shadow-md transition duration-300"
-              disabled={loading}
-            >
-              {currencies.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
-          {exchangeRate !== null && amount > 0 && (
-            <div className="text-center text-xl font-semibold drop-shadow-lg">
-              {amount} {fromCurrency} ={" "}
-              {convertedValue !== null ? convertedValue.toFixed(2) : "..."} {toCurrency}
-            </div>
-          )}
-
-          <button
-            onClick={handleSwap}
-            disabled={loading}
-            className={`w-full py-4 rounded-xl font-extrabold
-              text-blue-600 bg-white hover:bg-blue-50 transition duration-300
-              shadow-md ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
+        <Container maxWidth="xs">
+          <Paper
+            elevation={12}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              display: "flex",
+              flexDirection: "column",
+              backdropFilter: "blur(8px)",
+              bgcolor: "rgba(17, 24, 39, 0.85)",
+              color: "white",
+            }}
           >
-            {loading ? "Convirtiendo..." : "Convertir"}
-          </button>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold", textAlign: "center" }}>
+              Convertir Saldo
+            </Typography>
 
-          {message && (
-            <p
-              className={`mt-4 text-center font-semibold ${
-                message.startsWith("✅") ? "text-green-400" : "text-red-400"
-              }`}
+            <TextField
+              label={`Cantidad (${fromCurrency})`}
+              type="number"
+              fullWidth
+              value={amount || ""}
+              onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
+              inputProps={{ min: 0, step: 0.01 }}
+              disabled={loading}
+              sx={{
+                mb: 3,
+                input: { color: "white" },
+                label: { color: "#9ca3af" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#3b82f6" },
+                  "&:hover fieldset": { borderColor: "#60a5fa" },
+                  "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                },
+              }}
+              placeholder={`Disponible: ${balances[fromCurrency] ?? 0}`}
+            />
+
+            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+              <Select
+                value={fromCurrency}
+                onChange={(e) => setFromCurrency(e.target.value)}
+                fullWidth
+                disabled={loading}
+                sx={{
+                  color: "white",
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#60a5fa" },
+                }}
+              >
+                {currencies.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <Select
+                value={toCurrency}
+                onChange={(e) => setToCurrency(e.target.value)}
+                fullWidth
+                disabled={loading}
+                sx={{
+                  color: "white",
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#60a5fa" },
+                }}
+              >
+                {currencies.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+
+            {exchangeRate !== null && amount > 0 && (
+              <Typography
+                variant="h6"
+                align="center"
+                sx={{ mb: 2, fontWeight: "medium", color: "#cbd5e1" }}
+              >
+                {amount} {fromCurrency} ={" "}
+                {convertedValue !== null ? convertedValue.toFixed(2) : "..."} {toCurrency}
+              </Typography>
+            )}
+
+            <Button
+              onClick={handleSwap}
+              disabled={loading}
+              fullWidth
+              variant="contained"
+              sx={{
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: "bold",
+                borderRadius: 2,
+                backgroundColor: "#3b82f6",
+                "&:hover": { backgroundColor: "#2563eb" },
+              }}
             >
-              {message}
-            </p>
-          )}
-        </div>
-      </div>
+              {loading ? "Convirtiendo..." : "Convertir"}
+            </Button>
+
+            {message && (
+              <Typography
+                sx={{
+                  mt: 3,
+                  textAlign: "center",
+                  fontWeight: "medium",
+                  color: message.startsWith("✅") ? "#4ade80" : "#f87171",
+                }}
+              >
+                {message}
+              </Typography>
+            )}
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 };

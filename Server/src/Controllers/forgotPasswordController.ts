@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Usuario } from "../models/Usuario"; 
 import { transporter } from "../utils/emailService"; 
+import { sendResetPasswordEmailTemplate } from "../utils/emailTemplates";
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -20,20 +21,14 @@ export const forgotPassword = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
 
-    const resetLink = `https://proyectofinalutn2025.vercel.app/reset-password/${token}`; // URL del frontend
+    const resetLink = `https://proyectofinalutn2025.vercel.app/reset-password/${token}`;
 
-    const html = `
-      <h2>Hola, ${usuario.nombre}</h2>
-      <p>Hiciste una solicitud para restablecer tu contraseña.</p>
-      <p>Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
-      <a href="${resetLink}" target="_blank">${resetLink}</a>
-      <p>Este enlace expirará en 1 hora.</p>
-    `;
+    const html = sendResetPasswordEmailTemplate(usuario.nombre, resetLink);
 
     await transporter.sendMail({
       from: `"Wamoney" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: "Recuperación de contraseña - Wamoney",
+      subject: "Restablecer contraseña - Wamoney",
       html,
     });
 
