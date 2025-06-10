@@ -6,7 +6,6 @@ import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 
-// Material-UI Components
 import {
   Box,
   Typography,
@@ -24,9 +23,7 @@ import {
   Snackbar,
 } from "@mui/material";
 
-// Material-UI Icons
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -79,7 +76,16 @@ const Home = () => {
   const isDisabled = !userInfo.isconfirmed;
 
   return (
-    <Box sx={{ bgcolor: "#121212", color: "#e0e0e0", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        bgcolor: "#121212",
+        color: "#e0e0e0",
+        minHeight: "100vh",
+        // Asegura que el contenedor ocupe todo el viewport y no deje blanco abajo
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Navbar />
       <Box
         component="main"
@@ -91,13 +97,20 @@ const Home = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          flexGrow: 1,
         }}
         data-aos="fade-up"
       >
         <Typography
           variant="h3"
           component="h1"
-          sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "#90caf9" }}
+          sx={{
+            fontWeight: "bold",
+            mb: 6,
+            textAlign: "center",
+            color: "#90caf9",
+            userSelect: "none",
+          }}
         >
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
@@ -152,8 +165,16 @@ const Home = () => {
               >
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
-              <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="currency-select-label" sx={{ color: "#b0bec5" }}>
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 120 }}
+                color="primary"
+              >
+                <InputLabel
+                  id="currency-select-label"
+                  sx={{ color: "#b0bec5" }}
+                >
                   Moneda
                 </InputLabel>
                 <Select
@@ -163,6 +184,8 @@ const Home = () => {
                   label="Moneda"
                   sx={{
                     color: "#e0e0e0",
+                    backgroundColor: "#1e1e1e",
+                    borderRadius: 1,
                     ".MuiOutlinedInput-notchedOutline": { borderColor: "#333" },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                       borderColor: "#90caf9",
@@ -187,7 +210,11 @@ const Home = () => {
                     <MenuItem
                       key={currency}
                       value={currency}
-                      sx={{ "&:hover": { bgcolor: "#333" } }}
+                      sx={{
+                        bgcolor: "transparent",
+                        color: "#e0e0e0",
+                        "&:hover": { bgcolor: "#333" },
+                      }}
                     >
                       {currency}
                     </MenuItem>
@@ -207,6 +234,7 @@ const Home = () => {
                 px: 2,
                 py: 1,
                 borderRadius: 2,
+                userSelect: "all",
               }}
             >
               <Typography
@@ -221,7 +249,11 @@ const Home = () => {
                 CVU: {userInfo.cvu}
               </Typography>
               <Tooltip title="Copiar CVU">
-                <IconButton onClick={handleCopyCVU} size="small" sx={{ color: "#b0bec5" }}>
+                <IconButton
+                  onClick={handleCopyCVU}
+                  size="small"
+                  sx={{ color: "#b0bec5" }}
+                >
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -268,7 +300,6 @@ const Home = () => {
         >
           <Button
             variant="contained"
-            color="primary"
             onClick={() => navigate("/loadbalance")}
             disabled={isDisabled}
             startIcon={<AccountBalanceIcon />}
@@ -279,9 +310,12 @@ const Home = () => {
               fontSize: { xs: "0.9rem", sm: "1rem" },
               fontWeight: "bold",
               boxShadow: 4,
+              backgroundColor: "#1976d2",
+              color: "#fff",
               "&:hover": {
                 boxShadow: 8,
                 transform: "translateY(-2px)",
+                backgroundColor: "#1565c0",
               },
               transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
             }}
@@ -291,7 +325,6 @@ const Home = () => {
 
           <Button
             variant="contained"
-            color="primary"
             onClick={() => navigate("/transaction")}
             disabled={isDisabled}
             startIcon={<SendIcon />}
@@ -302,9 +335,12 @@ const Home = () => {
               fontSize: { xs: "0.9rem", sm: "1rem" },
               fontWeight: "bold",
               boxShadow: 4,
+              backgroundColor: "#1976d2",
+              color: "#fff",
               "&:hover": {
                 boxShadow: 8,
                 transform: "translateY(-2px)",
+                backgroundColor: "#1565c0",
               },
               transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
             }}
@@ -314,7 +350,11 @@ const Home = () => {
         </Paper>
 
         {/* Historial de transacciones */}
-        <Box sx={{ width: "100%", maxWidth: 900 }} data-aos="fade-up" data-aos-delay="200">
+        <Box
+          sx={{ width: "100%", maxWidth: 900 }}
+          data-aos="fade-up"
+          data-aos-delay="200"
+        >
           <TransactionHistory />
         </Box>
       </Box>
