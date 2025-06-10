@@ -209,26 +209,21 @@ const Navbar: React.FC = () => {
                 Admin Panel
               </Button>
             )}
-
-            <Button
-              component={Link}
-              to="/profile"
-              variant="text"
-              sx={{
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.08)", // Subtle hover background for text buttons
-                },
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 'bold',
-                py: 1,
-                px: 2,
-              }}
-              startIcon={<AccountCircleIcon />}
-            >
-              Mi Perfil
-            </Button>
+            <Tooltip title={userInfo.nombre} arrow>
+              <Avatar
+                alt={userInfo.nombre}
+                src={userInfo.perfil.imagen}
+                sx={{
+                  width: 44, // Slightly larger avatar
+                  height: 44,
+                  border: "2px solid #3b82f6", // Add a subtle border
+                  cursor: "pointer",
+                  transition: "border-color 0.3s ease-in-out",
+                  "&:hover": { borderColor: "white" }, // Border color changes on hover
+                }}
+                onClick={() => navigate("/profile")} // Make avatar clickable to profile
+              />
+            </Tooltip>
 
             <Button
               onClick={handleLogout}
@@ -246,22 +241,6 @@ const Navbar: React.FC = () => {
             >
               Cerrar sesión
             </Button>
-
-            <Tooltip title={userInfo.nombre} arrow>
-              <Avatar
-                alt={userInfo.nombre}
-                src={userInfo.perfil.imagen}
-                sx={{
-                  width: 44, // Slightly larger avatar
-                  height: 44,
-                  border: "2px solid #3b82f6", // Add a subtle border
-                  cursor: "pointer",
-                  transition: "border-color 0.3s ease-in-out",
-                  "&:hover": { borderColor: "white" }, // Border color changes on hover
-                }}
-                onClick={() => navigate("/profile")} // Make avatar clickable to profile
-              />
-            </Tooltip>
           </Box>
         </Toolbar>
       </AppBar>
