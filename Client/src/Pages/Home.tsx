@@ -17,18 +17,23 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Grid,
-  Chip, // For the verification alert
-  Paper, // Added for grouping action buttons
-  Divider, // For visual separation
+  Paper,
+  Chip,
+  Divider,
+  Tooltip,
+  IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 // Material-UI Icons
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"; // For overall balance
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; // For converting currency
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // For loading money (deposit)
-import SendIcon from "@mui/icons-material/Send"; // For transferring money (send)
-import WarningAmberIcon from "@mui/icons-material/WarningAmber"; // For the alert
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"; // Balance
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; // Convertir
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // Ingresar dinero
+import SendIcon from "@mui/icons-material/Send"; // Transferir dinero
+import WarningAmberIcon from "@mui/icons-material/WarningAmber"; // Alerta verificación
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Icono copiar CVU
+import VpnKeyIcon from "@mui/icons-material/VpnKey"; // Icono CVU
 
 import { useUser, Balance } from "../Components/Context/UserContext";
 
@@ -37,6 +42,7 @@ type Currency = keyof Balance;
 const Home = () => {
   const { userInfo, balance, fetchUserData } = useUser();
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
+  const [copySuccess, setCopySuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,7 +58,9 @@ const Home = () => {
     fetchUserData();
   }, [navigate, fetchUserData]);
 
-  const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement> | { target: { value: unknown } }) => {
+  const handleCurrencyChange = (
+    event: React.ChangeEvent<HTMLSelectElement> | { target: { value: unknown } }
+  ) => {
     setSelectedCurrency(event.target.value as Currency);
   };
 
@@ -62,14 +70,25 @@ const Home = () => {
 
   const isDisabled = !userInfo.isconfirmed;
 
+  const handleCopyCVU = () => {
+    if (userInfo.cvu) {
+      navigator.clipboard.writeText(userInfo.cvu);
+      setCopySuccess(true);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setCopySuccess(false);
+  };
+
   return (
-    <Box sx={{ bgcolor: "#121212", color: "#ffffff", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}>
       <Navbar />
 
       <Box
         component="main"
         sx={{
-          maxWidth: { xs: '100%', sm: '600px', md: '960px', lg: '1280px' },
+          maxWidth: { xs: "100%", sm: "600px", md: "960px", lg: "1280px" },
           mx: "auto",
           px: { xs: 2, sm: 3, md: 4 },
           py: 8,
@@ -79,7 +98,11 @@ const Home = () => {
         }}
         data-aos="fade-up"
       >
-        <Typography variant="h3" component="h1" sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "#90caf9" }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "primary.main" }}
+        >
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
@@ -87,8 +110,8 @@ const Home = () => {
           sx={{
             width: "100%",
             maxWidth: 600,
-            bgcolor: "#1e1e1e",
-            color: "#ffffff",
+            bgcolor: "background.paper",
+            color: "text.primary",
             borderRadius: 3,
             boxShadow: 8,
             p: 4,
@@ -98,48 +121,66 @@ const Home = () => {
               transform: "translateY(-5px) scale(1.01)",
               boxShadow: 12,
             },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             gap: 3,
-            border: '1px solid #333',
+            border: "1px solid",
+            borderColor: "divider",
           }}
         >
-          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 }, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "#90caf9" }} />
-            <Typography variant="h5" sx={{ fontWeight: "medium", mb: 1, color: "#b0bec5" }}>
+          <CardContent
+            sx={{
+              p: 0,
+              "&:last-child": { pb: 0 },
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "primary.main" }} />
+            <Typography
+              variant="h5"
+              component="h3"
+              sx={{ fontWeight: "medium", mb: 1, color: "text.secondary" }}
+            >
               Balance Actual
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2, mb: 3 }}>
-              <Typography variant="h4" sx={{ fontWeight: "bold", color: "#66bb6a" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 3 }}>
+              <Typography variant="h4" component="span" sx={{ fontWeight: "bold", color: "success.main" }}>
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
               <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="currency-select-label" sx={{ color: "#b0bec5" }}>Moneda</InputLabel>
+                <InputLabel id="currency-select-label" sx={{ color: "text.secondary" }}>
+                  Moneda
+                </InputLabel>
                 <Select
                   labelId="currency-select-label"
                   value={selectedCurrency}
                   onChange={handleCurrencyChange}
                   label="Moneda"
                   sx={{
-                    color: "#ffffff",
-                    ".MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#90caf9" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#777" },
-                    ".MuiSvgIcon-root": { color: "#b0bec5" },
+                    color: "text.primary",
+                    ".MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main" },
+                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "text.secondary" },
+                    ".MuiSvgIcon-root": { color: "text.secondary" },
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        bgcolor: "#1e1e1e",
-                        color: "#ffffff",
-                        border: '1px solid #333',
-                      }
-                    }
+                        bgcolor: "background.paper",
+                        color: "text.primary",
+                        border: "1px solid",
+                        borderColor: "divider",
+                      },
+                    },
                   }}
                 >
                   {currencyOptions.map((currency) => (
-                    <MenuItem key={currency} value={currency} sx={{ '&:hover': { bgcolor: "#2a2a2a" } }}>
+                    <MenuItem key={currency} value={currency} sx={{ "&:hover": { bgcolor: "action.hover" } }}>
                       {currency}
                     </MenuItem>
                   ))}
@@ -153,9 +194,47 @@ const Home = () => {
                 label="Verifica tu correo para activar todas las funciones."
                 color="warning"
                 variant="filled"
-                sx={{ mb: 3, fontSize: '0.9rem', py: 1.5, px: 1, height: 'auto', fontWeight: 'medium' }}
+                sx={{ mb: 3, fontSize: "0.9rem", py: 1.5, px: 1, height: "auto", fontWeight: "medium" }}
               />
             )}
+
+            {/* CVU Display */}
+            <Divider sx={{ width: "100%", my: 2 }} />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                width: "100%",
+                flexWrap: "wrap",
+              }}
+            >
+              <VpnKeyIcon color="primary" />
+              <Typography
+                variant="body1"
+                sx={{
+                  wordBreak: "break-all",
+                  fontWeight: "medium",
+                  userSelect: "text",
+                  flexGrow: 1,
+                  textAlign: "center",
+                }}
+                title="Tu CVU"
+              >
+                {userInfo.cvu ?? "No disponible"}
+              </Typography>
+              <Tooltip title="Copiar CVU">
+                <IconButton
+                  color="primary"
+                  onClick={handleCopyCVU}
+                  disabled={!userInfo.cvu}
+                  aria-label="copiar CVU"
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </CardContent>
         </Card>
 
@@ -167,18 +246,20 @@ const Home = () => {
             p: 3,
             mb: 8,
             borderRadius: 3,
-            bgcolor: "#1e1e1e",
+            bgcolor: "background.paper",
             boxShadow: 8,
-            border: '1px solid #333',
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-around',
-            alignItems: 'center',
+            border: "1px solid",
+            borderColor: "divider",
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-around",
+            alignItems: "center",
             gap: { xs: 2, sm: 3 },
           }}
         >
           <Button
             variant="contained"
+            color="primary"
             onClick={() => navigate("/loadbalance")}
             disabled={isDisabled}
             startIcon={<AccountBalanceIcon />}
@@ -186,16 +267,14 @@ const Home = () => {
               flexGrow: 1,
               py: 1.8,
               borderRadius: 2,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              fontWeight: 'bold',
-              bgcolor: "#2d2d2d",
-              color: "#fff",
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              fontWeight: "bold",
               boxShadow: 4,
-              '&:hover': {
+              "&:hover": {
                 boxShadow: 8,
-                bgcolor: "#3a3a3a",
-                transform: 'translateY(-2px)',
+                transform: "translateY(-2px)",
               },
+              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
             }}
           >
             Ingresar
@@ -203,6 +282,7 @@ const Home = () => {
 
           <Button
             variant="contained"
+            color="primary"
             onClick={() => navigate("/transaction")}
             disabled={isDisabled}
             startIcon={<SendIcon />}
@@ -210,16 +290,14 @@ const Home = () => {
               flexGrow: 1,
               py: 1.8,
               borderRadius: 2,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              fontWeight: 'bold',
-              bgcolor: "#2d2d2d",
-              color: "#fff",
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              fontWeight: "bold",
               boxShadow: 4,
-              '&:hover': {
+              "&:hover": {
                 boxShadow: 8,
-                bgcolor: "#3a3a3a",
-                transform: 'translateY(-2px)',
+                transform: "translateY(-2px)",
               },
+              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
             }}
           >
             Transferir
@@ -227,6 +305,7 @@ const Home = () => {
 
           <Button
             variant="contained"
+            color="primary"
             onClick={() => navigate("/exchange")}
             disabled={isDisabled}
             startIcon={<CurrencyExchangeIcon />}
@@ -234,16 +313,14 @@ const Home = () => {
               flexGrow: 1,
               py: 1.8,
               borderRadius: 2,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              fontWeight: 'bold',
-              bgcolor: "#2d2d2d",
-              color: "#fff",
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              fontWeight: "bold",
               boxShadow: 4,
-              '&:hover': {
+              "&:hover": {
                 boxShadow: 8,
-                bgcolor: "#3a3a3a",
-                transform: 'translateY(-2px)',
+                transform: "translateY(-2px)",
               },
+              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
             }}
           >
             Convertir
@@ -253,6 +330,18 @@ const Home = () => {
         <Box sx={{ width: "100%", maxWidth: 900 }} data-aos="fade-up" data-aos-delay="200">
           <TransactionHistory />
         </Box>
+
+        {/* Snackbar para confirmar copia */}
+        <Snackbar
+          open={copySuccess}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert severity="success" sx={{ width: "100%" }} onClose={handleCloseSnackbar}>
+            CVU copiado al portapapeles!
+          </Alert>
+        </Snackbar>
       </Box>
     </Box>
   );
