@@ -1,7 +1,17 @@
 import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
-import Navbar from "../Navbar/Navbar";
 import "react-toastify/dist/ReactToastify.css";
+import Navbar from "../Navbar/Navbar";
 
 const currencies = ["ARS", "USD", "EUR", "USDT", "BTC", "ETH"];
 
@@ -20,60 +30,106 @@ const LoadBalance: React.FC = () => {
     localStorage.setItem("fake_currency", currency);
 
     toast.info("Redirigiendo a la simulación de pago...", { autoClose: 1500 });
-    setTimeout(() => window.location.href = "/fake-checkout", 1500);
+    setTimeout(() => (window.location.href = "/fake-checkout"), 1500);
   };
 
   return (
     <>
       <Navbar />
-      <div
-        className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-        bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-500
-        animate-gradient-x text-white font-sans"
-        style={{ backgroundSize: "200% 200%" }}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundImage: "url('https://source.unsplash.com/featured/?finance,bank')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          bgcolor: "rgba(0,0,0,0.7)",
+          backgroundBlendMode: "darken",
+        }}
       >
-        <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-          Cargar saldo
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="number"
-            step="0.01"
-            min="0.01"
-            value={amount || ""}
-            onChange={e => setAmount(Number(e.target.value))}
-            placeholder="Monto"
-            required
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-              focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-70
-              shadow-md transition duration-300 placeholder:text-gray-400"
-          />
-
-          <select
-            value={currency}
-            onChange={e => setCurrency(e.target.value)}
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-              focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-70
-              shadow-md transition duration-300"
+        <Container maxWidth="xs">
+          <Paper
+            elevation={12}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              bgcolor: "rgba(17, 24, 39, 0.85)",
+              color: "white",
+            }}
           >
-            {currencies.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold", color: "white" }}>
+              Cargar Saldo
+            </Typography>
 
-          <button
-            type="submit"
-            className="w-full py-4 rounded-xl font-extrabold
-              text-blue-600 bg-white hover:bg-blue-50 transition duration-300
-              shadow-md"
-          >
-            Cargar saldo
-          </button>
-        </form>
+            <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+              <TextField
+                label="Monto"
+                type="number"
+                fullWidth
+                value={amount || ""}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                inputProps={{ min: 0.01, step: 0.01 }}
+                required
+                sx={{
+                  mb: 3,
+                  input: { color: "white" },
+                  label: { color: "#9ca3af" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#3b82f6" },
+                    "&:hover fieldset": { borderColor: "#60a5fa" },
+                    "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                  },
+                }}
+              />
 
-        <ToastContainer />
-      </div>
+              <Select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                fullWidth
+                required
+                sx={{
+                  mb: 3,
+                  color: "white",
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#60a5fa" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                }}
+              >
+                {currencies.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  backgroundColor: "#3b82f6",
+                  "&:hover": { backgroundColor: "#2563eb" },
+                  mb: 1,
+                }}
+              >
+                Cargar saldo
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
+      <ToastContainer />
     </>
   );
 };

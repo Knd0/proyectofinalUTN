@@ -16,6 +16,7 @@ import Dashboard from "Pages/Dashboard";
 import AdminRoute from "Pages/AdminRoute";
 import ConfirmAccount from "./Pages/ConfirmAccount";
 import ForgotPassword from "./Components/ForgotPassword/ForgotPassword";
+import ResetPassword from "./Components/ResetPassword/ResetPassword";
 
 const App: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token"); // o tu lógica real
@@ -27,6 +28,7 @@ const App: React.FC = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/confirm/:token" element={<ConfirmAccount />} /> 
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
         <Route path="/home" element={<Home />} />
         <Route path="/loadbalance" element={<LoadBalance />} />

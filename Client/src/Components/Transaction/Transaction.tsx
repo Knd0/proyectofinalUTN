@@ -1,4 +1,16 @@
 import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Navbar from "Components/Navbar/Navbar";
 
@@ -70,97 +82,154 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
   return (
     <>
       <Navbar />
-      <div
-        className="max-w-md mx-auto p-8 rounded-3xl shadow-2xl
-        bg-gradient-to-r from-blue-600 via-blue-500 to-purple-500
-        animate-gradient-x text-white font-sans"
-        style={{ backgroundSize: "200% 200%" }}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundImage: "url('https://source.unsplash.com/featured/?money,banking')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          bgcolor: "rgba(0,0,0,0.7)",
+          backgroundBlendMode: "darken",
+        }}
       >
-        <h2 className="text-4xl font-extrabold mb-8 text-center drop-shadow-lg">
-          Transferir saldo
-        </h2>
-
-        {userInfo?.nombre && (
-          <p className="text-center mb-4 font-medium text-white/80">
-            Usuario: <span className="font-bold">{userInfo.nombre}</span>
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="text"
-            placeholder="CVU destino"
-            value={toCvu}
-            onChange={(e) => setToCvu(e.target.value)}
-            disabled={loading}
-            required
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-            focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-            shadow-md transition duration-300 placeholder:text-gray-400"
-            autoComplete="off"
-          />
-
-          <input
-            type="number"
-            min="0.01"
-            step="0.01"
-            placeholder="Monto"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            disabled={loading}
-            required
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-            focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-            shadow-md transition duration-300 placeholder:text-gray-400"
-          />
-
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            disabled={loading}
-            className="w-full px-5 py-4 rounded-xl text-gray-900 font-semibold
-            focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-70
-            shadow-md transition duration-300"
+        <Container maxWidth="xs">
+          <Paper
+            elevation={12}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              bgcolor: "rgba(17, 24, 39, 0.85)",
+              color: "white",
+            }}
           >
-            {currencies.map((cur) => (
-              <option key={cur} value={cur}>
-                {cur}
-              </option>
-            ))}
-          </select>
+            <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold", color: "white" }}>
+              Transferir Saldo
+            </Typography>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-4 rounded-xl font-extrabold
-            text-blue-600 bg-white hover:bg-blue-50 transition duration-300
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${loading ? "animate-pulse" : ""}`}
-          >
-            {loading ? "Procesando..." : "Enviar"}
-          </button>
-        </form>
+            {userInfo?.nombre && (
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                Usuario: <strong>{userInfo.nombre}</strong>
+              </Typography>
+            )}
 
-        {message && (
-          <p
-            className={`mt-6 text-center text-lg font-bold drop-shadow-lg
-            ${message.type === "success" ? "text-green-300 animate-fadeIn" : "text-yellow-300 animate-fadeIn"}`}
-            style={{ animationDuration: "1s" }}
-            role={message.type === "error" ? "alert" : "status"}
-          >
-            {message.text}
-          </p>
-        )}
+            <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+              <TextField
+                label="CVU destino"
+                variant="outlined"
+                fullWidth
+                value={toCvu}
+                onChange={(e) => setToCvu(e.target.value)}
+                disabled={loading}
+                required
+                sx={{
+                  mb: 3,
+                  input: { color: "white" },
+                  label: { color: "#9ca3af" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#3b82f6" },
+                    "&:hover fieldset": { borderColor: "#60a5fa" },
+                    "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                  },
+                }}
+              />
 
-        <button
-          onClick={() => navigate("/home")}
-          disabled={loading}
-          className="mt-8 w-full py-4 rounded-xl font-extrabold
-          bg-white text-blue-600 hover:bg-blue-50 transition duration-300"
-        >
-          Volver al Inicio
-        </button>
-      </div>
+              <TextField
+                label="Monto"
+                type="number"
+                fullWidth
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                disabled={loading}
+                required
+                inputProps={{ min: 0.01, step: 0.01 }}
+                sx={{
+                  mb: 3,
+                  input: { color: "white" },
+                  label: { color: "#9ca3af" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#3b82f6" },
+                    "&:hover fieldset": { borderColor: "#60a5fa" },
+                    "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+                  },
+                }}
+              />
+
+              <Select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                fullWidth
+                disabled={loading}
+                sx={{
+                  mb: 3,
+                  color: "white",
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#60a5fa" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
+                }}
+              >
+                {currencies.map((cur) => (
+                  <MenuItem key={cur} value={cur}>
+                    {cur}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              {message && (
+                <Alert severity={message.type} sx={{ mb: 2 }}>
+                  {message.text}
+                </Alert>
+              )}
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading}
+                sx={{
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  backgroundColor: "#3b82f6",
+                  "&:hover": { backgroundColor: "#2563eb" },
+                  mb: 2,
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Enviar"}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => navigate("/home")}
+                disabled={loading}
+                sx={{
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  color: "white",
+                  borderColor: "white",
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    borderColor: "white",
+                  },
+                }}
+              >
+                Volver al Inicio
+              </Button>
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 };
