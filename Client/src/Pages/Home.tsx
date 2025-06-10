@@ -17,10 +17,11 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Chip,
   Paper,
+  Chip,
   IconButton,
   Tooltip,
+  Snackbar,
 } from "@mui/material";
 
 // Material-UI Icons
@@ -29,7 +30,7 @@ import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Icon to copy CVU
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import { useUser, Balance } from "../Components/Context/UserContext";
 
@@ -54,7 +55,9 @@ const Home = () => {
     fetchUserData();
   }, [navigate, fetchUserData]);
 
-  const handleCurrencyChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleCurrencyChange = (
+    event: React.ChangeEvent<HTMLSelectElement> | { target: { value: unknown } }
+  ) => {
     setSelectedCurrency(event.target.value as Currency);
   };
 
@@ -62,8 +65,11 @@ const Home = () => {
     if (userInfo?.cvu) {
       navigator.clipboard.writeText(userInfo.cvu);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setCopied(false);
   };
 
   const currencyOptions = balance ? (Object.keys(balance) as Currency[]) : [];
@@ -73,9 +79,8 @@ const Home = () => {
   const isDisabled = !userInfo.isconfirmed;
 
   return (
-    <Box sx={{ bgcolor: "#121212", color: "#fff", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}>
       <Navbar />
-
       <Box
         component="main"
         sx={{
@@ -92,33 +97,32 @@ const Home = () => {
         <Typography
           variant="h3"
           component="h1"
-          sx={{
-            fontWeight: "bold",
-            mb: 6,
-            textAlign: "center",
-            color: "primary.main",
-          }}
+          sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "primary.main" }}
         >
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
-        {/* Balance Card */}
         <Card
           sx={{
             width: "100%",
             maxWidth: 600,
-            bgcolor: "#1e1e1e",
-            color: "#fff",
+            bgcolor: "background.paper",
+            color: "text.primary",
             borderRadius: 3,
             boxShadow: 8,
             p: 4,
             mb: 6,
+            transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-5px) scale(1.01)",
+              boxShadow: 12,
+            },
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: 3,
             border: "1px solid",
-            borderColor: "#333",
+            borderColor: "divider",
           }}
         >
           <CardContent
@@ -131,17 +135,16 @@ const Home = () => {
               alignItems: "center",
             }}
           >
-            <AccountBalanceWalletIcon
-              sx={{ fontSize: 48, mb: 2, color: "primary.main" }}
-            />
+            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "primary.main" }} />
             <Typography
               variant="h5"
               component="h3"
-              sx={{ fontWeight: "medium", mb: 1, color: "gray" }}
+              sx={{ fontWeight: "medium", mb: 1, color: "text.secondary" }}
             >
               Balance Actual
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 3 }}>
+
+            <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 1 }}>
               <Typography
                 variant="h4"
                 component="span"
@@ -150,7 +153,7 @@ const Home = () => {
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
               <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="currency-select-label" sx={{ color: "#ccc" }}>
+                <InputLabel id="currency-select-label" sx={{ color: "text.secondary" }}>
                   Moneda
                 </InputLabel>
                 <Select
@@ -159,28 +162,33 @@ const Home = () => {
                   onChange={handleCurrencyChange}
                   label="Moneda"
                   sx={{
-                    color: "#fff",
-                    ".MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                    color: "text.primary",
+                    ".MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                       borderColor: "primary.main",
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#888",
+                      borderColor: "text.secondary",
                     },
-                    ".MuiSvgIcon-root": { color: "#ccc" },
+                    ".MuiSvgIcon-root": { color: "text.secondary" },
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        bgcolor: "#1e1e1e",
-                        color: "#fff",
-                        border: "1px solid #444",
+                        bgcolor: "background.paper",
+                        color: "text.primary",
+                        border: "1px solid",
+                        borderColor: "divider",
                       },
                     },
                   }}
                 >
                   {currencyOptions.map((currency) => (
-                    <MenuItem key={currency} value={currency}>
+                    <MenuItem
+                      key={currency}
+                      value={currency}
+                      sx={{ "&:hover": { bgcolor: "action.hover" } }}
+                    >
                       {currency}
                     </MenuItem>
                   ))}
@@ -188,26 +196,32 @@ const Home = () => {
               </FormControl>
             </Box>
 
-            {/* CVU Display */}
+            {/* CVU with copy */}
             <Box
               sx={{
-                bgcolor: "#2c2c2c",
-                px: 2,
-                py: 1,
-                borderRadius: 2,
+                mt: 2,
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
+                bgcolor: "action.hover",
+                px: 2,
+                py: 1,
+                borderRadius: 2,
               }}
             >
               <Typography
                 variant="body2"
-                sx={{ fontSize: "0.95rem", wordBreak: "break-all" }}
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: 500,
+                  fontSize: "0.9rem",
+                  wordBreak: "break-all",
+                }}
               >
                 CVU: {userInfo.cvu}
               </Typography>
-              <Tooltip title={copied ? "¡Copiado!" : "Copiar CVU"}>
-                <IconButton onClick={handleCopyCVU} sx={{ color: "#ccc", p: 0.5 }}>
+              <Tooltip title="Copiar CVU">
+                <IconButton onClick={handleCopyCVU} size="small" sx={{ color: "text.secondary" }}>
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -219,13 +233,20 @@ const Home = () => {
                 label="Verifica tu correo para activar todas las funciones."
                 color="warning"
                 variant="filled"
-                sx={{ mt: 3, fontSize: "0.9rem", py: 1.5, fontWeight: "medium" }}
+                sx={{
+                  mt: 3,
+                  fontSize: "0.9rem",
+                  py: 1.5,
+                  px: 1,
+                  height: "auto",
+                  fontWeight: "medium",
+                }}
               />
             )}
           </CardContent>
         </Card>
 
-        {/* Action Buttons */}
+        {/* Botones de acción */}
         <Paper
           elevation={6}
           sx={{
@@ -234,10 +255,10 @@ const Home = () => {
             p: 3,
             mb: 8,
             borderRadius: 3,
-            bgcolor: "#1e1e1e",
+            bgcolor: "background.paper",
             boxShadow: 8,
             border: "1px solid",
-            borderColor: "#333",
+            borderColor: "divider",
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-around",
@@ -315,11 +336,20 @@ const Home = () => {
           </Button>
         </Paper>
 
-        {/* Transaction History */}
+        {/* Historial */}
         <Box sx={{ width: "100%", maxWidth: 900 }} data-aos="fade-up" data-aos-delay="200">
           <TransactionHistory />
         </Box>
       </Box>
+
+      {/* Copiado exitoso */}
+      <Snackbar
+        open={copied}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message="CVU copiado al portapapeles"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </Box>
   );
 };
