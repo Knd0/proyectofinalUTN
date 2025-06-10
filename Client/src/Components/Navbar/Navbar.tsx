@@ -9,18 +9,22 @@ import {
   Tooltip,
   Drawer,
   List,
-  ListItem,
+  ListItemButton, // Changed from ListItem for better click feedback
+  ListItemIcon,
   ListItemText,
   Box,
   Button,
   Alert,
   Collapse,
+  useMediaQuery, // Hook for media queries
+  useTheme, // Hook to access the theme
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CloseIcon from "@mui/icons-material/Close";
+import HomeIcon from '@mui/icons-material/Home'; // Added Home icon for navigation
 
 interface UserInfo {
   nombre: string;
@@ -36,6 +40,8 @@ const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showVerificationAlert, setShowVerificationAlert] = useState(true);
   const navigate = useNavigate();
+  const theme = useTheme(); // Access the default theme
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Check if screen size is 'sm' or smaller
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -62,8 +68,6 @@ const Navbar: React.FC = () => {
 
         const data = await response.json();
         setUserInfo(data.user);
-        console.log(data.user);
-        
       } catch (error) {
         console.error("Error al cargar usuario:", error);
         localStorage.removeItem("token");
@@ -78,8 +82,6 @@ const Navbar: React.FC = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
-  console.log(userInfo);
-
 
   const toggleDrawer = () => {
     setMobileOpen(!mobileOpen);
@@ -88,22 +90,46 @@ const Navbar: React.FC = () => {
   if (!userInfo) return null;
 
   const drawer = (
-    <Box onClick={toggleDrawer} sx={{ width: 250, bgcolor: "#1f2937", height: "100%" }}>
-      <List>
+    <Box
+      onClick={toggleDrawer}
+      sx={{
+        width: 250,
+        bgcolor: "#1f2937", // Darker background for consistency
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        py: 2, // Padding top/bottom
+      }}
+    >
+      <List sx={{ flexGrow: 1 }}>
+        <ListItemButton component={Link} to="/home" sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "white" }}>
+            <HomeIcon />
+          </ListItemIcon>
+          <ListItemText primary="Inicio" />
+        </ListItemButton>
         {userInfo.admin && (
-          <ListItem component={Link} to="/admin" sx={{ color: "white" }}>
-            <AdminPanelSettingsIcon sx={{ mr: 1 }} />
-            <ListItemText primary="Admin" />
-          </ListItem>
+          <ListItemButton component={Link} to="/admin" sx={{ color: "white" }}>
+            <ListItemIcon sx={{ color: "white" }}>
+              <AdminPanelSettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Panel de Administración" />
+          </ListItemButton>
         )}
-        <ListItem component={Link} to="/profile" sx={{ color: "white" }}>
-          <AccountCircleIcon sx={{ mr: 1 }} />
+        <ListItemButton component={Link} to="/profile" sx={{ color: "white" }}>
+          <ListItemIcon sx={{ color: "white" }}>
+            <AccountCircleIcon />
+          </ListItemIcon>
           <ListItemText primary="Mi Perfil" />
-        </ListItem>
-        <ListItem onClick={handleLogout} sx={{ color: "red" }}>
-          <LogoutIcon sx={{ mr: 1 }} />
+        </ListItemButton>
+      </List>
+      <List>
+        <ListItemButton onClick={handleLogout} sx={{ color: "#ef4444" }}> {/* Tailwind red-500 */}
+          <ListItemIcon sx={{ color: "#ef4444" }}>
+            <LogoutIcon />
+          </ListItemIcon>
           <ListItemText primary="Cerrar sesión" />
-        </ListItem>
+        </ListItemButton>
       </List>
     </Box>
   );
@@ -113,20 +139,23 @@ const Navbar: React.FC = () => {
       <AppBar
         position="static"
         sx={{
-          bgcolor: "#1f2937",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.7)",
+          bgcolor: "#111827", // Even darker, nearly black for a sleeker look
+          boxShadow: "0 4px 12px rgba(0,0,0,0.8)", // More pronounced shadow
+          borderBottom: "1px solid rgba(255,255,255,0.05)", // Subtle bottom border
         }}
       >
-        <Toolbar className="max-w-6xl mx-auto w-full px-4">
-          <IconButton
-            color="inherit"
-            edge="start"
-            onClick={toggleDrawer}
-            sx={{ mr: 2, display: { sm: "none" } }}
-            aria-label="menu"
-          >
-            <MenuIcon />
-          </IconButton>
+        <Toolbar sx={{ maxWidth: "1280px", width: "100%", mx: "auto", px: { xs: 2, sm: 3, md: 4 } }}> {/* Adjusted max-width and padding */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              edge="start"
+              onClick={toggleDrawer}
+              sx={{ mr: 1 }} // Reduced margin for mobile
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
 
           <Box
             sx={{
@@ -134,14 +163,16 @@ const Navbar: React.FC = () => {
               alignItems: "center",
               flexGrow: 1,
               cursor: "pointer",
+              "&:hover": { opacity: 0.8 }, // Subtle hover effect for logo
+              transition: "opacity 0.3s ease-in-out",
             }}
             onClick={() => navigate("/home")}
           >
-            <AdminPanelSettingsIcon sx={{ mr: 1, color: "#3b82f6" }} />
+            {/* Using a custom icon or a logo component would be ideal here */}
             <Typography
-              variant="h6"
+              variant="h5" // Slightly larger for better branding
               component="div"
-              sx={{ color: "white", fontWeight: "bold" }}
+              sx={{ color: "#3b82f6", fontWeight: "bold", letterSpacing: 1.5 }} // Primary brand color and spacing
             >
               Wamoney
             </Typography>
@@ -151,7 +182,7 @@ const Navbar: React.FC = () => {
             sx={{
               display: { xs: "none", sm: "flex" },
               alignItems: "center",
-              gap: 2,
+              gap: 3, // Increased gap for more spacing
             }}
           >
             {userInfo.admin && (
@@ -163,14 +194,19 @@ const Navbar: React.FC = () => {
                   color: "#3b82f6",
                   borderColor: "#3b82f6",
                   "&:hover": {
-                    backgroundColor: "#2563eb",
-                    borderColor: "#2563eb",
-                    color: "white",
+                    backgroundColor: "rgba(59, 130, 246, 0.1)", // Lighter hover background
+                    borderColor: "#3b82f6",
+                    color: "#3b82f6",
                   },
+                  borderRadius: 2, // Slightly rounded corners
+                  textTransform: 'none', // Prevent uppercase
+                  fontWeight: 'bold',
+                  py: 1,
+                  px: 2,
                 }}
                 startIcon={<AdminPanelSettingsIcon />}
               >
-                Admin
+                Admin Panel
               </Button>
             )}
 
@@ -178,7 +214,17 @@ const Navbar: React.FC = () => {
               component={Link}
               to="/profile"
               variant="text"
-              sx={{ color: "white" }}
+              sx={{
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.08)", // Subtle hover background for text buttons
+                },
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 'bold',
+                py: 1,
+                px: 2,
+              }}
               startIcon={<AccountCircleIcon />}
             >
               Mi Perfil
@@ -186,10 +232,15 @@ const Navbar: React.FC = () => {
 
             <Button
               onClick={handleLogout}
+              variant="contained" // Use contained for primary actions like logout
               sx={{
-                color: "white",
-                bgcolor: "#dc2626",
-                "&:hover": { bgcolor: "#b91c1c" },
+                bgcolor: "#ef4444", // Tailwind red-500
+                "&:hover": { bgcolor: "#dc2626" }, // Darker red on hover
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 'bold',
+                py: 1,
+                px: 2,
               }}
               startIcon={<LogoutIcon />}
             >
@@ -197,27 +248,25 @@ const Navbar: React.FC = () => {
             </Button>
 
             <Tooltip title={userInfo.nombre} arrow>
-              <Box
+              <Avatar
+                alt={userInfo.nombre}
+                src={userInfo.perfil.imagen}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  ml: 2,
-                  gap: 1,
-                  color: "white",
+                  width: 44, // Slightly larger avatar
+                  height: 44,
+                  border: "2px solid #3b82f6", // Add a subtle border
+                  cursor: "pointer",
+                  transition: "border-color 0.3s ease-in-out",
+                  "&:hover": { borderColor: "white" }, // Border color changes on hover
                 }}
-              >
-                <Avatar
-                  alt={userInfo.nombre}
-                  src={userInfo.perfil.imagen}
-                  sx={{ width: 40, height: 40 }}
-                />
-                <Typography variant="body1">{userInfo.nombre}</Typography>
-              </Box>
+                onClick={() => navigate("/profile")} // Make avatar clickable to profile
+              />
             </Tooltip>
           </Box>
         </Toolbar>
       </AppBar>
 
+      {/* Verification Alert */}
       {!userInfo.isconfirmed && showVerificationAlert && (
         <Collapse in={showVerificationAlert}>
           <Alert
@@ -234,23 +283,37 @@ const Navbar: React.FC = () => {
               </IconButton>
             }
             sx={{
-              position: "fixed",
-              top: 80,
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1400,
-              bgcolor: "#facc15",
-              color: "#1f2937",
+              position: "sticky", // Changed from fixed to sticky for better flow
+              top: 0, // Sticks right below the AppBar
+              width: "100%",
+              zIndex: 1300, // Z-index slightly less than AppBar for proper layering
+              bgcolor: "#facc15", // Tailwind yellow-400
+              color: "#1f2937", // Dark text for contrast
               fontWeight: "bold",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-              borderRadius: 2,
-              px: 3,
-              py: 2,
-              maxWidth: 500,
+              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+              borderRadius: 0, // Remove border radius for full-width alert
               textAlign: "center",
+              py: 1.5, // Adjusted vertical padding
+              ".MuiAlert-icon": { mr: 1 }, // Spacing for icon
+              ".MuiAlert-action": { mr: 1 }, // Spacing for close button
             }}
           >
-            Verificá tu correo para poder navegar completamente por Wamoney.
+            Verificá tu correo para activar todas las funciones de Wamoney.
+            <Button
+              size="small"
+              sx={{
+                ml: 2,
+                color: '#1f2937', // Darker text for the button
+                textDecoration: 'underline',
+                '&:hover': {
+                    backgroundColor: 'transparent',
+                    textDecoration: 'none'
+                }
+              }}
+              onClick={() => { /* Implement resend verification email logic here */ }}
+            >
+                Reenviar correo
+            </Button>
           </Alert>
         </Collapse>
       )}
@@ -265,8 +328,9 @@ const Navbar: React.FC = () => {
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: 250,
-            bgcolor: "#1f2937",
+            bgcolor: "#1f2937", // Darker background for consistency
             color: "white",
+            borderRight: "1px solid rgba(255,255,255,0.05)",
           },
         }}
       >
