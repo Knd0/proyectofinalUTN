@@ -49,6 +49,7 @@ export const authController = {
           email: user.email,
           admin: user.admin,
           isconfirmed: user.isconfirmed,
+          cvu: user.cvu,
           perfil: {
             imagen: user.imagen,
             descripcion: user.descripcion,
