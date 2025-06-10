@@ -37,7 +37,9 @@ const Register = () => {
     async function fetchCountries() {
       setCountriesLoading(true);
       try {
-        const res = await fetch("https://restcountries.com/v3.1/all?fields=name");
+        const res = await fetch(
+          "https://restcountries.com/v3.1/all?fields=name"
+        );
         if (!res.ok) throw new Error("Error fetching countries");
         const data: Country[] = await res.json();
         data.sort((a, b) => a.name.official.localeCompare(b.name.official));
@@ -79,7 +81,13 @@ const Register = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, dni, nacionalidad, nombre: name }),
+          body: JSON.stringify({
+            email,
+            password,
+            dni,
+            nacionalidad,
+            nombre: name,
+          }),
           credentials: "include",
         }
       );
@@ -105,7 +113,8 @@ const Register = () => {
         alignItems: "center",
         justifyContent: "center",
         bgcolor: "background.default",
-        backgroundImage: "url('https://source.unsplash.com/random?finance-signup&orientation=landscape')",
+        backgroundImage:
+          "url('https://source.unsplash.com/random?finance-signup&orientation=landscape')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -196,23 +205,24 @@ const Register = () => {
                 labelId="nacionalidad-label"
                 id="nacionalidad"
                 value={nacionalidad}
-                label="Nacionalidad"
                 onChange={(e) => setNacionalidad(e.target.value)}
+                label="Nacionalidad"
                 disabled={countriesLoading}
               >
+                {!countriesLoading && (
+                  <MenuItem value="" disabled>
+                    Selecciona tu nacionalidad
+                  </MenuItem>
+                )}
+
                 {countriesLoading ? (
                   <MenuItem disabled>Cargando países...</MenuItem>
                 ) : (
-                  <>
-                    <option value="" disabled>
-                      Selecciona tu nacionalidad
-                    </option>
-                    {countries.map((country, idx) => (
-                      <option key={idx} value={country.name.official}>
-                        {country.name.official}
-                      </option>
-                    ))}
-                  </>
+                  countries.map((country, idx) => (
+                    <MenuItem key={idx} value={country.name.official}>
+                      {country.name.official}
+                    </MenuItem>
+                  ))
                 )}
               </Select>
             </FormControl>
@@ -238,7 +248,11 @@ const Register = () => {
               }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Registrarse"}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Registrarse"
+              )}
             </Button>
 
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
