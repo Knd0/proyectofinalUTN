@@ -3,19 +3,18 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  CircularProgress, // For loading state
+  CircularProgress,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider, // To separate list items
-  Paper, // As a container similar to a Card
-  Chip, // For operation number
-  Alert, // For no transactions message
+  Divider,
+  Paper,
+  Chip,
+  Alert,
 } from "@mui/material";
-import NorthEastIcon from '@mui/icons-material/NorthEast'; // For sent transactions
-import SouthWestIcon from '@mui/icons-material/SouthWest'; // For received transactions
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"; // For general transaction list icon
+import NorthEastIcon from '@mui/icons-material/NorthEast';
+import SouthWestIcon from '@mui/icons-material/SouthWest';
 
 interface Transaction {
   id: number;
@@ -23,14 +22,8 @@ interface Transaction {
   currency: string;
   date: string;
   type: "sent" | "received";
-  toUser?: {
-    nombre: string;
-    cvu: string;
-  };
-  fromUser?: {
-    nombre: string;
-    cvu: string;
-  };
+  toUser?: { nombre: string; cvu: string };
+  fromUser?: { nombre: string; cvu: string };
 }
 
 const generateOperationNumber = (id: number) =>
@@ -39,7 +32,7 @@ const generateOperationNumber = (id: number) =>
 const TransactionHistory: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // State for error messages
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -47,14 +40,10 @@ const TransactionHistory: React.FC = () => {
       setError(null);
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("No hay token de autenticación.");
-        }
+        if (!token) throw new Error("No hay token de autenticación.");
 
         const res = await fetch("https://proyectofinalutn-production.up.railway.app/transactions/all", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
@@ -63,7 +52,6 @@ const TransactionHistory: React.FC = () => {
         }
 
         const data: Transaction[] = await res.json();
-        // Sort transactions by date in descending order (most recent first)
         const sortedData = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(sortedData);
       } catch (err) {
@@ -80,8 +68,10 @@ const TransactionHistory: React.FC = () => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200, mt: 4 }}>
-        <CircularProgress color="primary" />
-        <Typography variant="body1" sx={{ ml: 2, color: 'text.secondary' }}>Cargando transacciones...</Typography>
+        <CircularProgress sx={{ color: "#90caf9" }} />
+        <Typography variant="body1" sx={{ ml: 2, color: "#b0bec5" }}>
+          Cargando transacciones...
+        </Typography>
       </Box>
     );
   }
@@ -89,11 +79,11 @@ const TransactionHistory: React.FC = () => {
   if (error) {
     return (
       <Alert severity="error" sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
-        <Typography variant="body1">
-          Hubo un problema al cargar el historial de transacciones: <strong>{error}</strong>
+        <Typography variant="body1" sx={{ color: "#fff" }}>
+          Hubo un problema al cargar el historial: <strong>{error}</strong>
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          Por favor, intentá recargar la página o contactá con soporte si el problema persiste.
+        <Typography variant="body2" sx={{ mt: 1, color: "#ccc" }}>
+          Recargá la página o contactá soporte si el problema persiste.
         </Typography>
       </Alert>
     );
@@ -102,10 +92,10 @@ const TransactionHistory: React.FC = () => {
   if (transactions.length === 0) {
     return (
       <Alert severity="info" sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
-        <Typography variant="h6" component="p">
+        <Typography variant="h6" component="p" sx={{ color: "#fff" }}>
           ¡Aún no hay transacciones!
         </Typography>
-        <Typography variant="body1" sx={{ mt: 1 }}>
+        <Typography variant="body1" sx={{ mt: 1, color: "#ccc" }}>
           Realizá tu primera operación para verla reflejada aquí.
         </Typography>
       </Alert>
@@ -114,28 +104,28 @@ const TransactionHistory: React.FC = () => {
 
   return (
     <Paper
-      elevation={8} // Higher elevation for a more prominent look
+      elevation={8}
       sx={{
         width: "100%",
-        maxWidth: 900, // Adjusted max-width for better use of space
+        maxWidth: 900,
         mx: "auto",
-        mt: 8, // Margin top for spacing from other sections
-        p: { xs: 2, sm: 4 }, // Responsive padding
-        borderRadius: 3, // Consistent rounded corners
-        bgcolor: 'background.paper', // Uses theme paper background
-        boxShadow: '0 6px 20px rgba(0,0,0,0.25)', // Custom, softer shadow
+        mt: 8,
+        p: { xs: 2, sm: 4 },
+        borderRadius: 3,
+        bgcolor: "#1e1e1e",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.5)",
       }}
     >
-      <Typography variant="h4" component="h2" sx={{ fontWeight: "bold", mb: 4, color: 'primary.dark', textAlign: 'center' }}>
+      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 4, color: "#90caf9", textAlign: "center" }}>
         Historial de Transacciones
       </Typography>
 
-      <List sx={{ width: '100%' }}>
+      <List>
         {transactions.map((tx, index) => {
           const isReceived = tx.type === "received";
           const counterparty = isReceived ? tx.fromUser : tx.toUser;
-          const iconColor = isReceived ? "success.main" : "error.main";
-          const amountColor = isReceived ? "success.dark" : "error.dark";
+          const iconColor = isReceived ? "#66bb6a" : "#ef5350";
+          const amountColor = isReceived ? "#81c784" : "#ef9a9a";
 
           return (
             <React.Fragment key={tx.id}>
@@ -143,62 +133,74 @@ const TransactionHistory: React.FC = () => {
                 alignItems="flex-start"
                 sx={{
                   py: 2,
-                  px: { xs: 0, sm: 2 }, // Adjusted padding for list items
-                  transition: "background-color 0.3s ease-in-out",
+                  px: 2,
+                  borderRadius: 2,
+                  transition: "background-color 0.2s",
                   "&:hover": {
-                    bgcolor: 'action.hover', // Subtle hover effect from theme
-                    borderRadius: 1,
+                    bgcolor: "#2c2c2c",
                   },
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 40, pt: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
                   {isReceived ? (
                     <SouthWestIcon sx={{ color: iconColor, fontSize: 30 }} />
                   ) : (
                     <NorthEastIcon sx={{ color: iconColor, fontSize: 30 }} />
                   )}
                 </ListItemIcon>
+
                 <ListItemText
                   primary={
-                    <Typography variant="h6" component="span" sx={{ fontWeight: "bold", color: 'text.primary' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#fff" }}>
                       {isReceived ? "Recibido de" : "Enviado a"}:{" "}
-                      <Box component="span" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                      <Box component="span" sx={{ color: "#90caf9", fontWeight: "bold" }}>
                         {counterparty?.nombre || "Usuario desconocido"}
                       </Box>
                     </Typography>
                   }
                   secondary={
                     <Box sx={{ mt: 1 }}>
-                      <Typography component="span" variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: "#b0bec5" }}>
                         CVU: {counterparty?.cvu || "N/A"}
                       </Typography>
-                      <br />
-                      <Chip
-                        label={`Nº de operación: ${generateOperationNumber(tx.id)}`}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ mt: 1, mr: 1, fontSize: '0.75rem' }}
-                      />
-                      <Chip
-                        label={`Fecha: ${new Date(tx.date).toLocaleString()}`}
-                        size="small"
-                        color="default"
-                        variant="outlined"
-                        sx={{ mt: 1, fontSize: '0.75rem' }}
-                      />
+                      <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        <Chip
+                          label={`Nº operación: ${generateOperationNumber(tx.id)}`}
+                          size="small"
+                          sx={{
+                            bgcolor: "transparent",
+                            color: "#90caf9",
+                            borderColor: "#90caf9",
+                            fontSize: "0.75rem",
+                          }}
+                          variant="outlined"
+                        />
+                        <Chip
+                          label={`Fecha: ${new Date(tx.date).toLocaleString()}`}
+                          size="small"
+                          sx={{
+                            bgcolor: "transparent",
+                            color: "#b0bec5",
+                            borderColor: "#555",
+                            fontSize: "0.75rem",
+                          }}
+                          variant="outlined"
+                        />
+                      </Box>
                     </Box>
                   }
                 />
-                <Box sx={{ textAlign: 'right', ml: 2 }}>
-                  <Typography variant="h5" component="p" sx={{ fontWeight: "extrabold", color: amountColor, letterSpacing: -0.5 }}>
-                    {isReceived ? "+" : "-"}
-                    {tx.amount} {tx.currency}
+
+                <Box sx={{ textAlign: "right", ml: 2 }}>
+                  <Typography variant="h6" sx={{ color: amountColor, fontWeight: "bold" }}>
+                    {isReceived ? "+" : "-"}{tx.amount} {tx.currency}
                   </Typography>
-                  {/* Potentially add a secondary amount in local currency if available */}
                 </Box>
               </ListItem>
-              {index < transactions.length - 1 && <Divider component="li" sx={{ my: 1, borderColor: 'divider' }} />}
+
+              {index < transactions.length - 1 && (
+                <Divider sx={{ my: 1, borderColor: "#444" }} />
+              )}
             </React.Fragment>
           );
         })}
