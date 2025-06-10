@@ -28,6 +28,8 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+
 
 import { useUser, Balance } from "../Components/Context/UserContext";
 
@@ -80,7 +82,11 @@ const Home = () => {
   return (
     <Box className={styles.container}>
       <Navbar />
-      <Box component="main" className={styles.main} data-aos="fade-up">
+      <Box
+        component="main"
+        className={styles.main}
+        data-aos="fade-up"
+      >
         <Typography variant="h3" component="h1" className={styles.title}>
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
@@ -176,9 +182,9 @@ const Home = () => {
 
           <Button
             variant="contained"
-            onClick={() => navigate("/convert")}
+            onClick={() => navigate("/exchange")}
             disabled={isDisabled}
-            startIcon={<AccountBalanceIcon />}
+            startIcon={<AutorenewIcon />}
             className={styles.actionButton}
           >
             Convertir
