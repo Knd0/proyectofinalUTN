@@ -17,23 +17,19 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Paper,
   Chip,
-  Divider,
-  Tooltip,
+  Paper,
   IconButton,
-  Snackbar,
-  Alert,
+  Tooltip,
 } from "@mui/material";
 
 // Material-UI Icons
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"; // Balance
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange"; // Convertir
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // Ingresar dinero
-import SendIcon from "@mui/icons-material/Send"; // Transferir dinero
-import WarningAmberIcon from "@mui/icons-material/WarningAmber"; // Alerta verificación
-import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Icono copiar CVU
-import VpnKeyIcon from "@mui/icons-material/VpnKey"; // Icono CVU
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import SendIcon from "@mui/icons-material/Send";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // Icon to copy CVU
 
 import { useUser, Balance } from "../Components/Context/UserContext";
 
@@ -42,7 +38,7 @@ type Currency = keyof Balance;
 const Home = () => {
   const { userInfo, balance, fetchUserData } = useUser();
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
-  const [copySuccess, setCopySuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,10 +54,16 @@ const Home = () => {
     fetchUserData();
   }, [navigate, fetchUserData]);
 
-  const handleCurrencyChange = (
-    event: React.ChangeEvent<HTMLSelectElement> | { target: { value: unknown } }
-  ) => {
+  const handleCurrencyChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedCurrency(event.target.value as Currency);
+  };
+
+  const handleCopyCVU = () => {
+    if (userInfo?.cvu) {
+      navigator.clipboard.writeText(userInfo.cvu);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const currencyOptions = balance ? (Object.keys(balance) as Currency[]) : [];
@@ -70,19 +72,8 @@ const Home = () => {
 
   const isDisabled = !userInfo.isconfirmed;
 
-  const handleCopyCVU = () => {
-    if (userInfo.cvu) {
-      navigator.clipboard.writeText(userInfo.cvu);
-      setCopySuccess(true);
-    }
-  };
-
-  const handleCloseSnackbar = () => {
-    setCopySuccess(false);
-  };
-
   return (
-    <Box sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#121212", color: "#fff", minHeight: "100vh" }}>
       <Navbar />
 
       <Box
@@ -101,32 +92,33 @@ const Home = () => {
         <Typography
           variant="h3"
           component="h1"
-          sx={{ fontWeight: "bold", mb: 6, textAlign: "center", color: "primary.main" }}
+          sx={{
+            fontWeight: "bold",
+            mb: 6,
+            textAlign: "center",
+            color: "primary.main",
+          }}
         >
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
+        {/* Balance Card */}
         <Card
           sx={{
             width: "100%",
             maxWidth: 600,
-            bgcolor: "background.paper",
-            color: "text.primary",
+            bgcolor: "#1e1e1e",
+            color: "#fff",
             borderRadius: 3,
             boxShadow: 8,
             p: 4,
             mb: 6,
-            transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-            "&:hover": {
-              transform: "translateY(-5px) scale(1.01)",
-              boxShadow: 12,
-            },
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: 3,
             border: "1px solid",
-            borderColor: "divider",
+            borderColor: "#333",
           }}
         >
           <CardContent
@@ -137,23 +129,28 @@ const Home = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 2,
             }}
           >
-            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "primary.main" }} />
+            <AccountBalanceWalletIcon
+              sx={{ fontSize: 48, mb: 2, color: "primary.main" }}
+            />
             <Typography
               variant="h5"
               component="h3"
-              sx={{ fontWeight: "medium", mb: 1, color: "text.secondary" }}
+              sx={{ fontWeight: "medium", mb: 1, color: "gray" }}
             >
               Balance Actual
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 3 }}>
-              <Typography variant="h4" component="span" sx={{ fontWeight: "bold", color: "success.main" }}>
+              <Typography
+                variant="h4"
+                component="span"
+                sx={{ fontWeight: "bold", color: "success.main" }}
+              >
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
               <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel id="currency-select-label" sx={{ color: "text.secondary" }}>
+                <InputLabel id="currency-select-label" sx={{ color: "#ccc" }}>
                   Moneda
                 </InputLabel>
                 <Select
@@ -162,30 +159,58 @@ const Home = () => {
                   onChange={handleCurrencyChange}
                   label="Moneda"
                   sx={{
-                    color: "text.primary",
-                    ".MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "text.secondary" },
-                    ".MuiSvgIcon-root": { color: "text.secondary" },
+                    color: "#fff",
+                    ".MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "primary.main",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#888",
+                    },
+                    ".MuiSvgIcon-root": { color: "#ccc" },
                   }}
                   MenuProps={{
                     PaperProps: {
                       sx: {
-                        bgcolor: "background.paper",
-                        color: "text.primary",
-                        border: "1px solid",
-                        borderColor: "divider",
+                        bgcolor: "#1e1e1e",
+                        color: "#fff",
+                        border: "1px solid #444",
                       },
                     },
                   }}
                 >
                   {currencyOptions.map((currency) => (
-                    <MenuItem key={currency} value={currency} sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+                    <MenuItem key={currency} value={currency}>
                       {currency}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
+            </Box>
+
+            {/* CVU Display */}
+            <Box
+              sx={{
+                bgcolor: "#2c2c2c",
+                px: 2,
+                py: 1,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "0.95rem", wordBreak: "break-all" }}
+              >
+                CVU: {userInfo.cvu}
+              </Typography>
+              <Tooltip title={copied ? "¡Copiado!" : "Copiar CVU"}>
+                <IconButton onClick={handleCopyCVU} sx={{ color: "#ccc", p: 0.5 }}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Box>
 
             {isDisabled && (
@@ -194,50 +219,13 @@ const Home = () => {
                 label="Verifica tu correo para activar todas las funciones."
                 color="warning"
                 variant="filled"
-                sx={{ mb: 3, fontSize: "0.9rem", py: 1.5, px: 1, height: "auto", fontWeight: "medium" }}
+                sx={{ mt: 3, fontSize: "0.9rem", py: 1.5, fontWeight: "medium" }}
               />
             )}
-
-            {/* CVU Display */}
-            <Divider sx={{ width: "100%", my: 2 }} />
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 1,
-                width: "100%",
-                flexWrap: "wrap",
-              }}
-            >
-              <VpnKeyIcon color="primary" />
-              <Typography
-                variant="body1"
-                sx={{
-                  wordBreak: "break-all",
-                  fontWeight: "medium",
-                  userSelect: "text",
-                  flexGrow: 1,
-                  textAlign: "center",
-                }}
-                title="Tu CVU"
-              >
-                {userInfo.cvu ?? "No disponible"}
-              </Typography>
-              <Tooltip title="Copiar CVU">
-                <IconButton
-                  color="primary"
-                  onClick={handleCopyCVU}
-                  disabled={!userInfo.cvu}
-                  aria-label="copiar CVU"
-                >
-                  <ContentCopyIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
           </CardContent>
         </Card>
 
+        {/* Action Buttons */}
         <Paper
           elevation={6}
           sx={{
@@ -246,10 +234,10 @@ const Home = () => {
             p: 3,
             mb: 8,
             borderRadius: 3,
-            bgcolor: "background.paper",
+            bgcolor: "#1e1e1e",
             boxShadow: 8,
             border: "1px solid",
-            borderColor: "divider",
+            borderColor: "#333",
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-around",
@@ -327,21 +315,10 @@ const Home = () => {
           </Button>
         </Paper>
 
+        {/* Transaction History */}
         <Box sx={{ width: "100%", maxWidth: 900 }} data-aos="fade-up" data-aos-delay="200">
           <TransactionHistory />
         </Box>
-
-        {/* Snackbar para confirmar copia */}
-        <Snackbar
-          open={copySuccess}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert severity="success" sx={{ width: "100%" }} onClose={handleCloseSnackbar}>
-            CVU copiado al portapapeles!
-          </Alert>
-        </Snackbar>
       </Box>
     </Box>
   );
