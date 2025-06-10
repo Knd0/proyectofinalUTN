@@ -31,6 +31,8 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 import { useUser, Balance } from "../Components/Context/UserContext";
 
+import styles from "./Home.module.css";
+
 type Currency = keyof Balance;
 
 const Home = () => {
@@ -76,105 +78,35 @@ const Home = () => {
   const isDisabled = !userInfo.isconfirmed;
 
   return (
-    <Box
-      sx={{
-        bgcolor: "#121212",
-        color: "#e0e0e0",
-        minHeight: "100vh",
-        // Asegura que el contenedor ocupe todo el viewport y no deje blanco abajo
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <Box className={styles.container}>
       <Navbar />
       <Box
         component="main"
-        sx={{
-          maxWidth: { xs: "100%", sm: "600px", md: "960px", lg: "1280px" },
-          mx: "auto",
-          px: { xs: 2, sm: 3, md: 4 },
-          py: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          flexGrow: 1,
-        }}
+        className={styles.main}
         data-aos="fade-up"
       >
-        <Typography
-          variant="h3"
-          component="h1"
-          sx={{
-            fontWeight: "bold",
-            mb: 6,
-            textAlign: "center",
-            color: "#90caf9",
-            userSelect: "none",
-          }}
-        >
+        <Typography variant="h3" component="h1" className={styles.title}>
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
-        <Card
-          sx={{
-            width: "100%",
-            maxWidth: 600,
-            bgcolor: "#1e1e1e",
-            color: "#e0e0e0",
-            borderRadius: 3,
-            boxShadow: "0 6px 20px rgba(0,0,0,0.5)",
-            p: 4,
-            mb: 6,
-            transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-            "&:hover": {
-              transform: "translateY(-5px) scale(1.01)",
-              boxShadow: "0 8px 25px rgba(0,0,0,0.7)",
-            },
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 3,
-            border: "1px solid",
-            borderColor: "#333",
-          }}
-        >
-          <CardContent
-            sx={{
-              p: 0,
-              "&:last-child": { pb: 0 },
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "#90caf9" }} />
-            <Typography
-              variant="h5"
-              component="h3"
-              sx={{ fontWeight: "medium", mb: 1, color: "#b0bec5" }}
-            >
+        <Card className={styles.card}>
+          <CardContent className={styles.cardContent}>
+            <AccountBalanceWalletIcon className={styles.walletIcon} />
+            <Typography variant="h5" component="h3" className={styles.subtitle}>
               Balance Actual
             </Typography>
 
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 1 }}>
-              <Typography
-                variant="h4"
-                component="span"
-                sx={{ fontWeight: "bold", color: "#81c784" }}
-              >
+            <Box className={styles.balanceRow}>
+              <Typography variant="h4" component="span" className={styles.balance}>
                 $ {balance[selectedCurrency]?.toFixed(2) ?? "0.00"}
               </Typography>
               <FormControl
                 variant="outlined"
                 size="small"
-                sx={{ minWidth: 120 }}
+                className={styles.selectFormControl}
                 color="primary"
               >
-                <InputLabel
-                  id="currency-select-label"
-                  sx={{ color: "#b0bec5" }}
-                >
+                <InputLabel id="currency-select-label" className={styles.selectLabel}>
                   Moneda
                 </InputLabel>
                 <Select
@@ -182,27 +114,10 @@ const Home = () => {
                   value={selectedCurrency}
                   onChange={handleCurrencyChange}
                   label="Moneda"
-                  sx={{
-                    color: "#e0e0e0",
-                    backgroundColor: "#1e1e1e",
-                    borderRadius: 1,
-                    ".MuiOutlinedInput-notchedOutline": { borderColor: "#333" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#90caf9",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#b0bec5",
-                    },
-                    ".MuiSvgIcon-root": { color: "#b0bec5" },
-                  }}
+                  className={styles.select}
                   MenuProps={{
                     PaperProps: {
-                      sx: {
-                        bgcolor: "#1e1e1e",
-                        color: "#e0e0e0",
-                        border: "1px solid",
-                        borderColor: "#333",
-                      },
+                      className: styles.selectMenuPaper,
                     },
                   }}
                 >
@@ -210,11 +125,7 @@ const Home = () => {
                     <MenuItem
                       key={currency}
                       value={currency}
-                      sx={{
-                        bgcolor: "transparent",
-                        color: "#e0e0e0",
-                        "&:hover": { bgcolor: "#333" },
-                      }}
+                      className={styles.selectMenuItem}
                     >
                       {currency}
                     </MenuItem>
@@ -223,37 +134,12 @@ const Home = () => {
               </FormControl>
             </Box>
 
-            {/* CVU with copy */}
-            <Box
-              sx={{
-                mt: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                bgcolor: "#333",
-                px: 2,
-                py: 1,
-                borderRadius: 2,
-                userSelect: "all",
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#b0bec5",
-                  fontWeight: 500,
-                  fontSize: "0.9rem",
-                  wordBreak: "break-all",
-                }}
-              >
+            <Box className={styles.cvuBox}>
+              <Typography variant="body2" className={styles.cvuText}>
                 CVU: {userInfo.cvu}
               </Typography>
               <Tooltip title="Copiar CVU">
-                <IconButton
-                  onClick={handleCopyCVU}
-                  size="small"
-                  sx={{ color: "#b0bec5" }}
-                >
+                <IconButton onClick={handleCopyCVU} size="small" className={styles.copyButton}>
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -265,60 +151,19 @@ const Home = () => {
                 label="Verifica tu correo para activar todas las funciones."
                 color="warning"
                 variant="filled"
-                sx={{
-                  mt: 3,
-                  fontSize: "0.9rem",
-                  py: 1.5,
-                  px: 1,
-                  height: "auto",
-                  fontWeight: "medium",
-                }}
+                className={styles.chipWarning}
               />
             )}
           </CardContent>
         </Card>
 
-        {/* Botones de acción */}
-        <Paper
-          elevation={6}
-          sx={{
-            width: "100%",
-            maxWidth: 600,
-            p: 3,
-            mb: 8,
-            borderRadius: 3,
-            bgcolor: "#1e1e1e",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.5)",
-            border: "1px solid",
-            borderColor: "#333",
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            justifyContent: "space-around",
-            alignItems: "center",
-            gap: { xs: 2, sm: 3 },
-          }}
-        >
+        <Paper elevation={6} className={styles.actionButtons}>
           <Button
             variant="contained"
             onClick={() => navigate("/loadbalance")}
             disabled={isDisabled}
             startIcon={<AccountBalanceIcon />}
-            sx={{
-              flexGrow: 1,
-              py: 1.8,
-              borderRadius: 2,
-              fontSize: { xs: "0.9rem", sm: "1rem" },
-              fontWeight: "bold",
-              boxShadow: 4,
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              "&:hover": {
-                boxShadow: 8,
-                transform: "translateY(-2px)",
-                backgroundColor: "#1565c0",
-              },
-              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-            }}
+            className={styles.actionButton}
           >
             Ingresar
           </Button>
@@ -328,33 +173,13 @@ const Home = () => {
             onClick={() => navigate("/transaction")}
             disabled={isDisabled}
             startIcon={<SendIcon />}
-            sx={{
-              flexGrow: 1,
-              py: 1.8,
-              borderRadius: 2,
-              fontSize: { xs: "0.9rem", sm: "1rem" },
-              fontWeight: "bold",
-              boxShadow: 4,
-              backgroundColor: "#1976d2",
-              color: "#fff",
-              "&:hover": {
-                boxShadow: 8,
-                transform: "translateY(-2px)",
-                backgroundColor: "#1565c0",
-              },
-              transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-            }}
+            className={styles.actionButton}
           >
             Transferir
           </Button>
         </Paper>
 
-        {/* Historial de transacciones */}
-        <Box
-          sx={{ width: "100%", maxWidth: 900 }}
-          data-aos="fade-up"
-          data-aos-delay="200"
-        >
+        <Box className={styles.transactionHistoryBox} data-aos="fade-up" data-aos-delay="200">
           <TransactionHistory />
         </Box>
       </Box>

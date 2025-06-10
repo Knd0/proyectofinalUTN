@@ -1,0 +1,239 @@
+.container {
+  background-color: #121212;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+}
+
+@media (min-width: 600px) {
+  .main {
+    max-width: 600px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 960px) {
+  .main {
+    max-width: 960px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 48px;
+  text-align: center;
+  color: #90caf9;
+  user-select: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 600px;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  padding: 32px;
+  margin-bottom: 48px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+
+  border: 1px solid #333;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+}
+
+.cardContent {
+  padding: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.walletIcon {
+  font-size: 48px !important;
+  margin-bottom: 16px !important;
+  color: #90caf9 !important;
+}
+
+.subtitle {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #b0bec5;
+}
+
+.balanceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.balance {
+  font-weight: bold;
+  color: #81c784;
+}
+
+.selectFormControl {
+  min-width: 120px;
+}
+
+.selectLabel {
+  color: #b0bec5 !important;
+}
+
+.select {
+  color: #e0e0e0 !important;
+  background-color: #1e1e1e !important;
+  border-radius: 4px !important;
+}
+
+.select .MuiOutlinedInput-notchedOutline {
+  border-color: #333 !important;
+}
+
+.select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #90caf9 !important;
+}
+
+.select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #b0bec5 !important;
+}
+
+.select .MuiSvgIcon-root {
+  color: #b0bec5 !important;
+}
+
+.selectMenuPaper {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #333 !important;
+}
+
+.selectMenuItem {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+.selectMenuItem:hover {
+  background-color: #333 !important;
+}
+
+.cvuBox {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #333;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 16px;
+  user-select: all;
+}
+
+.cvuText {
+  color: #b0bec5;
+  font-weight: 500;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.copyButton {
+  color: #b0bec5 !important;
+}
+
+.chipWarning {
+  margin-top: 24px !important;
+  font-size: 0.9rem !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  padding-left: 8px !important;
+  height: auto !important;
+  font-weight: 500 !important;
+}
+
+.actionButtons {
+  width: 100%;
+  max-width: 600px;
+  padding: 24px;
+  margin-bottom: 64px;
+  border-radius: 12px;
+  background-color: #1e1e1e;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .actionButtons {
+    flex-direction: row;
+    gap: 24px;
+  }
+}
+
+.actionButton {
+  flex-grow: 1;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  border-radius: 16px !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  box-shadow: 4 !important;
+  background-color: #1976d2 !important;
+  color: #fff !important;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+.actionButton:hover {
+  box-shadow: 8 !important;
+  transform: translateY(-2px);
+  background-color: #1565c0 !important;
+}
+
+@media (max-width: 600px) {
+  .actionButton {
+    font-size: 0.9rem !important;
+  }
+}
+
+.transactionHistoryBox {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 12px;
+  padding: 0;
+}
