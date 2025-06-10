@@ -204,13 +204,13 @@ const Register = () => {
                   <MenuItem disabled>Cargando países...</MenuItem>
                 ) : (
                   <>
-                    <MenuItem value="" disabled>
+                    <option value="" disabled>
                       Selecciona tu nacionalidad
-                    </MenuItem>
+                    </option>
                     {countries.map((country, idx) => (
-                      <MenuItem key={idx} value={country.name.official}>
+                      <option key={idx} value={country.name.official}>
                         {country.name.official}
-                      </MenuItem>
+                      </option>
                     ))}
                   </>
                 )}
