@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Loader/loader";
 import Navbar from "../Navbar/Navbar";
-import "./FakeCheckout.css";
+import styles from "./FakeCheckout.module.css";
 
 const FakeCheckout = () => {
   const navigate = useNavigate();
@@ -86,30 +86,30 @@ const FakeCheckout = () => {
 
         {/* Tarjeta animada */}
         <div
-          className={`flip-card ${isFlipped ? "flipped" : ""}`}
+          className={`${styles.flipCard} ${isFlipped ? styles.flipped : ""}`}
           onMouseEnter={() => setIsFlipped(true)}
           onMouseLeave={() => setIsFlipped(false)}
         >
-          <div className="flip-card-inner">
-            <div className="flip-card-front">
-              <p className="heading_8264">MASTERCARD</p>
-              <p className="number">
+          <div className={styles.flipCardInner}>
+            <div className={styles.flipCardFront}>
+              <p className={styles.heading}>MASTERCARD</p>
+              <p className={styles.number}>
                 {formatCardNumber(cardData.cardNumber) || "#### #### #### ####"}
               </p>
-              <p className="date_8264">
+              <p className={styles.date}>
                 {cardData.expiry
                   ? cardData.expiry.slice(5) + "/" + cardData.expiry.slice(2, 4)
                   : "MM/YY"}
               </p>
-              <p className="name">
+              <p className={styles.name}>
                 {cardData.cardName || "NOMBRE APELLIDO"}
               </p>
             </div>
-            <div className="flip-card-back">
-              <div className="strip"></div>
-              <div className="mstrip"></div>
-              <div className="sstrip">
-                <p className="code">{cardData.cvc || "***"}</p>
+            <div className={styles.flipCardBack}>
+              <div className={styles.strip}></div>
+              <div className={styles.mstrip}></div>
+              <div className={styles.sstrip}>
+                <p className={styles.code}>{cardData.cvc || "***"}</p>
               </div>
             </div>
           </div>
