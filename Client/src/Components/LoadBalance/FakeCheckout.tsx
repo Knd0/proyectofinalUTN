@@ -5,7 +5,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Loader/loader";
 import Navbar from "../Navbar/Navbar";
-
 import {
   Box,
   Button,
@@ -15,21 +14,26 @@ import {
   Typography,
 } from "@mui/material";
 
+// Estilos de la tarjeta flip-card
+import "./FakeCheckout.css";
+
 const FakeCheckout = () => {
   const navigate = useNavigate();
 
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
+  const [cardName, setCardName] = useState("");
   const [cvc, setCvc] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const handleFakePayment = async () => {
-    if (!cardNumber || !expiry || !cvc) {
+    if (!cardNumber || !expiry || !cvc || !cardName) {
       toast.error("Por favor completá todos los campos");
       return;
     }
 
-    if (cardNumber.length < 16 || cvc.length < 3) {
+    if (cardNumber.replace(/\s/g, "").length < 16 || cvc.length < 3) {
       toast.error("Datos de tarjeta inválidos");
       return;
     }
@@ -44,7 +48,6 @@ const FakeCheckout = () => {
     }
 
     setLoading(true);
-
     try {
       await axios.post(
         "https://proyectofinalutn-production.up.railway.app/auth/balance",
@@ -71,88 +74,41 @@ const FakeCheckout = () => {
 
   if (loading) return <Loader />;
 
+  const formatCardNumber = (num: string) =>
+    num
+      .replace(/\W/gi, "")
+      .replace(/(.{4})/g, "$1 ")
+      .trim();
+
   return (
     <>
       <Navbar />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundImage: "url('https://source.unsplash.com/featured/?creditcard,payment')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          bgcolor: "rgba(0,0,0,0.7)",
-          backgroundBlendMode: "darken",
-        }}
-      >
-        <Container maxWidth="sm">
-          <Paper
-            elevation={12}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              backdropFilter: "blur(8px)",
-              bgcolor: "rgba(17, 24, 39, 0.85)",
-              color: "white",
-            }}
-          >
-            <Typography variant="h4" mb={3} textAlign="center" fontWeight="bold">
-              Simulación de Pago
-            </Typography>
-
-            <TextField
-              fullWidth
-              label="Número de tarjeta"
-              placeholder="4242 4242 4242 4242"
-              variant="outlined"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              inputProps={{ maxLength: 19 }}
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              label="Vencimiento"
-              type="date"
-              variant="outlined"
-              value={expiry}
-              onChange={(e) => setExpiry(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              label="CVC"
-              placeholder="123"
-              variant="outlined"
-              value={cvc}
-              onChange={(e) => setCvc(e.target.value)}
-              inputProps={{ maxLength: 4 }}
-              sx={muiInputStyle}
-            />
-
-            <Button
-              fullWidth
-              variant="contained"
-              color="success"
-              sx={{
-                mt: 3,
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1rem",
-              }}
-              onClick={handleFakePayment}
-              disabled={loading}
-            >
-              Confirmar y pagar
-            </Button>
-          </Paper>
-        </Container>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <div
+          className={`flip-card ${isFlipped ? "flipped" : ""}`}
+          onMouseEnter={() => setIsFlipped(true)}
+          onMouseLeave={() => setIsFlipped(false)}
+        >
+          <div className="flip-card-inner">
+            <div className="flip-card-front">
+              <p className="heading_8264">MASTERCARD</p>
+              <p className="number">
+                {formatCardNumber(cardNumber) || "#### #### #### ####"}
+              </p>
+              <p className="date_8264">
+                {expiry ? expiry.slice(5) + "/" + expiry.slice(2, 4) : "MM/YY"}
+              </p>
+              <p className="name">{cardName || "NOMBRE APELLIDO"}</p>
+            </div>
+            <div className="flip-card-back">
+              <div className="strip"></div>
+              <div className="mstrip"></div>
+              <div className="sstrip">
+                <p className="code">{cvc || "***"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </Box>
 
       <ToastContainer />
