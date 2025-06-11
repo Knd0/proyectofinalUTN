@@ -5,18 +5,6 @@ import Loader from "../Loader/loader";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 
-import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Avatar,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
-
 interface UserProfile {
   descripcion: string;
   nacionalidad: string;
@@ -75,12 +63,15 @@ const Profile = () => {
     fetchUserData();
   }, [navigate]);
 
+  // Handle cambios de inputs, incluyendo campos anidados en perfil
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
     if (!formData) return;
 
+    // Campos anidados en perfil tienen nombre con formato "perfil.campo"
     if (name.startsWith("perfil.")) {
       const key = name.split(".")[1];
       setFormData({
@@ -135,174 +126,162 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <Box textAlign="center" mt={10}>
+      <div className="text-center mt-10 text-xl">
         <Loader />
-      </Box>
+      </div>
     );
   }
 
   if (errorMsg) {
     return (
-      <Box textAlign="center" mt={10}>
-        <Alert severity="error">{errorMsg}</Alert>
-      </Box>
+      <div className="text-center mt-10 text-red-600 font-semibold">
+        {errorMsg}
+      </div>
     );
   }
 
-  if (!user || !formData) return null;
+  if (!user || !formData) {
+    return null;
+  }
 
   return (
     <>
       <Navbar />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundImage: "url('https://source.unsplash.com/featured/?profile,user')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          bgcolor: "rgba(0,0,0,0.7)",
-          backgroundBlendMode: "darken",
-        }}
+      <div
+        className="max-w-2xl mx-auto p-6 bg-gray-300 rounded-xl shadow-md mt-10"
+        data-aos="fade-up"
       >
-        <Container maxWidth="sm">
-          <Paper
-            elevation={12}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              backdropFilter: "blur(8px)",
-              bgcolor: "rgba(17, 24, 39, 0.85)",
-              color: "white",
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Mi Perfil</h1>
+          <button
+            onClick={() => {
+              if (editMode) {
+                setFormData(user); // reset formData si cancela
+              }
+              setEditMode(!editMode);
+              setErrorMsg(null);
             }}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition"
+            aria-label={editMode ? "Cancelar edición" : "Editar perfil"}
           >
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-              <Typography variant="h4" fontWeight="bold" color="white">
-                Mi Perfil
-              </Typography>
-              <Button
-                variant="text"
-                color="info"
-                onClick={() => {
-                  if (editMode) setFormData(user);
-                  setEditMode(!editMode);
-                  setErrorMsg(null);
-                }}
-              >
-                {editMode ? "Cancelar" : "Editar"}
-              </Button>
-            </Box>
+            {editMode ? "Cancelar" : "Editar"}
+          </button>
+        </div>
 
-            <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-              <Avatar
-                src={formData.perfil.imagen || "/default-avatar.png"}
-                alt="Avatar"
-                sx={{ width: 100, height: 100, mb: 2 }}
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src={formData.perfil.imagen || "/default-avatar.png"}
+            alt="Avatar"
+            className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500 shadow"
+          />
+          {editMode && (
+            <input
+              type="text"
+              name="perfil.imagen"
+              value={formData.perfil.imagen}
+              onChange={handleChange}
+              placeholder="URL de la imagen"
+              className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+            />
+          )}
+        </div>
+
+        <div className="mt-6 space-y-4">
+          <div>
+            <label htmlFor="nombre" className="font-semibold text-gray-600">
+              Nombre
+            </label>
+            {editMode ? (
+              <input
+                id="nombre"
+                type="text"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="Nombre"
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
               />
-              {editMode && (
-                <TextField
-                  fullWidth
-                  label="URL de la imagen"
-                  name="perfil.imagen"
-                  value={formData.perfil.imagen}
-                  onChange={handleChange}
-                  variant="outlined"
-                  sx={muiInputStyle}
-                />
-              )}
-            </Box>
-
-            <TextField
-              fullWidth
-              label="Nombre"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              variant="outlined"
-              disabled={!editMode}
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              label="Email"
-              value={user.email}
-              variant="outlined"
-              disabled
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              multiline
-              label="Descripción"
-              name="perfil.descripcion"
-              value={formData.perfil.descripcion}
-              onChange={handleChange}
-              variant="outlined"
-              disabled={!editMode}
-              rows={3}
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              label="Nacionalidad"
-              name="perfil.nacionalidad"
-              value={formData.perfil.nacionalidad}
-              onChange={handleChange}
-              variant="outlined"
-              disabled={!editMode}
-              sx={muiInputStyle}
-            />
-
-            <TextField
-              fullWidth
-              label="DNI"
-              name="perfil.dni"
-              value={formData.perfil.dni}
-              onChange={handleChange}
-              variant="outlined"
-              disabled={!editMode}
-              sx={muiInputStyle}
-            />
-
-            {editMode && (
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{
-                  mt: 3,
-                  py: 1.5,
-                  fontWeight: "bold",
-                  backgroundColor: "#3b82f6",
-                  "&:hover": { backgroundColor: "#2563eb" },
-                }}
-                onClick={handleSubmit}
-                disabled={saving}
-              >
-                {saving ? <CircularProgress size={24} color="inherit" /> : "Guardar Cambios"}
-              </Button>
+            ) : (
+              <p>{user.nombre}</p>
             )}
-          </Paper>
-        </Container>
-      </Box>
+          </div>
+
+          <div>
+            <label className="font-semibold text-gray-600">Email</label>
+            <p>{user.email}</p>
+          </div>
+
+          <div>
+            <label htmlFor="descripcion" className="font-semibold text-gray-600">
+              Descripción
+            </label>
+            {editMode ? (
+              <textarea
+                id="descripcion"
+                name="perfil.descripcion"
+                value={formData.perfil.descripcion}
+                onChange={handleChange}
+                placeholder="Descripción"
+                className="textarea textarea-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+                rows={3}
+              />
+            ) : (
+              <p>{user.perfil.descripcion || "Sin descripción"}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="nacionalidad" className="font-semibold text-gray-600">
+              Nacionalidad
+            </label>
+            {editMode ? (
+              <input
+                id="nacionalidad"
+                type="text"
+                name="perfil.nacionalidad"
+                value={formData.perfil.nacionalidad}
+                onChange={handleChange}
+                placeholder="Nacionalidad"
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.perfil.nacionalidad || "No especificado"}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="dni" className="font-semibold text-gray-600">
+              DNI
+            </label>
+            {editMode ? (
+              <input
+                id="dni"
+                type="text"
+                name="perfil.dni"
+                value={formData.perfil.dni}
+                onChange={handleChange}
+                placeholder="DNI"
+                className="input input-bordered w-full px-4 py-2 rounded-md border border-gray-300"
+              />
+            ) : (
+              <p>{user.perfil.dni || "No especificado"}</p>
+            )}
+          </div>
+
+          {editMode && (
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+              aria-busy={saving}
+            >
+              {saving ? "Guardando..." : "Guardar Cambios"}
+            </button>
+          )}
+        </div>
+      </div>
     </>
   );
-};
-
-const muiInputStyle = {
-  mb: 2,
-  input: { color: "white" },
-  label: { color: "#9ca3af" },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": { borderColor: "#3b82f6" },
-    "&:hover fieldset": { borderColor: "#60a5fa" },
-    "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-  },
 };
 
 export default Profile;
