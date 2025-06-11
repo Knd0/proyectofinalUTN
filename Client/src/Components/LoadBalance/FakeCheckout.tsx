@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Loader/loader";
 import Navbar from "../Navbar/Navbar";
-import "./FakeCheckout.css"; // Asegurate de tener los estilos que te pasé antes
+import "./FakeCheckout.css";
 
 const FakeCheckout = () => {
   const navigate = useNavigate();
