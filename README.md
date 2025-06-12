@@ -7,12 +7,12 @@ Este proyecto es una **billetera virtual** desarrollada como trabajo final para 
 ### 🖥️ Frontend
 - **React** con **TypeScript**
 - **React Router DOM** para rutas
-- Estilos con CSS y framework a elección
+- Estilos con **Tailwind CSS**
 
 ### 🛠️ Backend
 - **Node.js** con **Express**
 - **Sequelize** como ORM
-- **PostgreSQL** como base de datos
+- **PostgreSQL** como base de datos (antes SQLite)
 
 ### 🔐 Seguridad
 - **JWT (JSON Web Tokens)** para autenticación segura
@@ -22,40 +22,40 @@ Este proyecto es una **billetera virtual** desarrollada como trabajo final para 
 
 - Registro de usuario
 - Inicio de sesión con JWT
-- Visualización de perfil
+- Visualización y edición de perfil
 - Gestión de balance en múltiples monedas: ARS, USD, EUR, BTC, ETH, USDT
 - Carga de saldo en moneda seleccionada
+- Historial de movimientos
+- Conversión entre monedas con tasas en tiempo real
+- Transferencias entre usuarios
+- Dashboard con métricas (en proceso)
 
 ## 📂 Estructura del Proyecto
 
 ```
 proyecto/
-├── Client/                 # Frontend (React)
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── index.tsx
-│   │   ├── components/
-│   │   │      │ 
-│   │   │      ├── Landing.tsx
-│   │   │      ├── Home.tsx
-│   │   │      ├── Login.tsx
-│   │   │      ├── History.tsx
-│   │   │      ├── Profile.tsx
-│   │   │      ├── Navbar.tsx
-│   │   │      ├── Register.tsx
-│   │   │      └── LoadBalance.tsx
-│   │   └── ...
+├── Client/ # Frontend (React)
+│ ├── src/
+│ │ ├── App.tsx
+│ │ ├── index.tsx
+│ │ ├── components/
+│ │ │ ├── Landing.tsx
+│ │ │ ├── Home.tsx
+│ │ │ ├── Login.tsx
+│ │ │ ├── History.tsx
+│ │ │ ├── Profile.tsx
+│ │ │ ├── Navbar.tsx
+│ │ │ ├── Register.tsx
+│ │ │ └── LoadBalance.tsx
+│ └── ...
 │
-└── Server/                # Backend (Node.js + Express)
-    ├── src/
-    │   ├── Controllers/
-    │   │   └── authController.ts
-    │   ├── Models/
-    │   │   └── Usuario.ts
-    │   ├── Routes/
-    │   │   └── authRoutes.ts
-    │   ├── db.ts
-    │   └── index.ts
+└── Server/ # Backend (Node.js + Express)
+├── src/
+│ ├── Controllers/
+│ ├── Models/
+│ ├── Routes/
+│ ├── db.ts
+│ └── index.ts
 ```
 
 ## ⚙️ Cómo correr el proyecto
@@ -82,7 +82,7 @@ proyecto/
 
    Por defecto corre en: [https://proyectofinalutn-production.up.railway.app](https://proyectofinalutn-production.up.railway.app)
 
-> **Nota:** el servidor genera la base de datos SQLite automáticamente en `Server/database.sqlite` si no existe.
+> **Nota:** Se puede correr en local pero necesitas crear tu propia base de datos para que funcione. Recomiendo PosgresSQL con PGAdmin 4. 
 
 ### 💻 Frontend
 
@@ -104,7 +104,7 @@ proyecto/
    npm start
    ```
 
-   Por defecto corre en: [http://localhost:3000](http://localhost:3000)
+   Por defecto corre en: [http://localhost:3000](http://localhost:3000). Sin el backend corriendo no vas a poder pasar del Landing/Register/Login.
 
 ## 🔐 Autenticación con JWT
 
@@ -129,6 +129,8 @@ Authorization: Bearer <token>
   descripcion?: string,
   nacionalidad?: string,
   dni?: string,
+  isconfirmed?: boolean,
+  admin: boolean,
   COD: {
     ARS: number,
     USD: number,
@@ -142,12 +144,17 @@ Authorization: Bearer <token>
 
 ## 📥 Rutas del Backend (Resumen)
 
-| Método | Ruta               | Descripción                         |
-|--------|--------------------|-------------------------------------|
-| POST   | /auth/register     | Crear nuevo usuario                 |
-| POST   | /auth/login        | Iniciar sesión y obtener token JWT |
-| GET    | /auth/profile      | Obtener perfil del usuario         |
-| POST   | /auth/balance      | Cargar saldo en moneda específica  |
+| Método | Ruta           | Descripción                        |
+| ------ | -------------- | ---------------------------------- |
+| POST   | /auth/register | Crear nuevo usuario                |
+| POST   | /auth/login    | Iniciar sesión y obtener token JWT |
+| GET    | /auth/profile  | Obtener perfil del usuario         |
+| PUT    | /auth/update   | Editar datos del perfil            |
+| POST   | /auth/balance  | Cargar saldo en moneda específica  |
+| GET    | /auth/history  | Ver historial de transacciones     |
+| POST   | /auth/transfer | Transferir a otro usuario          |
+| POST   | /auth/exchange | Convertir entre monedas            |
+
 
 ## 🧪 Estado Actual del Proyecto
 
@@ -170,4 +177,14 @@ Authorization: Bearer <token>
 
 ## 🧑‍🎓 Autor
 
-Proyecto realizado por Jonas Mendelovich, Mateo Zeballos, Franco de Iriondo y Gaston Nuñez, estudiantes de la UTN.
+Proyecto desarrollado por:
+
+• Franco de Iriondo
+
+• Jonas Mendelovich
+
+• Mateo Zeballos
+
+• Gaston Nuñez
+
+🎓 Estudiantes de la Universidad Tecnológica Nacional — 2025.
