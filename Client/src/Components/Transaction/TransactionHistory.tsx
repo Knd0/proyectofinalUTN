@@ -92,10 +92,10 @@ const TransactionHistory: React.FC = () => {
   if (transactions.length === 0) {
     return (
       <Alert severity="info" sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
-        <Typography variant="h6" component="p" sx={{ color: "#fff" }}>
+        <Typography variant="h6" component="p" sx={{ color: "#90caf9" }}>
           ¡Aún no hay transacciones!
         </Typography>
-        <Typography variant="body1" sx={{ mt: 1, color: "#ccc" }}>
+        <Typography variant="body1" sx={{ mt: 1, color: "#90caf9" }}>
           Realizá tu primera operación para verla reflejada aquí.
         </Typography>
       </Alert>
