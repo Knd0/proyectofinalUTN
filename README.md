@@ -12,7 +12,7 @@ Este proyecto es una **billetera virtual** desarrollada como trabajo final para 
 ### 🛠️ Backend
 - **Node.js** con **Express**
 - **Sequelize** como ORM
-- **SQLite** como base de datos
+- **PostgreSQL** como base de datos
 
 ### 🔐 Seguridad
 - **JWT (JSON Web Tokens)** para autenticación segura
