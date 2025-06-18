@@ -240,7 +240,7 @@ const Profile = () => {
               multiline
               label="Descripción"
               name="perfil.descripcion"
-              value={formData.perfil.descripcion}
+              value={user.perfil.descripcion}
               onChange={handleChange}
               variant="outlined"
               disabled={!editMode}
@@ -252,7 +252,7 @@ const Profile = () => {
               fullWidth
               label="Nacionalidad"
               name="perfil.nacionalidad"
-              value={formData.perfil.nacionalidad}
+              value={user.perfil.nacionalidad}
               onChange={handleChange}
               variant="outlined"
               disabled={!editMode}
@@ -263,7 +263,7 @@ const Profile = () => {
               fullWidth
               label="DNI"
               name="perfil.dni"
-              value={formData.perfil.dni}
+              value={user.perfil.dni}
               onChange={handleChange}
               variant="outlined"
               disabled={!editMode}
