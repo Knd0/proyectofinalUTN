@@ -4,7 +4,6 @@ import "aos/dist/aos.css";
 import Loader from "../Loader/loader";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-
 import {
   Box,
   Button,
@@ -15,8 +14,6 @@ import {
   Avatar,
   CircularProgress,
   Alert,
-  InputLabelProps,
-  InputProps
 } from "@mui/material";
 
 interface UserProfile {
@@ -84,7 +81,7 @@ const Profile = () => {
     if (!formData) return;
 
     if (name.startsWith("perfil.")) {
-      const key = name.split(".")[1];
+      const key = name.split(".")[1] as keyof UserProfile;
       setFormData({
         ...formData,
         perfil: {
@@ -151,203 +148,162 @@ const Profile = () => {
     );
   }
 
-  if (!user || !formData) return null;
+  if (!user || !formData || !formData.perfil) return null;
 
   return (
     <>
-  <Navbar />
-  <Box
-    sx={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundImage: "url('https://source.unsplash.com/featured/?digital-wallet')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      bgcolor: "rgba(0,0,0,0.7)",
-      backgroundBlendMode: "darken",
-    }}
-  >
-    <Container maxWidth="sm">
-      <Paper
-        elevation={12}
+      <Navbar />
+      <Box
         sx={{
-          p: 4,
-          borderRadius: 3,
-          backdropFilter: "blur(8px)",
-          bgcolor: "rgba(17, 24, 39, 0.85)",
-          color: "white",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundImage: "url('https://source.unsplash.com/featured/?digital-wallet')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          bgcolor: "rgba(0,0,0,0.7)",
+          backgroundBlendMode: "darken",
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" fontWeight="bold" color="white">
-            Mi Perfil
-          </Typography>
-          <Button
-            variant="text"
-            sx={{ color: "#3b82f6", fontWeight: "bold" }}
-            onClick={() => {
-              if (editMode) setFormData(user);
-              setEditMode(!editMode);
-              setErrorMsg(null);
+        <Container maxWidth="sm">
+          <Paper
+            elevation={12}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              backdropFilter: "blur(8px)",
+              bgcolor: "rgba(17, 24, 39, 0.85)",
+              color: "white",
             }}
           >
-            {editMode ? "Cancelar" : "Editar"}
-          </Button>
-        </Box>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+              <Typography variant="h4" fontWeight="bold" color="white">
+                Mi Perfil
+              </Typography>
+              <Button
+                variant="text"
+                sx={{ color: "#3b82f6", fontWeight: "bold" }}
+                onClick={() => {
+                  if (editMode) setFormData(user);
+                  setEditMode(!editMode);
+                  setErrorMsg(null);
+                }}
+              >
+                {editMode ? "Cancelar" : "Editar"}
+              </Button>
+            </Box>
 
-        <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-          <Avatar
-            src={formData.perfil.imagen || "/default-avatar.png"}
-            alt="Avatar"
-            sx={{ width: 100, height: 100, mb: 2 }}
-          />
-          {editMode && (
+            <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+              <Avatar
+                src={formData.perfil.imagen || "/default-avatar.png"}
+                alt="Avatar"
+                sx={{ width: 100, height: 100, mb: 2 }}
+              />
+              {editMode && (
+                <TextField
+                  fullWidth
+                  label="URL de la imagen"
+                  name="perfil.imagen"
+                  value={formData.perfil.imagen}
+                  onChange={handleChange}
+                  variant="outlined"
+                  sx={muiInputStyle}
+                  InputLabelProps={{ style: { color: "#9ca3af" } }}
+                  InputProps={{
+                    style: { color: "white" },
+                  }}
+                />
+              )}
+            </Box>
+
             <TextField
               fullWidth
-              label="URL de la imagen"
-              name="perfil.imagen"
-              value={formData.perfil.imagen}
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
               onChange={handleChange}
               variant="outlined"
+              disabled={!editMode}
               sx={muiInputStyle}
               InputLabelProps={{ style: { color: "#9ca3af" } }}
-              InputProps={{
-                style: { color: "white" },
-                sx: {
-                  "& fieldset": { borderColor: "#3b82f6" },
-                  "&:hover fieldset": { borderColor: "#60a5fa" },
-                  "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-                },
-              }}
+              InputProps={{ style: { color: "white" } }}
             />
-          )}
-        </Box>
 
-                <TextField
-          fullWidth
-          label="Nombre"
-          name="nombre"
-          value={formData.nombre}
-          onChange={handleChange}
-          variant="outlined"
-          disabled={!editMode}
-          sx={muiInputStyle}
-          InputLabelProps={{ style: { color: "#9ca3af" } }}
-          InputProps={{
-            style: { color: "white" },
-            sx: {
-              "& fieldset": { borderColor: "#3b82f6" },
-              "&:hover fieldset": { borderColor: "#60a5fa" },
-              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-            },
-          }}
-        />
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Descripción"
+              name="perfil.descripcion"
+              value={formData.perfil.descripcion}
+              onChange={handleChange}
+              variant="outlined"
+              disabled={!editMode}
+              sx={muiInputStyle}
+              InputLabelProps={{ style: { color: "#9ca3af" } }}
+              InputProps={{ style: { color: "white" } }}
+            />
 
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label="Descripción"
-          name="perfil.descripcion"
-          value={formData.perfil.descripcion}
-          onChange={handleChange}
-          variant="outlined"
-          disabled={!editMode}
-          sx={muiInputStyle}
-          InputLabelProps={{ style: { color: "#9ca3af" } }}
-          InputProps={{
-            style: { color: "white" },
-            sx: {
-              "& fieldset": { borderColor: "#3b82f6" },
-              "&:hover fieldset": { borderColor: "#60a5fa" },
-              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-            },
-          }}
-        />
+            <TextField
+              fullWidth
+              label="Nacionalidad"
+              name="perfil.nacionalidad"
+              value={formData.perfil.nacionalidad}
+              onChange={handleChange}
+              variant="outlined"
+              disabled={!editMode}
+              sx={muiInputStyle}
+              InputLabelProps={{ style: { color: "#9ca3af" } }}
+              InputProps={{ style: { color: "white" } }}
+            />
 
-        <TextField
-          fullWidth
-          label="Nacionalidad"
-          name="perfil.nacionalidad"
-          value={formData.perfil.nacionalidad}
-          onChange={handleChange}
-          variant="outlined"
-          disabled={!editMode}
-          sx={muiInputStyle}
-          InputLabelProps={{ style: { color: "#9ca3af" } }}
-          InputProps={{
-            style: { color: "white" },
-            sx: {
-              "& fieldset": { borderColor: "#3b82f6" },
-              "&:hover fieldset": { borderColor: "#60a5fa" },
-              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-            },
-          }}
-        />
+            <TextField
+              fullWidth
+              label="DNI"
+              name="perfil.dni"
+              value={formData.perfil.dni}
+              onChange={handleChange}
+              variant="outlined"
+              disabled={!editMode}
+              sx={muiInputStyle}
+              InputLabelProps={{ style: { color: "#9ca3af" } }}
+              InputProps={{ style: { color: "white" } }}
+            />
 
-        <TextField
-          fullWidth
-          label="DNI"
-          name="perfil.dni"
-          value={formData.perfil.dni}
-          onChange={handleChange}
-          variant="outlined"
-          disabled={!editMode}
-          sx={muiInputStyle}
-          InputLabelProps={{ style: { color: "#9ca3af" } }}
-          InputProps={{
-            style: { color: "white" },
-            sx: {
-              "& fieldset": { borderColor: "#3b82f6" },
-              "&:hover fieldset": { borderColor: "#60a5fa" },
-              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-            },
-          }}
-        />
-        
-        <TextField
-          fullWidth
-          label="Email"
-          value={user.email}
-          variant="outlined"
-          disabled
-          sx={muiInputStyle}
-          InputLabelProps={{ style: { color: "#9ca3af" } }}
-          InputProps={{
-            style: { color: "white" },
-            sx: {
-              "& fieldset": { borderColor: "#3b82f6" },
-              "&:hover fieldset": { borderColor: "#60a5fa" },
-              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-            },
-          }}
-        />
+            <TextField
+              fullWidth
+              label="Email"
+              value={user.email}
+              variant="outlined"
+              disabled
+              sx={muiInputStyle}
+              InputLabelProps={{ style: { color: "#9ca3af" } }}
+              InputProps={{ style: { color: "white" } }}
+            />
 
-        {editMode && (
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{
-              mt: 3,
-              py: 1.5,
-              fontWeight: "bold",
-              backgroundColor: "#3b82f6",
-              "&:hover": { backgroundColor: "#2563eb" },
-            }}
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? <CircularProgress size={24} color="inherit" /> : "Guardar Cambios"}
-          </Button>
-        )}
-      </Paper>
-    </Container>
-  </Box>
-</>
-
+            {editMode && (
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{
+                  mt: 3,
+                  py: 1.5,
+                  fontWeight: "bold",
+                  backgroundColor: "#3b82f6",
+                  "&:hover": { backgroundColor: "#2563eb" },
+                }}
+                onClick={handleSubmit}
+                disabled={saving}
+              >
+                {saving ? <CircularProgress size={24} color="inherit" /> : "Guardar Cambios"}
+              </Button>
+            )}
+          </Paper>
+        </Container>
+      </Box>
+    </>
   );
 };
 
