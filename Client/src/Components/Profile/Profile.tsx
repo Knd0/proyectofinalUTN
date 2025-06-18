@@ -226,107 +226,88 @@ const Profile = () => {
           )}
         </Box>
 
+                <TextField
+          fullWidth
+          label="Nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={!editMode}
+          sx={muiInputStyle}
+          InputLabelProps={{ style: { color: "#9ca3af" } }}
+          InputProps={{
+            style: { color: "white" },
+            sx: {
+              "& fieldset": { borderColor: "#3b82f6" },
+              "&:hover fieldset": { borderColor: "#60a5fa" },
+              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+            },
+          }}
+        />
+
         <TextField
-  fullWidth
-  label="Nombre"
-  name="nombre"
-  value={formData.nombre}
-  onChange={handleChange}
-  variant="outlined"
-  disabled={!editMode}
-  sx={muiInputStyle}
-  InputLabelProps={{ style: { color: "#9ca3af" } }}
-  InputProps={{
-    style: { color: "white" },
-    sx: {
-      "& fieldset": { borderColor: "#3b82f6" },
-      "&:hover fieldset": { borderColor: "#60a5fa" },
-      "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-    },
-  }}
-/>
+          fullWidth
+          multiline
+          rows={3}
+          label="Descripción"
+          name="perfil.descripcion"
+          value={formData.perfil.descripcion}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={!editMode}
+          sx={muiInputStyle}
+          InputLabelProps={{ style: { color: "#9ca3af" } }}
+          InputProps={{
+            style: { color: "white" },
+            sx: {
+              "& fieldset": { borderColor: "#3b82f6" },
+              "&:hover fieldset": { borderColor: "#60a5fa" },
+              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+            },
+          }}
+        />
 
-<TextField
-  fullWidth
-  multiline
-  rows={3}
-  label="Descripción"
-  name="perfil.descripcion"
-  value={formData.perfil.descripcion}
-  onChange={handleChange}
-  variant="outlined"
-  disabled={!editMode}
-  sx={muiInputStyle}
-  InputLabelProps={{ style: { color: "#9ca3af" } }}
-  InputProps={{
-    style: { color: "white" },
-    sx: {
-      "& fieldset": { borderColor: "#3b82f6" },
-      "&:hover fieldset": { borderColor: "#60a5fa" },
-      "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-    },
-  }}
-/>
+        <TextField
+          fullWidth
+          label="Nacionalidad"
+          name="perfil.nacionalidad"
+          value={formData.perfil.nacionalidad}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={!editMode}
+          sx={muiInputStyle}
+          InputLabelProps={{ style: { color: "#9ca3af" } }}
+          InputProps={{
+            style: { color: "white" },
+            sx: {
+              "& fieldset": { borderColor: "#3b82f6" },
+              "&:hover fieldset": { borderColor: "#60a5fa" },
+              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+            },
+          }}
+        />
 
-<TextField
-  fullWidth
-  label="Nacionalidad"
-  name="perfil.nacionalidad"
-  value={formData.perfil.nacionalidad}
-  onChange={handleChange}
-  variant="outlined"
-  disabled={!editMode}
-  sx={muiInputStyle}
-  InputLabelProps={{ style: { color: "#9ca3af" } }}
-  InputProps={{
-    style: { color: "white" },
-    sx: {
-      "& fieldset": { borderColor: "#3b82f6" },
-      "&:hover fieldset": { borderColor: "#60a5fa" },
-      "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-    },
-  }}
-/>
-
-<TextField
-  fullWidth
-  label="DNI"
-  name="perfil.dni"
-  value={formData.perfil.dni}
-  onChange={handleChange}
-  variant="outlined"
-  disabled={!editMode}
-  sx={muiInputStyle}
-  InputLabelProps={{ style: { color: "#9ca3af" } }}
-  InputProps={{
-    style: { color: "white" },
-    sx: {
-      "& fieldset": { borderColor: "#3b82f6" },
-      "&:hover fieldset": { borderColor: "#60a5fa" },
-      "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-    },
-  }}
-/>
-
-<TextField
-  fullWidth
-  label="Email"
-  value={user.email}
-  variant="outlined"
-  disabled
-  sx={muiInputStyle}
-  InputLabelProps={{ style: { color: "#9ca3af" } }}
-  InputProps={{
-    style: { color: "white" },
-    sx: {
-      "& fieldset": { borderColor: "#3b82f6" },
-      "&:hover fieldset": { borderColor: "#60a5fa" },
-      "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
-    },
-  }}
-/>
-
-
+        <TextField
+          fullWidth
+          label="DNI"
+          name="perfil.dni"
+          value={formData.perfil.dni}
+          onChange={handleChange}
+          variant="outlined"
+          disabled={!editMode}
+          sx={muiInputStyle}
+          InputLabelProps={{ style: { color: "#9ca3af" } }}
+          InputProps={{
+            style: { color: "white" },
+            sx: {
+              "& fieldset": { borderColor: "#3b82f6" },
+              "&:hover fieldset": { borderColor: "#60a5fa" },
+              "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+            },
+          }}
+        />
+        
         <TextField
           fullWidth
           label="Email"
