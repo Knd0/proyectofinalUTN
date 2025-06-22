@@ -1,15 +1,16 @@
+// Importamos nodemailer para poder enviar correos electrónicos
 import nodemailer from "nodemailer";
 
-// Configuración del transporter
+// Configuración del transporter de nodemailer para usar Gmail como servicio de envío
 export const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: "gmail", // Usamos el servicio Gmail
   auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
+    user: process.env.MAIL_USER, // Usuario del correo (definido en variables de entorno)
+    pass: process.env.MAIL_PASS, // Contraseña o token del correo
   },
 });
 
-// Plantilla HTML para correos de transacción
+// Plantilla HTML para correos relacionados con transacciones (envíos, recepción, etc.)
 const transactionEmailTemplate = (usuario: string, mensaje: string) => `
 <!DOCTYPE html>
 <html lang="es">
@@ -28,7 +29,7 @@ const transactionEmailTemplate = (usuario: string, mensaje: string) => `
         <td style="padding:30px;">
           <h2 style="color:#333;">Hola, ${usuario} 👋</h2>
           <p style="color:#555;font-size:16px;line-height:1.5;">
-            ${mensaje}
+            ${mensaje} <!-- Aquí se inserta el mensaje dinámico de la transacción -->
           </p>
           <p style="margin-top:30px;color:#888;font-size:14px;">Si no realizaste esta acción, por favor contactanos.</p>
         </td>
@@ -43,18 +44,20 @@ const transactionEmailTemplate = (usuario: string, mensaje: string) => `
 </html>
 `;
 
-// Función para enviar email de transacción
+// Función asíncrona para enviar el correo electrónico de transacción
 export const sendTransactionEmail = async (to: string, usuario: string, mensaje: string) => {
-  const subject = "Transacción realizada con éxito";
-  const html = transactionEmailTemplate(usuario, mensaje);
+  const subject = "Transacción realizada con éxito"; // Asunto del correo
+  const html = transactionEmailTemplate(usuario, mensaje); // HTML generado con la plantilla
 
+  // Logging básico para monitorear envío
   console.log("📨 Enviando a:", to);
   console.log("📨 Asunto:", subject);
 
+  // Enviamos el correo usando el transporter previamente configurado
   await transporter.sendMail({
-    from: `"Wamoney" <${process.env.MAIL_USER}>`,
-    to,
-    subject,
-    html,
+    from: `"Wamoney" <${process.env.MAIL_USER}>`, // Remitente
+    to,                                          // Destinatario
+    subject,                                     // Asunto
+    html,                                        // Cuerpo del mensaje en formato HTML
   });
 };

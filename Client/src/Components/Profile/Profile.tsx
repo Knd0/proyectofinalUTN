@@ -1,9 +1,12 @@
+// Dependencias principales de React y librerías externas
 import React, { useEffect, useState } from "react";
-import AOS from "aos";
+import AOS from "aos"; // Animaciones de scroll
 import "aos/dist/aos.css";
-import Loader from "../Loader/loader";
+import Loader from "../Loader/loader"; // Componente personalizado de carga
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar/Navbar";
+import Navbar from "../Navbar/Navbar"; // Navbar principal
+
+// Componentes de Material UI
 import {
   Box,
   Button,
@@ -16,6 +19,7 @@ import {
   Alert,
 } from "@mui/material";
 
+// Interfaces para tipar correctamente el usuario y su perfil
 interface UserProfile {
   descripcion: string;
   nacionalidad: string;
@@ -30,23 +34,26 @@ interface User {
 }
 
 const Profile = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const navigate = useNavigate();
+  // Estados del componente
+  const [user, setUser] = useState<User | null>(null); // Datos del usuario original
+  const [editMode, setEditMode] = useState(false); // Modo edición activo
+  const [formData, setFormData] = useState<User | null>(null); // Copia editable del usuario
+  const [loading, setLoading] = useState(true); // Estado de carga inicial
+  const [saving, setSaving] = useState(false); // Indicador de guardado
+  const [errorMsg, setErrorMsg] = useState<string | null>(null); // Error general
+  const navigate = useNavigate(); // Hook para redireccionar
 
+  // Al montar el componente
   useEffect(() => {
-    AOS.init({ duration: 600, once: true });
+    AOS.init({ duration: 600, once: true }); // Inicializa animaciones
 
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login");
+      navigate("/login"); // Si no hay token, redirige
       return;
     }
 
+    // Trae los datos del usuario logueado
     const fetchUserData = async () => {
       try {
         setLoading(true);
@@ -62,8 +69,8 @@ const Profile = () => {
         if (!res.ok) throw new Error("Error al obtener datos de usuario");
 
         const data = await res.json();
-        setUser(data.user);
-        setFormData(data.user);
+        setUser(data.user); // Guarda original
+        setFormData(data.user); // Copia editable
       } catch (error) {
         setErrorMsg("No se pudieron cargar los datos del perfil.");
       } finally {
@@ -74,6 +81,7 @@ const Profile = () => {
     fetchUserData();
   }, [navigate]);
 
+  // Manejador de cambios en los inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -81,6 +89,7 @@ const Profile = () => {
     if (!formData) return;
 
     if (name.startsWith("perfil.")) {
+      // Actualiza campo anidado del perfil
       const key = name.split(".")[1] as keyof UserProfile;
       setFormData({
         ...formData,
@@ -97,6 +106,7 @@ const Profile = () => {
     }
   };
 
+  // Envía los datos modificados al backend
   const handleSubmit = async () => {
     if (!formData) return;
 
@@ -132,6 +142,7 @@ const Profile = () => {
     }
   };
 
+  // Loader mientras se obtienen los datos
   if (loading) {
     return (
       <Box textAlign="center" mt={10}>
@@ -140,6 +151,7 @@ const Profile = () => {
     );
   }
 
+  // Muestra error general
   if (errorMsg) {
     return (
       <Box textAlign="center" mt={10}>
@@ -148,6 +160,7 @@ const Profile = () => {
     );
   }
 
+  // Si algo salió mal y no hay datos válidos
   if (!user || !formData || !formData.perfil) return null;
 
   return (
@@ -178,6 +191,7 @@ const Profile = () => {
               color: "white",
             }}
           >
+            {/* Título y botón de edición */}
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
               <Typography variant="h4" fontWeight="bold" color="white">
                 Mi Perfil
@@ -186,8 +200,8 @@ const Profile = () => {
                 variant="text"
                 sx={{ color: "#3b82f6", fontWeight: "bold" }}
                 onClick={() => {
-                  if (editMode) setFormData(user);
-                  setEditMode(!editMode);
+                  if (editMode) setFormData(user); // Cancela cambios
+                  setEditMode(!editMode); // Cambia modo edición
                   setErrorMsg(null);
                 }}
               >
@@ -195,6 +209,7 @@ const Profile = () => {
               </Button>
             </Box>
 
+            {/* Avatar e imagen */}
             <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
               <Avatar
                 src={formData.perfil.imagen || "/default-avatar.png"}
@@ -218,6 +233,7 @@ const Profile = () => {
               )}
             </Box>
 
+            {/* Campos editables */}
             <TextField
               fullWidth
               label="Nombre"
@@ -283,6 +299,7 @@ const Profile = () => {
               InputProps={{ style: { color: "white" } }}
             />
 
+            {/* Botón de guardar */}
             {editMode && (
               <Button
                 variant="contained"
@@ -307,6 +324,7 @@ const Profile = () => {
   );
 };
 
+// Estilos reutilizables para los campos de texto
 const muiInputStyle = {
   mb: 2,
   input: { color: "white" },
