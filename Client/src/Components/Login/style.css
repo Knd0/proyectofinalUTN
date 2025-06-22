@@ -1,0 +1,129 @@
+/* Contenedor general de las páginas */
+.img{
+  
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Contenedor del formulario */
+.wrapper {
+  width: 380px;
+  background: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente */
+  backdrop-filter: blur(10px); /* Efecto de desenfoque */
+  color: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Título del formulario */
+.form-login, .form-register {
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Estilos para las cajas de input */
+.input-box {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.input-box input {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 40px;
+  font-size: 16px;
+  color: #fff;
+  padding: 0 20px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+/* Efecto cuando el input está enfocado */
+.input-box input:focus {
+  border-color: #4E9AF1; /* Color azul cuando el campo está enfocado */
+}
+
+/* Estilo del placeholder */
+.input-box input::placeholder {
+  color: #fff;
+  opacity: 0.7;
+}
+
+/* Botón de envío */
+.wrapper .btn {
+  width: 100%;
+  height: 45px;
+  background: #4E9AF1;
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+/* Efecto hover en el botón */
+.wrapper .btn:hover {
+  background-color: #3b8cc9;
+}
+
+/* Enlace para "Forgot Password" o "Already have an account?" */
+.remember-forgot, .register-link {
+  font-size: 14px;
+  color: #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remember-forgot a, .register-link a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* Hover en los links */
+.remember-forgot a:hover, .register-link a:hover {
+  color: #4E9AF1;
+}
+
+/* Mensaje de error */
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* Ajustes para móviles */
+@media (max-width: 480px) {
+  .wrapper {
+    width: 90%;
+    padding: 20px;
+  }
+  .form-login, .form-register {
+    font-size: 24px;
+  }
+  .input-box input {
+    font-size: 14px;
+  }
+  .wrapper .btn {
+    font-size: 14px;
+  }
+}
