@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Usuario } from "../models/Usuario";
 import { generateUniqueCVU } from "../utils/GenerateCVU";
-import axios from "axios";
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { sendTransactionEmail } from "../utils/emailService";
 
@@ -13,34 +12,20 @@ const mercadopago = new MercadoPagoConfig({
 const preference = new Preference(mercadopago);
 const payment = new Payment(mercadopago);
 
-const CURRENCY_API_KEY = process.env.CURRENCY_API_KEY;
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Valor predeterminado
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 
 export const authController = {
-  // Obtener información del usuario, incluyendo perfil y balance
-  getUserInfo: async (req: Request, res: Response, next: NextFunction) => {
+  // 📄 Obtener datos del usuario autenticado
+  getUserInfo: async (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization?.split(" ")[1]; // Extrae el token del formato "Bearer token"
-      if (!token) {
-        return res.status(401).json({ error: "Token no proporcionado" });
-      }
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) return res.status(401).json({ error: "Token no proporcionado" });
 
-      // Verificar y decodificar el token
-      const decoded: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET || "default_secret"
-      );
-      const userId = decoded.id;
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const user = await Usuario.findOne({ where: { id: decoded.id } });
 
-      // Obtener el usuario con perfil y balance
-      const user = await Usuario.findOne({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
+      if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
       return res.json({
         user: {
@@ -61,28 +46,21 @@ export const authController = {
       });
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ error: "Error al obtener la información del usuario" });
+      return res.status(500).json({ error: "Error al obtener información del usuario" });
     }
   },
-  // Registro de un nuevo usuario
-  register: async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response> => {
-    const { nombre, email, password, dni, nacionalidad} = req.body;
+
+  // 📝 Registrar nuevo usuario
+  register: async (req: Request, res: Response): Promise<Response> => {
+    const { nombre, email, password, dni, nacionalidad } = req.body;
 
     if (!nombre || !email || !password || !dni || !nacionalidad) {
       return res.status(400).json({ error: "Faltan campos obligatorios" });
     }
 
     try {
-      const userExists = await Usuario.findOne({ where: { email } });
-      if (userExists) {
-        return res.status(409).json({ error: "El email ya está registrado" });
-      }
+      const existingUser = await Usuario.findOne({ where: { email } });
+      if (existingUser) return res.status(409).json({ error: "El email ya está registrado" });
 
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
       const cvu = await generateUniqueCVU();
@@ -92,8 +70,7 @@ export const authController = {
         email,
         password: hashedPassword,
         cvu,
-        imagen:
-          "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg",
+        imagen: "https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg",
         descripcion: "",
         nacionalidad,
         dni,
@@ -108,37 +85,27 @@ export const authController = {
         isconfirmed: false
       });
 
-      return res
-        .status(201)
-        .json({ message: "Usuario creado correctamente", usuario: newUser });
+      return res.status(201).json({ message: "Usuario creado correctamente", usuario: newUser });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Error al crear el usuario" });
     }
   },
 
-  // Inicio de sesión de usuario
+  // 🔐 Login
   login: async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
+    if (!email || !password) return res.status(400).json({ error: "Faltan campos obligatorios" });
 
     try {
       const user = await Usuario.findOne({ where: { email } });
-      if (!user) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
+      if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ error: "Contraseña incorrecta" });
-      }
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-        expiresIn: "3h",
-      });
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "3h" });
 
       return res.json({
         token,
@@ -150,91 +117,53 @@ export const authController = {
     }
   },
 
-  // Carga de balance de usuario
-  loadBalance: async (req: Request, res: Response, next: NextFunction) => {
+  // 💰 Cargar balance
+  loadBalance: async (req: Request, res: Response) => {
     const { amount, currency } = req.body;
-
-    console.log("🔁 Datos recibidos:", { amount, currency });
-
     const token = req.headers.authorization?.split(" ")[1];
-    console.log("🔑 Token recibido:", token ? "Sí" : "No");
 
     if (typeof amount !== "number" || typeof currency !== "string") {
-      console.log("❌ Campos inválidos:", { amount, currency });
-      return res
-        .status(400)
-        .json({ error: "Faltan campos obligatorios o tipo incorrecto" });
+      return res.status(400).json({ error: "Datos inválidos" });
     }
 
     try {
       const validCurrencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
       if (!validCurrencies.includes(currency)) {
-        console.log("❌ Moneda no válida:", currency);
         return res.status(400).json({ error: "Moneda no válida" });
       }
 
-      if (!token) {
-        console.log("❌ Token no proporcionado");
-        return res.status(401).json({ error: "Token no proporcionado" });
-      }
+      if (!token) return res.status(401).json({ error: "Token no proporcionado" });
 
-      const decoded: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET || "default_secret"
-      );
-      const userId = decoded.id;
-      console.log("✅ Token verificado. Usuario ID:", userId);
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+      const user = await Usuario.findByPk(decoded.id);
+      if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-      const user = await Usuario.findOne({ where: { id: userId } });
-
-      if (!user) {
-        console.log("❌ Usuario no encontrado");
-        return res.status(404).json({ error: "Usuario no encontrado" });
-      }
-
-      const currentCOD = user.COD;
-      console.log("📊 Balance actual:", currentCOD);
-
-      if (!(currency in currentCOD)) {
-        console.log("❌ Moneda no existe en COD:", currency);
-        return res
-          .status(400)
-          .json({ error: "Moneda no válida en el balance" });
-      }
-
-      const updatedCOD = {
-        ...currentCOD,
-        [currency]: currentCOD[currency] + amount,
+      const newBalance = {
+        ...user.COD,
+        [currency]: user.COD[currency] + amount,
       };
 
-      console.log("📝 Nuevo balance COD:", updatedCOD);
-
-      await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
+      await Usuario.update({ COD: newBalance }, { where: { id: user.id } });
 
       try {
         const mensaje = `Tu cuenta fue acreditada con <strong>${amount} ${currency}</strong>. ¡Gracias por usar Wamoney! 💸`;
-        console.log("📧 Enviando email a:", user.email);
         await sendTransactionEmail(user.email, user.nombre, mensaje);
-        console.log("✅ Email enviado correctamente");
-      } catch (emailError) {
-        console.error("❌ Error al enviar el email:", emailError);
+      } catch (e) {
+        console.error("Error al enviar email:", e);
       }
 
-
-
-      console.log("✅ Balance actualizado correctamente");
-      
       return res.json({
         message: `Balance de ${currency} actualizado correctamente`,
-        balance: updatedCOD,
+        balance: newBalance,
       });
     } catch (error) {
-      console.error("🔥 Error en loadBalance:", error);
+      console.error("Error en loadBalance:", error);
       return res.status(500).json({ error: "Error al cargar el balance" });
     }
   },
-  
-  updateProfile: async (req: Request, res: Response, next: NextFunction) => {
+
+  // 🖋️ Editar perfil
+  updateProfile: async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) return res.status(401).json({ error: "Token no proporcionado" });
@@ -244,18 +173,13 @@ export const authController = {
 
       const { imagen, descripcion, nacionalidad, dni } = req.body;
 
-      await Usuario.update(
-        { imagen, descripcion, nacionalidad, dni },
-        { where: { id: userId } }
-      );
-
+      await Usuario.update({ imagen, descripcion, nacionalidad, dni }, { where: { id: userId } });
       const updatedUser = await Usuario.findByPk(userId);
 
       return res.json({ message: "Perfil actualizado", user: updatedUser });
     } catch (error) {
-      console.error("❌ Error al actualizar perfil:", error);
+      console.error("Error al actualizar perfil:", error);
       return res.status(500).json({ error: "Error al actualizar el perfil" });
     }
   },
-
-}
+};

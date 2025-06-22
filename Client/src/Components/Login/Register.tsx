@@ -1,3 +1,4 @@
+// Importación de hooks, componentes de MUI y utilidades
 import React, { useState } from "react";
 import {
   Avatar,
@@ -21,23 +22,28 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Componente de registro
 const Register = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // para redirección post-registro
 
+  // Estados de los campos del formulario
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dni, setDni] = useState("");
   const [nacionalidad, setNacionalidad] = useState("");
 
+  // Manejo del envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validación simple de campos vacíos
     if (!nombre || !email || !password || !dni || !nacionalidad) {
       toast.error("Por favor completá todos los campos");
       return;
     }
 
+    // Envío de datos al backend
     try {
       await axios.post("https://proyectofinalutn-production.up.railway.app/auth/register", {
         nombre,
@@ -46,14 +52,16 @@ const Register = () => {
         dni,
         nacionalidad,
       });
+
       toast.success("✅ Registro exitoso");
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => navigate("/login"), 1500); // redirige tras éxito
     } catch (error) {
       console.error(error);
       toast.error("❌ Error al registrar");
     }
   };
 
+  // Renderizado del formulario
   return (
     <Box
       sx={{
@@ -65,7 +73,7 @@ const Register = () => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        bgcolor: "rgba(0, 0, 0, 0.7)",
+        bgcolor: "rgba(0, 0, 0, 0.7)", // superposición oscura
         backgroundBlendMode: "darken",
       }}
     >
@@ -80,7 +88,7 @@ const Register = () => {
             alignItems: "center",
             borderRadius: 3,
             backdropFilter: "blur(8px)",
-            bgcolor: "rgba(17, 24, 39, 0.85)",
+            bgcolor: "rgba(17, 24, 39, 0.85)", // fondo oscuro semitransparente
             color: "white",
           }}
         >
@@ -91,6 +99,7 @@ const Register = () => {
             Crear cuenta
           </Typography>
 
+          {/* Formulario */}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -125,6 +134,8 @@ const Register = () => {
               onChange={(e) => setDni(e.target.value)}
               sx={muiInputStyle}
             />
+
+            {/* Selector de nacionalidad */}
             <FormControl fullWidth sx={muiInputStyle}>
               <InputLabel sx={{ color: "#9ca3af" }}>Nacionalidad</InputLabel>
               <Select
@@ -145,6 +156,7 @@ const Register = () => {
               </Select>
             </FormControl>
 
+            {/* Botón de registro */}
             <Button
               type="submit"
               fullWidth
@@ -155,8 +167,9 @@ const Register = () => {
               Registrarse
             </Button>
 
+            {/* Link a login */}
             <Grid container justifyContent="flex-end">
-              <Grid >
+              <Grid>
                 <Link href="/login" variant="body2" color="secondary">
                   ¿Ya tenés cuenta? Iniciá sesión
                 </Link>
@@ -165,11 +178,12 @@ const Register = () => {
           </Box>
         </Paper>
       </Container>
-      <ToastContainer />
+      <ToastContainer /> {/* Contenedor de los toasts */}
     </Box>
   );
 };
 
+// Estilos reutilizables para los campos de texto
 const muiInputStyle = {
   mb: 2,
   input: { color: "white" },

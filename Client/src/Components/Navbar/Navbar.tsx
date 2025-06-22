@@ -1,24 +1,16 @@
+// React + hooks + navegación de rutas
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+
+// Componentes de Material UI
 import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Avatar,
-  Tooltip,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Box,
-  Button,
-  Alert,
-  Collapse,
-  useMediaQuery,
-  useTheme,
+  AppBar, Toolbar, IconButton, Typography, Avatar, Tooltip, Drawer,
+  List, ListItemButton, ListItemIcon, ListItemText,
+  Box, Button, Alert, Collapse,
+  useMediaQuery, useTheme,
 } from "@mui/material";
+
+// Íconos
 import MenuIcon from "@mui/icons-material/Menu";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -26,6 +18,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import CloseIcon from "@mui/icons-material/Close";
 import HomeIcon from "@mui/icons-material/Home";
 
+// Interfaz que define cómo luce el objeto `userInfo`
 interface UserInfo {
   nombre: string;
   admin: boolean;
@@ -35,14 +28,19 @@ interface UserInfo {
   };
 }
 
+// Componente Navbar principal
 const Navbar: React.FC = () => {
+  // Estados locales
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [showVerificationAlert, setShowVerificationAlert] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false); // Drawer en móviles
+  const [showVerificationAlert, setShowVerificationAlert] = useState(true); // Alerta de email no confirmado
+
+  // Hooks para navegación y media queries
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // true si el viewport es móvil
 
+  // Carga los datos del usuario autenticado al montar
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -52,14 +50,9 @@ const Navbar: React.FC = () => {
 
     const fetchUserData = async () => {
       try {
-        const response = await fetch(
-          "https://proyectofinalutn-production.up.railway.app/auth/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch("https://proyectofinalutn-production.up.railway.app/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (!response.ok) throw new Error("No se pudo obtener el usuario");
 
@@ -75,17 +68,21 @@ const Navbar: React.FC = () => {
     fetchUserData();
   }, [navigate]);
 
+  // Cierra sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
+  // Abre/cierra el drawer lateral en mobile
   const toggleDrawer = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // Si no hay datos de usuario cargados aún, no renderiza nada
   if (!userInfo) return null;
 
+  // Contenido del Drawer (menú lateral)
   const drawer = (
     <Box
       onClick={toggleDrawer}
@@ -104,17 +101,20 @@ const Navbar: React.FC = () => {
           <ListItemIcon sx={{ color: "white" }}><HomeIcon /></ListItemIcon>
           <ListItemText primary="Inicio" />
         </ListItemButton>
+
         {userInfo.admin && (
           <ListItemButton component={Link} to="/admin" sx={{ color: "white", py: 1.5 }}>
             <ListItemIcon sx={{ color: "white" }}><AdminPanelSettingsIcon /></ListItemIcon>
             <ListItemText primary="Panel de Administración" />
           </ListItemButton>
         )}
+
         <ListItemButton component={Link} to="/profile" sx={{ color: "white", py: 1.5 }}>
           <ListItemIcon sx={{ color: "white" }}><AccountCircleIcon /></ListItemIcon>
           <ListItemText primary="Mi Perfil" />
         </ListItemButton>
       </List>
+
       <List>
         <ListItemButton onClick={handleLogout} sx={{ color: "#ef4444", py: 1.5 }}>
           <ListItemIcon sx={{ color: "#ef4444" }}><LogoutIcon /></ListItemIcon>
@@ -126,6 +126,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
+      {/* Barra superior */}
       <AppBar
         position="static"
         sx={{
@@ -146,6 +147,7 @@ const Navbar: React.FC = () => {
             justifyContent: "space-between",
           }}
         >
+          {/* Botón del drawer solo en mobile */}
           {isMobile && (
             <IconButton
               color="inherit"
@@ -158,6 +160,7 @@ const Navbar: React.FC = () => {
             </IconButton>
           )}
 
+          {/* Logo y título de la app */}
           <Box
             sx={{
               display: "flex",
@@ -184,6 +187,7 @@ const Navbar: React.FC = () => {
             </Typography>
           </Box>
 
+          {/* Menú horizontal (solo visible en desktop) */}
           <Box
             sx={{
               display: { xs: "none", sm: "flex" },
@@ -214,6 +218,7 @@ const Navbar: React.FC = () => {
                 Admin Panel
               </Button>
             )}
+
             <Tooltip title={userInfo.nombre} arrow>
               <Avatar
                 alt={userInfo.nombre}
@@ -254,6 +259,7 @@ const Navbar: React.FC = () => {
         </Toolbar>
       </AppBar>
 
+      {/* Alerta si el correo aún no está confirmado */}
       {!userInfo.isconfirmed && showVerificationAlert && (
         <Collapse in={showVerificationAlert}>
           <Alert
@@ -289,7 +295,7 @@ const Navbar: React.FC = () => {
             <Button
               size="small"
               onClick={() => {
-                // Lógica para reenviar correo
+                // Aquí deberías colocar la lógica para reenviar el correo de verificación
               }}
               sx={{
                 ml: 2,
@@ -311,11 +317,12 @@ const Navbar: React.FC = () => {
         </Collapse>
       )}
 
+      {/* Drawer lateral para mobile */}
       <Drawer
         anchor="left"
         open={mobileOpen}
         onClose={toggleDrawer}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{ keepMounted: true }} // Mejora rendimiento mobile
         sx={{
           display: { xs: "block", sm: "none" },
           "& .MuiDrawer-paper": {
