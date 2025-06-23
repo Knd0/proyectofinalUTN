@@ -1,11 +1,9 @@
-// Importa las utilidades necesarias de Sequelize
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db";
 
-// Define el modelo Currency, asociado a un usuario
 export class Currency extends Model {
-  public id!: number; // ID autoincremental de la tabla
-  public usuarioId!: number; // Clave foránea que enlaza con el usuario
+  public id!: number;
+  public usuarioId!: number;
   public COD!: {
     ARS: number;
     USD: number;
@@ -13,18 +11,17 @@ export class Currency extends Model {
     BTC: number;
     ETH: number;
     USDT: number;
-  }; // Objeto con los saldos de las distintas monedas
+  }
 }
 
-// Inicializa el modelo con Sequelize
 Currency.init(
   {
     usuarioId: {
-      type: DataTypes.INTEGER, // ID del usuario asociado
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     COD: {
-      type: DataTypes.JSON, // Saldos multimoneda
+      type: DataTypes.JSON,
       allowNull: false,
       defaultValue: {
         ARS: 0,
@@ -37,9 +34,9 @@ Currency.init(
     },
   },
   {
-    sequelize,             // Conexión a la base de datos
-    modelName: "Currency", // Nombre del modelo
-    tableName: "currency", // Nombre real de la tabla
-    timestamps: false,     // Desactiva createdAt y updatedAt
+    sequelize,
+    modelName: "Currency",
+    tableName: "currency",
+    timestamps: false,
   }
 );

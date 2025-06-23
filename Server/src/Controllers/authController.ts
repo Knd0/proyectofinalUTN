@@ -33,6 +33,7 @@ export const authController = {
       );
       const userId = decoded.id;
 
+
       // Obtener el usuario con perfil y balance
       const user = await Usuario.findOne({
         where: { id: userId },
@@ -185,6 +186,7 @@ export const authController = {
       const userId = decoded.id;
       console.log("✅ Token verificado. Usuario ID:", userId);
 
+
       const user = await Usuario.findOne({ where: { id: userId } });
 
       if (!user) {
@@ -195,6 +197,8 @@ export const authController = {
       const currentCOD = user.COD;
       console.log("📊 Balance actual:", currentCOD);
 
+
+      
       if (!(currency in currentCOD)) {
         console.log("❌ Moneda no existe en COD:", currency);
         return res
@@ -258,6 +262,9 @@ export const authController = {
 
       await Usuario.update(updateData, { where: { id: userId } });
 
+
+
+
       const updatedUser = await Usuario.findByPk(userId);
 
       if (!updatedUser) {
@@ -289,5 +296,4 @@ export const authController = {
   },
 
 }
-
 

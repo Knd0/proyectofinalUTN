@@ -1,6 +1,4 @@
 // src/components/TransactionHistory.tsx
-// Componente que muestra un historial de transacciones enviadas y recibidas por el usuario
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -15,10 +13,9 @@ import {
   Chip,
   Alert,
 } from "@mui/material";
-import NorthEastIcon from '@mui/icons-material/NorthEast'; // Ícono para transacciones enviadas
-import SouthWestIcon from '@mui/icons-material/SouthWest'; // Ícono para transacciones recibidas
+import NorthEastIcon from '@mui/icons-material/NorthEast';
+import SouthWestIcon from '@mui/icons-material/SouthWest';
 
-// Definición del tipo de transacción
 interface Transaction {
   id: number;
   amount: number;
@@ -29,16 +26,14 @@ interface Transaction {
   fromUser?: { nombre: string; cvu: string };
 }
 
-// Generador de número de operación con formato OP-00000042
 const generateOperationNumber = (id: number) =>
   `OP-${String(id).padStart(8, "0")}`;
 
 const TransactionHistory: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]); // Lista de transacciones
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [error, setError] = useState<string | null>(null); // Estado de error
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Efecto que se ejecuta al montar el componente
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
@@ -47,7 +42,6 @@ const TransactionHistory: React.FC = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No hay token de autenticación.");
 
-        // Fetch al endpoint de todas las transacciones
         const res = await fetch("https://proyectofinalutn-production.up.railway.app/transactions/all", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -58,7 +52,6 @@ const TransactionHistory: React.FC = () => {
         }
 
         const data: Transaction[] = await res.json();
-        // Ordena de más reciente a más antigua
         const sortedData = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(sortedData);
       } catch (err) {
@@ -72,7 +65,6 @@ const TransactionHistory: React.FC = () => {
     fetchTransactions();
   }, []);
 
-  // Estado de carga: spinner + texto
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200, mt: 4 }}>
@@ -84,7 +76,6 @@ const TransactionHistory: React.FC = () => {
     );
   }
 
-  // Estado de error: alerta roja
   if (error) {
     return (
       <Alert severity="error" sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
@@ -98,7 +89,6 @@ const TransactionHistory: React.FC = () => {
     );
   }
 
-  // No hay transacciones: alerta informativa
   if (transactions.length === 0) {
     return (
       <Alert severity="info" sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
@@ -112,7 +102,6 @@ const TransactionHistory: React.FC = () => {
     );
   }
 
-  // Render del historial de transacciones
   return (
     <Paper
       elevation={8}
@@ -133,8 +122,8 @@ const TransactionHistory: React.FC = () => {
 
       <List>
         {transactions.map((tx, index) => {
-          const isReceived = tx.type === "received"; // Tipo de transacción
-          const counterparty = isReceived ? tx.fromUser : tx.toUser; // Usuario contrario
+          const isReceived = tx.type === "received";
+          const counterparty = isReceived ? tx.fromUser : tx.toUser;
           const iconColor = isReceived ? "#66bb6a" : "#ef5350";
           const amountColor = isReceived ? "#81c784" : "#ef9a9a";
 
@@ -152,7 +141,6 @@ const TransactionHistory: React.FC = () => {
                   },
                 }}
               >
-                {/* Ícono de dirección */}
                 <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
                   {isReceived ? (
                     <SouthWestIcon sx={{ color: iconColor, fontSize: 30 }} />
@@ -161,7 +149,6 @@ const TransactionHistory: React.FC = () => {
                   )}
                 </ListItemIcon>
 
-                {/* Info principal y secundaria */}
                 <ListItemText
                   primary={
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#fff" }}>
@@ -177,7 +164,6 @@ const TransactionHistory: React.FC = () => {
                         CVU: {counterparty?.cvu || "N/A"}
                       </Typography>
                       <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
-                        {/* Chips de detalles */}
                         <Chip
                           label={`Nº operación: ${generateOperationNumber(tx.id)}`}
                           size="small"
@@ -205,7 +191,6 @@ const TransactionHistory: React.FC = () => {
                   }
                 />
 
-                {/* Monto con signo y color */}
                 <Box sx={{ textAlign: "right", ml: 2 }}>
                   <Typography variant="h6" sx={{ color: amountColor, fontWeight: "bold" }}>
                     {isReceived ? "+" : "-"}{tx.amount} {tx.currency}
@@ -213,7 +198,6 @@ const TransactionHistory: React.FC = () => {
                 </Box>
               </ListItem>
 
-              {/* Separador entre elementos */}
               {index < transactions.length - 1 && (
                 <Divider sx={{ my: 1, borderColor: "#444" }} />
               )}

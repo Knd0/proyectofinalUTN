@@ -1,39 +1,36 @@
-// Importa tipos necesarios desde Sequelize
 import { DataTypes } from "sequelize";
-// Importa la instancia de Sequelize previamente configurada
 import { sequelize } from "../db";
 
-// Define el modelo de transacciones con Sequelize
 export const Transaction = sequelize.define("Transaction", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true, // Se incrementa automáticamente
+    autoIncrement: true,
   },
   from_user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false, // Usuario que envía la transacción
+    allowNull: false,
   },
   to_user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false, // Usuario que recibe la transacción
+    allowNull: false,
   },
   amount: {
-    type: DataTypes.DECIMAL(15, 2), // Monto transferido (soporta decimales grandes)
+    type: DataTypes.DECIMAL(15, 2),
     allowNull: false,
   },
   currency: {
-    type: DataTypes.STRING(5), // Tipo de moneda (hasta 5 caracteres)
+    type: DataTypes.STRING(5),
     allowNull: false,
     validate: {
-      isIn: [['ARS', 'USD', 'EUR', 'BTC', 'ETH', 'USDT']], // Solo permite estas monedas
+      isIn: [['ARS', 'USD', 'EUR', 'BTC', 'ETH', 'USDT']],
     },
   },
   date: {
-    type: DataTypes.DATE, // Fecha en que se hizo la transacción
-    defaultValue: DataTypes.NOW, // Por defecto, la fecha actual
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
 }, {
-  tableName: "transactions", // Nombre explícito de la tabla
-  timestamps: false, // No usa campos createdAt ni updatedAt
+  tableName: "transactions",
+  timestamps: false
 });

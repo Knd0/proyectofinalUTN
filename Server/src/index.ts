@@ -1,3 +1,4 @@
+
 // Carga las variables de entorno desde el archivo .env
 import dotenv from "dotenv";
 dotenv.config();
@@ -14,11 +15,14 @@ import { Usuario } from "./models/Usuario"; // Modelo de usuario
 import jwt from "jsonwebtoken"; // Utilidad para trabajar con JWT
 
 // Importa más rutas
+
 import transactionRoutes from "./Routes/transactionRoutes";
 import exchangeRoutes from "./Routes/exchangeRoutes";
 import adminRoutes from "./Routes/adminRoutes";
 import confirmationRoutes from "./Routes/confirmationRoutes";
 import forgotPasswordRoutes from "./Routes/forgotPasswordRoutes";
+const app = express();
+
 
 // Inicializa la aplicación Express
 const app = express();
@@ -57,6 +61,7 @@ app.use("/auth", forgotPasswordRoutes);
 // Middleware global para manejar errores no atrapados por otras rutas
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err); // Muestra el error en consola
+
   res
     .status(500) // Devuelve error 500 (interno del servidor)
     .json({
@@ -65,12 +70,14 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+
 // Define el puerto en el que correrá el servidor
 const port = process.env.PORT || 5000;
 
 // Sincroniza la base de datos y levanta el servidor
 sequelize
   .sync({ force: false }) // No borra las tablas existentes
+
   .then(() => {
     console.log("Base de datos sincronizada correctamente");
     app.listen(port, () => {
