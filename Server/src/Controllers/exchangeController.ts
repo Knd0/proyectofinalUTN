@@ -65,7 +65,7 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
       return res.status(400).json({ error: `Saldo insuficiente en ${fromCurrency}` });
     }
 
-    // Obtener tasa de cambio
+    // Obtener tasa de cambio desde CurrencyAPI
     const apiKey = process.env.CURRENCY_API_KEY || "cur_live_5jkcaHmfOjUYaYuokyl4Z8NsWFOPibneBtiBIWpX";
     const url = `https://api.currencyapi.com/v3/latest?apikey=${apiKey}&base_currency=${fromCurrency}&currencies=${toCurrency}`;
 
@@ -88,21 +88,20 @@ export const exchangeCurrency = async (req: Request, res: Response, next: NextFu
 
     console.log("🧮 Nuevo balance tras conversión:", updatedCOD);
 
-    // Actualizar usuario
+    // Actualizar balance del usuario
     await Usuario.update({ COD: updatedCOD }, { where: { id: userId } });
 
     // Enviar email de confirmación
     const mensaje = `
     Se ha realizado una conversión en tu cuenta:<br/>
-    Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>.¡Gracias por usar Wamoney! 💸`;
+    Has cambiado <strong>${amount} ${fromCurrency}</strong> a <strong>${converted} ${toCurrency}</strong>. ¡Gracias por usar Wamoney! 💸`;
 
     try {
-    await sendTransactionEmail(user.email, user.nombre || "usuario", mensaje);
-    console.log("📧 Email de conversión enviado correctamente");
+      await sendTransactionEmail(user.email, user.nombre || "usuario", mensaje);
+      console.log("📧 Email de conversión enviado correctamente");
     } catch (emailError) {
-    console.error("❌ Error al enviar email de conversión:", emailError);
+      console.error("❌ Error al enviar email de conversión:", emailError);
     }
-
 
     console.log("✅ Conversión realizada con éxito");
 

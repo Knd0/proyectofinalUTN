@@ -1,7 +1,9 @@
+// Función que genera una plantilla HTML para el correo de confirmación de cuenta
 export const sendConfirmationEmailTemplate = (nombre: string, link: string) => `
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <!-- Metadatos básicos y estilos internos -->
   <meta charset="UTF-8">
   <title>Confirmación de Cuenta</title>
   <style>
@@ -58,6 +60,7 @@ export const sendConfirmationEmailTemplate = (nombre: string, link: string) => `
   </style>
 </head>
 <body>
+  <!-- Contenido principal del email -->
   <div class="container">
     <div class="header">
       <h1>Bienvenido a Wamoney</h1>
@@ -72,6 +75,8 @@ export const sendConfirmationEmailTemplate = (nombre: string, link: string) => `
 </body>
 </html>
 `;
+
+// Función que genera una plantilla HTML para el correo de restablecimiento de contraseña
 export const sendResetPasswordEmailTemplate = (nombre: string, link: string) => `
 <!DOCTYPE html>
 <html lang="es">
@@ -132,6 +137,7 @@ export const sendResetPasswordEmailTemplate = (nombre: string, link: string) => 
   </style>
 </head>
 <body>
+  <!-- Contenido del mensaje para restablecer la contraseña -->
   <div class="container">
     <div class="header">
       <h1>Restablecer Contraseña</h1>

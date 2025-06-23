@@ -5,6 +5,7 @@ import { Usuario } from "../models/Usuario";
 import { transporter } from "../utils/emailService"; 
 import { sendResetPasswordEmailTemplate } from "../utils/emailTemplates";
 
+// 👉 Controlador para iniciar el proceso de recuperación de contraseña
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -15,6 +16,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "No existe un usuario con ese correo" });
     }
 
+    // Token con propósito específico y expiración
     const token = jwt.sign(
       { id: usuario.id, purpose: "password-reset" },
       process.env.JWT_SECRET || "default_secret",
@@ -22,9 +24,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
     );
 
     const resetLink = `https://proyectofinalutn2025.vercel.app/reset-password/${token}`;
-
     const html = sendResetPasswordEmailTemplate(usuario.nombre, resetLink);
 
+    // Envío del correo
     await transporter.sendMail({
       from: `"Wamoney" <${process.env.MAIL_USER}>`,
       to: email,
@@ -39,10 +41,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
+// 🔐 Controlador para aplicar la nueva contraseña
 export const resetPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
-  console.log("Token recibido:", token);
-  console.log("Body recibido:", req.body);
   const { nuevaPassword } = req.body;
 
   if (!nuevaPassword) {

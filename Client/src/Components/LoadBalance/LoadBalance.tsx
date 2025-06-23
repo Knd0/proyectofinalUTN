@@ -1,3 +1,4 @@
+// Importación de dependencias necesarias
 import React, { useState } from "react";
 import {
   Box,
@@ -13,29 +14,40 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../Navbar/Navbar";
 
+// Lista de monedas disponibles para seleccionar
 const currencies = ["ARS", "USD", "EUR", "USDT", "BTC", "ETH"];
 
+// Componente principal para cargar saldo
 const LoadBalance: React.FC = () => {
+  // Estados locales para el monto y la moneda
   const [amount, setAmount] = useState<number>(0);
   const [currency, setCurrency] = useState<string>("ARS");
 
+  // Maneja el envío del formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validación: no se permite cargar montos menores o iguales a 0
     if (amount <= 0) {
       toast.error("El monto debe ser mayor a 0");
       return;
     }
 
+    // Guarda los datos temporalmente en localStorage
     localStorage.setItem("fake_amount", amount.toString());
     localStorage.setItem("fake_currency", currency);
 
+    // Muestra mensaje y redirige al checkout simulado
     toast.info("Redirigiendo a la simulación de pago...", { autoClose: 1500 });
     setTimeout(() => (window.location.href = "/fake-checkout"), 1500);
   };
 
   return (
     <>
+      {/* Navbar superior */}
       <Navbar />
+
+      {/* Fondo y contenedor principal */}
       <Box
         sx={{
           minHeight: "100vh",
@@ -51,6 +63,7 @@ const LoadBalance: React.FC = () => {
         }}
       >
         <Container maxWidth="xs">
+          {/* Tarjeta con el formulario */}
           <Paper
             elevation={12}
             sx={{
@@ -64,11 +77,14 @@ const LoadBalance: React.FC = () => {
               color: "white",
             }}
           >
+            {/* Título */}
             <Typography variant="h4" sx={{ mb: 3, fontWeight: "bold", color: "white" }}>
               Cargar Saldo
             </Typography>
 
+            {/* Formulario de carga */}
             <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+              {/* Input de monto */}
               <TextField
                 label="Monto"
                 type="number"
@@ -89,6 +105,7 @@ const LoadBalance: React.FC = () => {
                 }}
               />
 
+              {/* Selector de moneda */}
               <Select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
@@ -102,6 +119,7 @@ const LoadBalance: React.FC = () => {
                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3b82f6" },
                 }}
               >
+                {/* Lista de opciones */}
                 {currencies.map((c) => (
                   <MenuItem key={c} value={c}>
                     {c}
@@ -109,6 +127,7 @@ const LoadBalance: React.FC = () => {
                 ))}
               </Select>
 
+              {/* Botón de envío */}
               <Button
                 type="submit"
                 fullWidth
@@ -129,6 +148,8 @@ const LoadBalance: React.FC = () => {
           </Paper>
         </Container>
       </Box>
+
+      {/* Contenedor de notificaciones */}
       <ToastContainer />
     </>
   );
