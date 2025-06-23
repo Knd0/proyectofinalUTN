@@ -33,6 +33,7 @@ export const authController = {
       );
       const userId = decoded.id;
 
+
       // Obtener el usuario con perfil y balance
       const user = await Usuario.findOne({
         where: { id: userId },
@@ -185,6 +186,7 @@ export const authController = {
       const userId = decoded.id;
       console.log("✅ Token verificado. Usuario ID:", userId);
 
+
       const user = await Usuario.findOne({ where: { id: userId } });
 
       if (!user) {
@@ -195,6 +197,8 @@ export const authController = {
       const currentCOD = user.COD;
       console.log("📊 Balance actual:", currentCOD);
 
+
+      
       if (!(currency in currentCOD)) {
         console.log("❌ Moneda no existe en COD:", currency);
         return res
@@ -242,16 +246,49 @@ export const authController = {
       const decoded: any = jwt.verify(token, JWT_SECRET);
       const userId = decoded.id;
 
-      const { imagen, descripcion, nacionalidad, dni } = req.body;
+      const { nombre, perfil } = req.body;
+      const { imagen, descripcion, nacionalidad, dni } = perfil || {};
 
       await Usuario.update(
         { imagen, descripcion, nacionalidad, dni },
         { where: { id: userId } }
       );
+      const updateData: any = {};
+      if (nombre !== undefined) updateData.nombre = nombre;
+      if (imagen !== undefined) updateData.imagen = imagen;
+      if (descripcion !== undefined) updateData.descripcion = descripcion;
+      if (nacionalidad !== undefined) updateData.nacionalidad = nacionalidad;
+      if (dni !== undefined) updateData.dni = dni;
+
+      await Usuario.update(updateData, { where: { id: userId } });
+
+
+
 
       const updatedUser = await Usuario.findByPk(userId);
 
-      return res.json({ message: "Perfil actualizado", user: updatedUser });
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      return res.json({
+        message: "Perfil actualizado",
+        user: {
+          id: updatedUser.id,
+          nombre: updatedUser.nombre,
+          email: updatedUser.email,
+          admin: updatedUser.admin,
+          isconfirmed: updatedUser.isconfirmed,
+          cvu: updatedUser.cvu,
+          perfil: {
+            imagen: updatedUser.imagen,
+            descripcion: updatedUser.descripcion,
+            nacionalidad: updatedUser.nacionalidad,
+            dni: updatedUser.dni,
+          },
+          balance: updatedUser.COD,
+        },
+      });
     } catch (error) {
       console.error("❌ Error al actualizar perfil:", error);
       return res.status(500).json({ error: "Error al actualizar el perfil" });
@@ -259,3 +296,4 @@ export const authController = {
   },
 
 }
+
