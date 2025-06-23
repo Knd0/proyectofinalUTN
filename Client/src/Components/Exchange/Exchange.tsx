@@ -1,8 +1,5 @@
-// Importación de React y hooks necesarios
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-// Importación de componentes de Material UI
 import {
   Box,
   Button,
@@ -13,41 +10,22 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-
-// Hook de navegación de React Router
 import { useNavigate } from "react-router-dom";
-
-// Componente de navegación
 import Navbar from "Components/Navbar/Navbar";
 
-// Lista de monedas disponibles para conversión
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
-// Componente funcional Exchange
 const Exchange: React.FC = () => {
-  // Estados para selección de moneda de origen y destino
   const [fromCurrency, setFromCurrency] = useState("ARS");
   const [toCurrency, setToCurrency] = useState("USD");
-
-  // Cantidad ingresada por el usuario
   const [amount, setAmount] = useState<number>(0);
-
-  // Tasa de cambio obtenida desde API externa
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
-
-  // Valor convertido en tiempo real
   const [convertedValue, setConvertedValue] = useState<number | null>(null);
-
-  // Estados de carga y mensajes
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
-  // Balances del usuario por moneda
   const [balances, setBalances] = useState<{ [key: string]: number }>({});
-
   const navigate = useNavigate();
 
-  // Obtener los balances del usuario al montar el componente
   const fetchBalances = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -66,13 +44,11 @@ const Exchange: React.FC = () => {
     fetchBalances();
   }, []);
 
-  // Obtener tasa de conversión cada vez que cambia la selección de monedas
   useEffect(() => {
     if (fromCurrency === toCurrency) {
       setExchangeRate(1);
       return;
     }
-
     const fetchRate = async () => {
       try {
         const res = await axios.get("https://api.currencyapi.com/v3/latest", {
@@ -88,11 +64,9 @@ const Exchange: React.FC = () => {
         setExchangeRate(null);
       }
     };
-
     fetchRate();
   }, [fromCurrency, toCurrency]);
 
-  // Actualizar valor convertido en tiempo real cuando cambia la cantidad o la tasa
   useEffect(() => {
     if (exchangeRate !== null) {
       setConvertedValue(amount * exchangeRate);
@@ -101,18 +75,15 @@ const Exchange: React.FC = () => {
     }
   }, [amount, exchangeRate]);
 
-  // Función que realiza la conversión al hacer clic en el botón
   const handleSwap = async () => {
     if (fromCurrency === toCurrency) {
       setMessage("Las monedas deben ser diferentes");
       return;
     }
-
     if (amount <= 0) {
       setMessage("La cantidad debe ser mayor que cero");
       return;
     }
-
     if ((balances[fromCurrency] || 0) < amount) {
       setMessage(`Saldo insuficiente en ${fromCurrency}`);
       return;
@@ -122,7 +93,6 @@ const Exchange: React.FC = () => {
     setMessage("");
 
     const token = localStorage.getItem("token");
-
     try {
       const res = await axios.post(
         "https://proyectofinalutn-production.up.railway.app/exchange/me",
@@ -130,15 +100,13 @@ const Exchange: React.FC = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Mostrar mensaje de éxito y actualizar estados
       setMessage(
         `✅ Convertiste ${amount} ${fromCurrency} a ${res.data.converted.toFixed(2)} ${toCurrency}. Redirigiendo...`
       );
       setAmount(0);
       setConvertedValue(null);
-      await fetchBalances(); // refrescar balances
+      await fetchBalances();
 
-      // Redirigir al home después de 3 segundos
       setTimeout(() => navigate("/home"), 3000);
     } catch (error: any) {
       setMessage(error.response?.data?.message || "Error al realizar la conversión");
@@ -150,7 +118,6 @@ const Exchange: React.FC = () => {
   return (
     <>
       <Navbar />
-
       <Box
         sx={{
           minHeight: "100vh",
@@ -182,7 +149,6 @@ const Exchange: React.FC = () => {
               Convertir Saldo
             </Typography>
 
-            {/* Campo de cantidad */}
             <TextField
               label={`Cantidad (${fromCurrency})`}
               type="number"
@@ -204,7 +170,6 @@ const Exchange: React.FC = () => {
               placeholder={`Disponible: ${balances[fromCurrency] ?? 0}`}
             />
 
-            {/* Select de monedas */}
             <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
               <Select
                 value={fromCurrency}
@@ -243,7 +208,6 @@ const Exchange: React.FC = () => {
               </Select>
             </Box>
 
-            {/* Resultado de la conversión */}
             {exchangeRate !== null && amount > 0 && (
               <Typography
                 variant="h6"
@@ -255,7 +219,6 @@ const Exchange: React.FC = () => {
               </Typography>
             )}
 
-            {/* Botón para convertir */}
             <Button
               onClick={handleSwap}
               disabled={loading}
@@ -273,7 +236,6 @@ const Exchange: React.FC = () => {
               {loading ? "Convirtiendo..." : "Convertir"}
             </Button>
 
-            {/* Mensaje de éxito o error */}
             {message && (
               <Typography
                 sx={{
@@ -293,5 +255,4 @@ const Exchange: React.FC = () => {
   );
 };
 
-// Exportar componente
 export default Exchange;

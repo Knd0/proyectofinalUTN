@@ -12,24 +12,19 @@ import {
 } from "@mui/material";
 import LockResetIcon from "@mui/icons-material/LockReset";
 
-// Componente para restablecer la contraseña a través de un token enviado por email
 const ResetPassword = () => {
-  // Obtiene el token desde la URL
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
 
-  // Estados para los campos y el feedback del usuario
-  const [password, setPassword] = useState(""); // Nueva contraseña
-  const [confirmPassword, setConfirmPassword] = useState(""); // Confirmación
-  const [loading, setLoading] = useState(false); // Spinner mientras se procesa
-  const [error, setError] = useState<string | null>(null); // Mensaje de error
-  const [success, setSuccess] = useState(false); // Estado de éxito
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  // Función que maneja el envío del formulario
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validación: las contraseñas deben coincidir
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
       return;
@@ -39,7 +34,6 @@ const ResetPassword = () => {
     setError(null);
 
     try {
-      // Llamado al backend para restablecer la contraseña usando el token
       const res = await fetch(
         `https://proyectofinalutn-production.up.railway.app/auth/reset-password/${token}`,
         {
@@ -53,7 +47,7 @@ const ResetPassword = () => {
 
       if (res.ok) {
         setSuccess(true);
-        // Redirige automáticamente al login después de 3 segundos
+        // Opcional: redirigir al login luego de 3 segundos
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError(data.error || "Error al restablecer la contraseña.");
@@ -72,12 +66,13 @@ const ResetPassword = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: "url('https://source.unsplash.com/featured/?lock,password')",
+        backgroundImage:
+          "url('https://source.unsplash.com/featured/?lock,password')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         bgcolor: "rgba(0,0,0,0.7)",
-        backgroundBlendMode: "darken", // oscurece la imagen de fondo para mejor legibilidad
+        backgroundBlendMode: "darken",
       }}
     >
       <Container maxWidth="xs">
@@ -103,9 +98,7 @@ const ResetPassword = () => {
             Restablecer Contraseña
           </Typography>
 
-          {/* Formulario de restablecimiento */}
           <Box component="form" onSubmit={handleReset} sx={{ width: "100%" }}>
-            {/* Campo para la nueva contraseña */}
             <TextField
               variant="outlined"
               margin="normal"
@@ -127,7 +120,6 @@ const ResetPassword = () => {
               }}
             />
 
-            {/* Campo para confirmar la nueva contraseña */}
             <TextField
               variant="outlined"
               margin="normal"
@@ -149,21 +141,18 @@ const ResetPassword = () => {
               }}
             />
 
-            {/* Mensaje de error en caso de fallo */}
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
               </Alert>
             )}
 
-            {/* Mensaje de éxito si se reseteó correctamente */}
             {success && (
               <Alert severity="success" sx={{ mb: 2 }}>
                 Contraseña restablecida con éxito. Redirigiendo al login...
               </Alert>
             )}
 
-            {/* Botón de envío */}
             <Button
               type="submit"
               fullWidth

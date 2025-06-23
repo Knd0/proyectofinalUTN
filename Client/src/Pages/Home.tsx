@@ -1,16 +1,11 @@
-// Página principal del usuario (dashboard) después de iniciar sesión
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-
-// Componentes internos
 import Navbar from "../Components/Navbar/Navbar";
 import TransactionHistory from "../Components/Transaction/TransactionHistory";
 import Loader from "../Components/Loader/loader";
 
-// Componentes de UI de Material-UI
 import {
   Box,
   Typography,
@@ -28,7 +23,6 @@ import {
   Snackbar,
 } from "@mui/material";
 
-// Íconos de Material-UI
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
@@ -36,24 +30,20 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-// Hook de contexto para acceder a la información del usuario
 import { useUser, Balance } from "../Components/Context/UserContext";
 
-// Tipo para restringir las monedas disponibles
 type Currency = keyof Balance;
 
 const Home = () => {
   const { userInfo, balance, fetchUserData } = useUser();
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
-  const [copied, setCopied] = useState(false); // Estado para mostrar el snackbar cuando se copia el CVU
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
-  // Inicializa la animación con AOS una vez montado el componente
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
 
-  // Verifica si hay token, y si lo hay, carga los datos del usuario
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -63,14 +53,12 @@ const Home = () => {
     fetchUserData();
   }, [navigate, fetchUserData]);
 
-  // Cambia la moneda seleccionada del selector
   const handleCurrencyChange = (
     event: React.ChangeEvent<HTMLSelectElement> | { target: { value: unknown } }
   ) => {
     setSelectedCurrency(event.target.value as Currency);
   };
 
-  // Copia el CVU al portapapeles
   const handleCopyCVU = () => {
     if (userInfo?.cvu) {
       navigator.clipboard.writeText(userInfo.cvu);
@@ -78,18 +66,14 @@ const Home = () => {
     }
   };
 
-  // Cierra el aviso de "copiado"
   const handleCloseSnackbar = () => {
     setCopied(false);
   };
 
-  // Si hay balance disponible, obtiene las claves de las monedas
   const currencyOptions = balance ? (Object.keys(balance) as Currency[]) : [];
 
-  // Muestra loader si todavía no se cargó la info del usuario
   if (!userInfo) return <Loader />;
 
-  // Desactiva funciones si el usuario no confirmó su correo
   const isDisabled = !userInfo.isconfirmed;
 
   return (
@@ -98,6 +82,7 @@ const Home = () => {
         bgcolor: "#121212",
         color: "#e0e0e0",
         minHeight: "100vh",
+        // Asegura que el contenedor ocupe todo el viewport y no deje blanco abajo
         display: "flex",
         flexDirection: "column",
       }}
@@ -117,7 +102,6 @@ const Home = () => {
         }}
         data-aos="fade-up"
       >
-        {/* Bienvenida al usuario */}
         <Typography
           variant="h3"
           component="h1"
@@ -132,7 +116,6 @@ const Home = () => {
           ¡Bienvenido, {userInfo.nombre}!
         </Typography>
 
-        {/* Card con el balance actual y selector de moneda */}
         <Card
           sx={{
             width: "100%",
@@ -175,7 +158,6 @@ const Home = () => {
               Balance Actual
             </Typography>
 
-            {/* Monto y selector de moneda */}
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 2, mb: 1 }}>
               <Typography
                 variant="h4"
@@ -242,7 +224,7 @@ const Home = () => {
               </FormControl>
             </Box>
 
-            {/* CVU con botón de copiar */}
+            {/* CVU with copy */}
             <Box
               sx={{
                 mt: 2,
@@ -278,7 +260,6 @@ const Home = () => {
               </Tooltip>
             </Box>
 
-            {/* Aviso si el correo no fue verificado */}
             {isDisabled && (
               <Chip
                 icon={<WarningAmberIcon />}
@@ -298,7 +279,7 @@ const Home = () => {
           </CardContent>
         </Card>
 
-        {/* Botones de acción: ingresar, transferir, convertir */}
+        {/* Botones de acción */}
         <Paper
           elevation={6}
           sx={{
@@ -403,7 +384,6 @@ const Home = () => {
         </Box>
       </Box>
 
-      {/* Snackbar que aparece cuando se copia el CVU */}
       <Snackbar
         open={copied}
         autoHideDuration={2500}
