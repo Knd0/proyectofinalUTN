@@ -3,7 +3,7 @@ import { Usuario } from "../models/Usuario";
 import { Transaction } from "../models/Transaction";
 
 export const adminController = {
-  // 🧾 Obtener todos los usuarios con sus transacciones enviadas y recibidas
+  // Obtener todos los usuarios con sus transacciones
   getAllUsersWithTransactions: async (req: Request, res: Response) => {
     try {
       const adminUser = await Usuario.findByPk((req as any).user.id);
@@ -16,12 +16,16 @@ export const adminController = {
           {
             model: Transaction,
             as: "sentTransactions",
-            include: [{ model: Usuario, as: "toUser", attributes: ["id", "nombre"] }],
+            include: [
+              { model: Usuario, as: "toUser", attributes: ["id", "nombre"] },
+            ],
           },
           {
             model: Transaction,
             as: "receivedTransactions",
-            include: [{ model: Usuario, as: "fromUser", attributes: ["id", "nombre"] }],
+            include: [
+              { model: Usuario, as: "fromUser", attributes: ["id", "nombre"] },
+            ],
           },
         ],
         order: [["id", "ASC"]],
@@ -34,7 +38,7 @@ export const adminController = {
     }
   },
 
-  // 🖋️ Actualizar perfil completo de un usuario por ID
+  // Actualizar perfil de cualquier usuario por ID
   updateUserById: async (req: Request, res: Response) => {
     try {
       const adminUser = await Usuario.findByPk((req as any).user.id);
@@ -43,14 +47,16 @@ export const adminController = {
       }
 
       const { id } = req.params;
-      const { imagen, descripcion, nacionalidad, dni, nombre, email } = req.body;
+      const { imagen, descripcion, nacionalidad, dni, nombre, email } =
+        req.body;
 
       const [updated] = await Usuario.update(
         { imagen, descripcion, nacionalidad, dni, nombre, email },
         { where: { id } }
       );
 
-      if (updated === 0) return res.status(404).json({ error: "Usuario no encontrado" });
+      if (updated === 0)
+        return res.status(404).json({ error: "Usuario no encontrado" });
 
       const updatedUser = await Usuario.findByPk(id);
       res.json({ message: "Usuario actualizado", user: updatedUser });
@@ -60,7 +66,7 @@ export const adminController = {
     }
   },
 
-  // ❌ Eliminar usuario por ID
+  // Eliminar usuario por ID
   deleteUserById: async (req: Request, res: Response) => {
     try {
       const adminUser = await Usuario.findByPk((req as any).user.id);
@@ -71,7 +77,8 @@ export const adminController = {
       const { id } = req.params;
       const deleted = await Usuario.destroy({ where: { id } });
 
-      if (deleted === 0) return res.status(404).json({ error: "Usuario no encontrado" });
+      if (deleted === 0)
+        return res.status(404).json({ error: "Usuario no encontrado" });
 
       res.json({ message: "Usuario eliminado correctamente" });
     } catch (error) {

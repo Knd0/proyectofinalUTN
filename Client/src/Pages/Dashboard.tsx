@@ -1,29 +1,43 @@
-// Panel administrativo para listar y gestionar usuarios (sólo accesible a administradores)
-
 import React, { useState, useEffect } from "react";
-
-// Componentes de UI de Material-UI para diseño de tablas, diálogos, alertas, etc.
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button,
-  CircularProgress, Typography, Collapse, Box, Alert, Divider, Stack,
-  Container, List, ListItem, ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  CircularProgress,
+  Typography,
+  Collapse,
+  Box, // For flexible box layouts
+  Alert, // For error messages
+  Divider, // For separating content
+  Stack,
+  Container,
+  List,
+  ListItem,
+  ListItemText, // For horizontal/vertical spacing
 } from "@mui/material";
-
-// Íconos usados en la tabla y detalle de usuarios
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import EmailIcon from '@mui/icons-material/Email';
-import SendIcon from '@mui/icons-material/Send';
-import CallReceivedIcon from '@mui/icons-material/CallReceived';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'; // Icon for user name
+import EmailIcon from '@mui/icons-material/Email'; // Icon for email
+import SendIcon from '@mui/icons-material/Send'; // For sent transactions
+import CallReceivedIcon from '@mui/icons-material/CallReceived'; // For received transactions
+import DashboardIcon from '@mui/icons-material/Dashboard'; // Main dashboard icon
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'; // Error icon
 
-import Navbar from "Components/Navbar/Navbar"; // Barra de navegación (se mantiene en todas las vistas)
+import Navbar from "Components/Navbar/Navbar"; // Assuming this path is correct
 
-// Tipos de datos utilizados por el Dashboard
+// --- Interfaces (No changes needed, but keeping for completeness) ---
 interface Transaction {
   id: number;
   amount: number;
@@ -48,19 +62,18 @@ interface Usuario {
   nacionalidad?: string;
   dni?: string;
   admin: boolean;
-  COD: { [key: string]: number }; // Balance por moneda
+  COD: { [key: string]: number }; // Assuming COD is for balances
   sentTransactions: Transaction[];
   receivedTransactions: Transaction[];
 }
 
-// Componente que muestra el contenido colapsable por usuario
+// --- Helper component for Collapsible Row Content ---
 interface RowContentProps {
   user: Usuario;
 }
 
 const RowContent: React.FC<RowContentProps> = ({ user }) => (
   <Box sx={{ margin: 1, py: 2, px: 3, bgcolor: 'action.hover', borderRadius: 2 }}>
-    {/* Datos personales del usuario */}
     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
       Detalles del Usuario
     </Typography>
@@ -81,12 +94,11 @@ const RowContent: React.FC<RowContentProps> = ({ user }) => (
 
     <Divider sx={{ my: 2 }} />
 
-    {/* Transacciones enviadas */}
     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
       <SendIcon sx={{ verticalAlign: 'middle', mr: 1, color: 'error.main' }} /> Transacciones Enviadas
     </Typography>
     {user.sentTransactions?.length ? (
-      <List sx={{ ml: 2 }}>
+      <List sx={{ ml: 2 }}> {/* Using MUI List for better styling */}
         {user.sentTransactions.map((t) => (
           <ListItem key={t.id} sx={{ py: 0.5 }}>
             <ListItemText
@@ -112,12 +124,11 @@ const RowContent: React.FC<RowContentProps> = ({ user }) => (
 
     <Divider sx={{ my: 2 }} />
 
-    {/* Transacciones recibidas */}
     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
       <CallReceivedIcon sx={{ verticalAlign: 'middle', mr: 1, color: 'success.main' }} /> Transacciones Recibidas
     </Typography>
     {user.receivedTransactions?.length ? (
-      <List sx={{ ml: 2 }}>
+      <List sx={{ ml: 2 }}> {/* Using MUI List for better styling */}
         {user.receivedTransactions.map((t) => (
           <ListItem key={t.id} sx={{ py: 0.5 }}>
             <ListItemText
@@ -141,7 +152,7 @@ const RowContent: React.FC<RowContentProps> = ({ user }) => (
       </Typography>
     )}
 
-    {/* Balance por moneda */}
+    {/* Display Balances if available and not empty */}
     {user.COD && Object.keys(user.COD).length > 0 && (
       <>
         <Divider sx={{ my: 2 }} />
@@ -161,38 +172,21 @@ const RowContent: React.FC<RowContentProps> = ({ user }) => (
 );
 
 
-
 const Dashboard = () => {
-  // Estado para la lista de usuarios
   const [users, setUsers] = useState<Usuario[]>([]);
-
-  // Información del usuario actual (admin)
   const [userInfo, setUserInfo] = useState<Usuario | null>(null);
-
-  // Controla si se está cargando la info
   const [loading, setLoading] = useState(true);
-
-  // Estado para errores en la carga o acciones
   const [error, setError] = useState<string | null>(null);
-
-  // Controla si el diálogo de confirmación de eliminación está abierto
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  // Almacena el ID del usuario que se desea eliminar
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-
-  // ID del usuario expandido en la tabla (para mostrar detalles)
   const [expandedUserId, setExpandedUserId] = useState<number | null>(null);
 
-  // Token de autenticación del usuario logueado
   const token = localStorage.getItem("token");
 
-  // Al montar el componente, carga los datos del usuario actual y de todos los usuarios si es admin
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
-      setError(null);
-
+      setError(null); // Clear previous errors
       if (!token) {
         setError("No autorizado. Por favor, inicia sesión.");
         setLoading(false);
@@ -200,23 +194,21 @@ const Dashboard = () => {
       }
 
       try {
-        // Obtiene la info del usuario actual
+        // Fetch current user info
         const userResponse = await fetch(
           "https://proyectofinalutn-production.up.railway.app/auth/me",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-
         if (!userResponse.ok) {
           const errorData = await userResponse.json();
           throw new Error(errorData.message || "Error al obtener tus datos de usuario.");
         }
-
         const userData = await userResponse.json();
         setUserInfo(userData.user);
 
-        // Si el usuario es admin, carga la lista de todos los usuarios
+        // If user is admin, fetch all users
         if (userData.user.admin) {
           const usersResponse = await fetch(
             "https://proyectofinalutn-production.up.railway.app/admin/users",
@@ -224,12 +216,10 @@ const Dashboard = () => {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-
           if (!usersResponse.ok) {
             const errorData = await usersResponse.json();
             throw new Error(errorData.message || "Error al cargar los usuarios para el panel de administración.");
           }
-
           const usersData = await usersResponse.json();
           setUsers(usersData.users);
         } else {
@@ -244,15 +234,13 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, [token]);
+  }, [token]); // Depend on token to re-fetch if it changes
 
-  // Abre el diálogo para confirmar la eliminación de un usuario
   const handleDeleteClick = (id: number) => {
     setUserToDelete(id);
     setConfirmOpen(true);
   };
 
-  // Confirma la eliminación del usuario y hace la solicitud DELETE
   const handleConfirmDelete = async () => {
     if (userToDelete === null) return;
 
@@ -270,8 +258,8 @@ const Dashboard = () => {
         throw new Error(errorData.message || "Error al eliminar usuario.");
       }
 
-      // Filtra al usuario eliminado de la lista
       setUsers(users.filter((u) => u.id !== userToDelete));
+      // Optionally show a success message
     } catch (err) {
       console.error("Error al eliminar usuario:", err);
       setError(err instanceof Error ? err.message : "Error al eliminar usuario.");
@@ -281,19 +269,16 @@ const Dashboard = () => {
     }
   };
 
-  // Cancela la acción de eliminación
   const handleCancelDelete = () => {
     setConfirmOpen(false);
     setUserToDelete(null);
   };
 
-  // Alterna la expansión del usuario en la tabla
   const toggleExpand = (id: number) => {
     setExpandedUserId((prev) => (prev === id ? null : id));
   };
 
-  // --- Renderizado en función del estado ---
-
+  // --- Render Logic for various states ---
   if (loading) {
     return (
       <>
@@ -339,7 +324,7 @@ const Dashboard = () => {
               variant="outlined"
               color="primary"
               sx={{ mt: 2 }}
-              onClick={() => window.location.href = '/home'}
+              onClick={() => window.location.href = '/home'} // Or navigate to home page
             >
               Volver a la Página Principal
             </Button>
@@ -349,7 +334,7 @@ const Dashboard = () => {
     );
   }
 
-  // Si todo está correcto, renderiza el panel con la tabla de usuarios
+  // --- Main Dashboard Content ---
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       <Navbar />
@@ -359,7 +344,6 @@ const Dashboard = () => {
           Panel de Administración
         </Typography>
 
-        {/* Tabla con lista de usuarios */}
         <Paper elevation={6} sx={{ borderRadius: 3, overflow: 'hidden', mb: 4 }}>
           <TableContainer>
             <Table aria-label="admin users table">
@@ -413,17 +397,15 @@ const Dashboard = () => {
                             aria-label="eliminar"
                             color="error"
                             onClick={(e) => {
-                              e.stopPropagation(); // Evita expandir la fila al hacer click en eliminar
+                              e.stopPropagation(); // Prevent row expansion on delete click
                               handleDeleteClick(user.id);
                             }}
-                            disabled={user.id === userInfo?.id} // No permite eliminarse a uno mismo
+                            disabled={user.id === userInfo?.id} // Prevent deleting self
                           >
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
                       </TableRow>
-
-                      {/* Contenido colapsable con detalles del usuario */}
                       <TableRow>
                         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                           <Collapse in={expandedUserId === user.id} timeout="auto" unmountOnExit>
@@ -439,7 +421,7 @@ const Dashboard = () => {
           </TableContainer>
         </Paper>
 
-        {/* Diálogo de confirmación para eliminar usuario */}
+        {/* Confirmation Dialog */}
         <Dialog
           open={confirmOpen}
           onClose={handleCancelDelete}
@@ -449,7 +431,7 @@ const Dashboard = () => {
           <DialogTitle id="confirm-delete-dialog-title">{"Confirmar Eliminación de Usuario"}</DialogTitle>
           <DialogContent>
             <Typography variant="body1" id="confirm-delete-dialog-description">
-              ¿Estás seguro de que deseas eliminar al usuario <strong>{users.find(u => u.id === userToDelete)?.nombre || 'este usuario'}</strong>? Esta acción no se puede deshacer.
+              ¿Estás seguro de que deseas eliminar al usuario **{users.find(u => u.id === userToDelete)?.nombre || 'este usuario'}**? Esta acción no se puede deshacer.
             </Typography>
           </DialogContent>
           <DialogActions>

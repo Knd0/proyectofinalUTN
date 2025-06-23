@@ -1,4 +1,3 @@
-// Componente de transferencia de saldo entre usuarios
 import React, { useState } from "react";
 import {
   Box,
@@ -15,24 +14,20 @@ import {
 import { useNavigate } from "react-router-dom";
 import Navbar from "Components/Navbar/Navbar";
 
-// Props opcionales: datos del usuario logueado
 type TransactionProps = {
   userInfo?: { nombre?: string };
 };
 
-// Lista de monedas disponibles para transferir
 const currencies = ["ARS", "USD", "EUR", "BTC", "ETH", "USDT"];
 
 const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
-  // Estados del formulario
-  const [toCvu, setToCvu] = useState(""); // CVU destino
-  const [amount, setAmount] = useState(""); // Monto
-  const [currency, setCurrency] = useState("ARS"); // Moneda seleccionada
-  const [loading, setLoading] = useState(false); // Indicador de carga
-  const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null); // Mensaje de éxito o error
-  const navigate = useNavigate(); // Hook para redirección
+  const [toCvu, setToCvu] = useState("");
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("ARS");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
+  const navigate = useNavigate();
 
-  // Validaciones básicas del formulario
   const validateInput = () => {
     if (!toCvu.trim()) {
       setMessage({ text: "El CVU destino es obligatorio", type: "error" });
@@ -46,14 +41,13 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
     return true;
   };
 
-  // Función que maneja el envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateInput()) return; // Si hay errores, se cancela
+    if (!validateInput()) return;
 
     setLoading(true);
-    setMessage(null); // Limpia mensajes anteriores
+    setMessage(null);
 
     try {
       const res = await fetch("https://proyectofinalutn-production.up.railway.app/transactions/send", {
@@ -72,10 +66,8 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
       const data = await res.json();
 
       if (!res.ok) {
-        // Muestra error de backend si lo hay
         setMessage({ text: data.error || "Error inesperado", type: "error" });
       } else {
-        // Muestra éxito y limpia campos
         setMessage({ text: "✅ ¡Transacción realizada con éxito!", type: "success" });
         setToCvu("");
         setAmount("");
@@ -100,7 +92,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          bgcolor: "rgba(0,0,0,0.7)", // oscurece el fondo
+          bgcolor: "rgba(0,0,0,0.7)",
           backgroundBlendMode: "darken",
         }}
       >
@@ -114,7 +106,7 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
               flexDirection: "column",
               alignItems: "center",
               backdropFilter: "blur(8px)",
-              bgcolor: "rgba(17, 24, 39, 0.85)", // gris oscuro translúcido
+              bgcolor: "rgba(17, 24, 39, 0.85)",
               color: "white",
             }}
           >
@@ -122,16 +114,13 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
               Transferir Saldo
             </Typography>
 
-            {/* Muestra el nombre del usuario si está disponible */}
             {userInfo?.nombre && (
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 Usuario: <strong>{userInfo.nombre}</strong>
               </Typography>
             )}
 
-            {/* Formulario de transferencia */}
             <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-              {/* Campo CVU destino */}
               <TextField
                 label="CVU destino"
                 variant="outlined"
@@ -152,7 +141,6 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
                 }}
               />
 
-              {/* Campo monto */}
               <TextField
                 label="Monto"
                 type="number"
@@ -174,7 +162,6 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
                 }}
               />
 
-              {/* Selector de moneda */}
               <Select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
@@ -195,14 +182,12 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
                 ))}
               </Select>
 
-              {/* Mensaje de éxito o error */}
               {message && (
                 <Alert severity={message.type} sx={{ mb: 2 }}>
                   {message.text}
                 </Alert>
               )}
 
-              {/* Botón de envío */}
               <Button
                 type="submit"
                 fullWidth
@@ -221,7 +206,6 @@ const Transaction: React.FC<TransactionProps> = ({ userInfo }) => {
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Enviar"}
               </Button>
 
-              {/* Botón para volver */}
               <Button
                 fullWidth
                 variant="outlined"
