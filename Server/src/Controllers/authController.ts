@@ -108,7 +108,20 @@ export const authController = {
         },
         isconfirmed: false
       });
+      
+      const token = jwt.sign(
+      { id: newUser.id },
+      process.env.JWT_SECRET || "default_secret",
+      { expiresIn: "1h" }
+      );
 
+      // 📧 Armar link de confirmación
+      const confirmationLink = `https://proyectofinalutn2025.vercel.app/confirm/${token}`
+      // 📧 Enviar mail con link (usando el ya funcional sendTransactionEmail)
+      const mensaje = `Confirmá tu cuenta haciendo clic en el siguiente enlace: ${confirmationLink}`;
+
+      await sendTransactionEmail(newUser.email, newUser.nombre, mensaje);
+      
       return res
         .status(201)
         .json({ message: "Usuario creado correctamente", usuario: newUser });
