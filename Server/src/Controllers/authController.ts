@@ -118,7 +118,17 @@ export const authController = {
       // 📧 Armar link de confirmación
       const confirmationLink = `https://proyectofinalutn2025.vercel.app/confirm/${token}`
       // 📧 Enviar mail con link (usando el ya funcional sendTransactionEmail)
-      const mensaje = `Confirmá tu cuenta haciendo clic en el siguiente enlace: ${confirmationLink}`;
+      const mensaje = `
+      Gracias por registrarte. Para confirmar tu cuenta hacé clic en el botón:
+      <br><br>
+      <a href="${confirmationLink}" 
+      style="display:inline-block;padding:12px 24px;background-color:#10b981;color:white;
+            text-decoration:none;border-radius:8px;font-weight:bold;">
+      Confirmar cuenta
+      </a>
+      <br><br>
+      Si no te registraste, podés ignorar este correo.
+      `;
 
       await sendTransactionEmail(newUser.email, newUser.nombre, mensaje);
       
