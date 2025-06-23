@@ -1,76 +1,56 @@
-// Carga las variables de entorno desde el archivo .env
 import dotenv from "dotenv";
 dotenv.config();
-
-// Importa las dependencias necesarias de Express
 import express, { Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser"; // Middleware para parsear cuerpos JSON
-import cors from "cors"; // Middleware para habilitar CORS
-
-// Importa las rutas del proyecto
+import bodyParser from "body-parser";
+import cors from "cors";
 import authRoutes from "./Routes/authRoutes";
-import { sequelize } from "./db"; // Conexión con la base de datos Sequelize
-import { Usuario } from "./models/Usuario"; // Modelo de usuario
-import jwt from "jsonwebtoken"; // Utilidad para trabajar con JWT
-
-// Importa más rutas
+import { sequelize } from "./db";
+import { Usuario } from "./models/Usuario";
+import jwt from "jsonwebtoken";
 import transactionRoutes from "./Routes/transactionRoutes";
 import exchangeRoutes from "./Routes/exchangeRoutes";
 import adminRoutes from "./Routes/adminRoutes";
 import confirmationRoutes from "./Routes/confirmationRoutes";
 import forgotPasswordRoutes from "./Routes/forgotPasswordRoutes";
-
-// Inicializa la aplicación Express
 const app = express();
 
-// Configura CORS para permitir solicitudes desde el frontend
+// Configura CORSS
 app.use(
   cors({
-    origin: "https://proyectofinalutn2025.vercel.app", // Origen permitido
-    methods: ["GET", "POST", "PUT", "DELETE"], // Métodos HTTP permitidos
-    allowedHeaders: ["Content-Type", "Authorization"], // Headers permitidos
-    credentials: true, // Permitir cookies y headers de autenticación
+    origin: "https://proyectofinalutn2025.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+
+    credentials: true,
   })
 );
 
-// Middleware que permite leer el cuerpo de las solicitudes en formato JSON
+// Middleware para parsear JSON en el body
 app.use(bodyParser.json());
 
-// Usa las rutas de autenticación bajo el prefijo /auth
+// Rutas de autenticación
 app.use("/auth", authRoutes);
-
-// Usa las rutas para transacciones bajo el prefijo /transactions
 app.use("/transactions", transactionRoutes);
-
-// Usa las rutas para conversión de divisas bajo el prefijo /exchange
 app.use("/exchange", exchangeRoutes);
-
-// Usa las rutas de administración bajo el prefijo /admin
 app.use("/admin", adminRoutes);
-
-// Usa las rutas de confirmación de email bajo el prefijo /email
 app.use("/email", confirmationRoutes as express.Router); 
-
-// Usa las rutas de recuperación de contraseña bajo el prefijo /auth
 app.use("/auth", forgotPasswordRoutes);
 
-// Middleware global para manejar errores no atrapados por otras rutas
+// Manejo de errores global
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err); // Muestra el error en consola
+  console.error(err);
   res
-    .status(500) // Devuelve error 500 (interno del servidor)
+    .status(500)
     .json({
       message: "Ha ocurrido un error en el servidor",
       error: err.message,
     });
 });
 
-// Define el puerto en el que correrá el servidor
 const port = process.env.PORT || 5000;
 
-// Sincroniza la base de datos y levanta el servidor
 sequelize
-  .sync({ force: false }) // No borra las tablas existentes
+  .sync({ force: false })
   .then(() => {
     console.log("Base de datos sincronizada correctamente");
     app.listen(port, () => {
