@@ -359,7 +359,15 @@ const muiInputStyle = {
     "& fieldset": { borderColor: "#3b82f6" },
     "&:hover fieldset": { borderColor: "#60a5fa" },
     "&.Mui-focused fieldset": { borderColor: "#3b82f6" },
+    "&.Mui-disabled .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#3b82f6",
+    },
+    "&.Mui-disabled input": {
+      color: "white",
+      WebkitTextFillColor: "white",
+    },
   },
 };
+
 
 export default Profile;
