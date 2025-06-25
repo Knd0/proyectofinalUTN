@@ -1,5 +1,5 @@
 // Client/src/components/ChatBot.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -10,24 +10,60 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-const responses: Record<string, string> = {
-  "¿Cómo cargo saldo?":
-    "En el inicio, una vez logueado, verás un botón que indica 'Ingresar'. Entrás en el mismo y te llevará a una sección en la cual elegís el monto a cargar y en cuál divisa. Luego deberás completar con tu tarjeta a preferencia.",
-    <button href="/exchange"> PRUEBA </button >
-  "¿Cómo envío dinero?":
-    "Debés ingresar en la sección 'Transferir'. Deberás ingresar el CVU del destinatario, la moneda y el monto, y por último le das al botón de enviar.",
+const responses: Record<string, string | TSX.Element> = {
+  "¿Cómo cargo saldo?": (
+    <>
+      En el inicio, una vez logueado, verás un botón que indica 'Ingresar'. Entrás en el mismo y te llevará a una sección en la cual elegís el monto a cargar y en cuál divisa. Luego deberás completar con tu tarjeta a preferencia.
+      <br />
+      <Button href="/loadbalance" variant="contained" size="small" sx={{ mt: 1 }}>
+        Ir a Depositar
+      </Button>
+    </>
+  ),
 
-  "¿Cómo veo mi historial?":
-    "Tu historial de transferencias aparecerá en el inicio de la página, debajo de las diferentes acciones como Ingresar, Transferir, etc.",
+  "¿Cómo envío dinero?": (
+    <>
+      Debés ingresar en la sección 'Transferir'. Deberás ingresar el CVU del destinatario, la moneda y el monto, y por último le das al botón de enviar.
+      <br />
+      <Button href="/transaction" variant="contained" size="small" sx={{ mt: 1 }}>
+        Ir a Transferir
+      </Button>
+    </>
+  ),
 
-  "¿Cómo cambio mi moneda?":
-    "Usá la sección de conversión de monedas, en el botón llamado 'Convertir'. Seleccioná el monto, el origen y por último el destino.",
+  "¿Cómo veo mi historial?": (
+    <>
+      Tu historial de transferencias aparecerá en el inicio de la página, debajo de las diferentes acciones como Ingresar, Transferir, etc.
+      <br />
+    </>
+  ),
 
-  "¿Dónde veo mis datos?":
-    "En el navbar verás un ícono de fotografía. Apretás ahí y te llevará a tu perfil.",
+  "¿Cómo cambio mi moneda?": (
+    <>
+      Usá la sección de conversión de monedas, en el botón llamado 'Convertir'. Seleccioná el monto, el origen y por último el destino.
+      <br />
+      <Button href="/exchange" variant="contained" size="small" sx={{ mt: 1 }}>
+        Ir a Convertir
+      </Button>
+    </>
+  ),
 
-  "¿Cómo confirmo mi cuenta?":
-    "En el correo con el que te registraste llegará un enlace de confirmación. Solo debés entrar allí y esperar que te redirija a la página. Si nada de esto sucede, debés contactarte con el soporte.",
+  "¿Dónde veo mis datos?": (
+    <>
+      En el navbar verás un ícono de fotografía. Apretás ahí y te llevará a tu perfil.
+      <br />
+      <Button href="/profile" variant="contained" size="small" sx={{ mt: 1 }}>
+        Ir a Perfil
+      </Button>
+    </>
+  ),
+
+  "¿Cómo confirmo mi cuenta?": (
+    <>
+      En el correo con el que te registraste llegará un enlace de confirmación. Solo debés entrar allí y esperar que te redirija a la página. Si nada de esto sucede, debés contactarte con el soporte.
+      <br />
+    </>
+  ),
 };
 
 const options = Object.keys(responses);
@@ -38,7 +74,8 @@ interface Props {
 }
 
 const ChatBot: React.FC<Props> = ({ visible, onClose }) => {
-  const [chat, setChat] = useState<{ from: "user" | "bot"; text: string }[]>([]);
+  const [chat, setChat] = useState<{ from: "user" | "bot"; text: string | JSX.Element }[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const handleOptionClick = (opt: string) => {
     setChat((prev) => [
@@ -47,6 +84,14 @@ const ChatBot: React.FC<Props> = ({ visible, onClose }) => {
       { from: "bot", text: responses[opt] },
     ]);
   };
+
+  // Auto scroll al final del chat
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [chat]);
 
   if (!visible) return null;
 
@@ -72,6 +117,7 @@ const ChatBot: React.FC<Props> = ({ visible, onClose }) => {
         <Divider sx={{ mb: 1 }} />
 
         <Box
+          ref={chatContainerRef}
           display="flex"
           flexDirection="column"
           gap={1}
