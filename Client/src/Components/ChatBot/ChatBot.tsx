@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 const responses: Record<string, string> = {
   "¿Cómo cargo saldo?":
     "En el inicio, una vez logueado, verás un botón que indica 'Ingresar'. Entrás en el mismo y te llevará a una sección en la cual elegís el monto a cargar y en cuál divisa. Luego deberás completar con tu tarjeta a preferencia.",
-
+    <button href="/exchange"> PRUEBA </button >
   "¿Cómo envío dinero?":
     "Debés ingresar en la sección 'Transferir'. Deberás ingresar el CVU del destinatario, la moneda y el monto, y por último le das al botón de enviar.",
 
