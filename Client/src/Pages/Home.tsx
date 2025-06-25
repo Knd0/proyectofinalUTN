@@ -27,10 +27,14 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import SendIcon from "@mui/icons-material/Send";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import AutorenewIcon from '@mui/icons-material/Autorenew';
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
+import ChatIcon from "@mui/icons-material/Chat";
+
 import { useUser, Balance } from "../Components/Context/UserContext";
+
+import ChatBot from "../Components/ChatBot/ChatBot";
 
 type Currency = keyof Balance;
 
@@ -38,6 +42,7 @@ const Home = () => {
   const { userInfo, balance, fetchUserData } = useUser();
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
   const [copied, setCopied] = useState(false);
+  const [showBot, setShowBot] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,7 +87,6 @@ const Home = () => {
         bgcolor: "#121212",
         color: "#e0e0e0",
         minHeight: "100vh",
-        // Asegura que el contenedor ocupe todo el viewport y no deje blanco abajo
         display: "flex",
         flexDirection: "column",
       }}
@@ -149,7 +153,9 @@ const Home = () => {
               alignItems: "center",
             }}
           >
-            <AccountBalanceWalletIcon sx={{ fontSize: 48, mb: 2, color: "#90caf9" }} />
+            <AccountBalanceWalletIcon
+              sx={{ fontSize: 48, mb: 2, color: "#90caf9" }}
+            />
             <Typography
               variant="h5"
               component="h3"
@@ -172,10 +178,7 @@ const Home = () => {
                 sx={{ minWidth: 120 }}
                 color="primary"
               >
-                <InputLabel
-                  id="currency-select-label"
-                  sx={{ color: "#b0bec5" }}
-                >
+                <InputLabel id="currency-select-label" sx={{ color: "#b0bec5" }}>
                   Moneda
                 </InputLabel>
                 <Select
@@ -224,7 +227,6 @@ const Home = () => {
               </FormControl>
             </Box>
 
-            {/* CVU with copy */}
             <Box
               sx={{
                 mt: 2,
@@ -279,7 +281,6 @@ const Home = () => {
           </CardContent>
         </Card>
 
-        {/* Botones de acción */}
         <Paper
           elevation={6}
           sx={{
@@ -374,7 +375,6 @@ const Home = () => {
           </Button>
         </Paper>
 
-        {/* Historial de transacciones */}
         <Box
           sx={{ width: "100%", maxWidth: 900 }}
           data-aos="fade-up"
@@ -391,6 +391,38 @@ const Home = () => {
         message="CVU copiado al portapapeles"
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       />
+
+      {/* Botón flotante para abrir chatbot */}
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          zIndex: 1500,
+        }}
+      >
+        <IconButton
+          onClick={() => setShowBot(true)}
+          sx={{
+            backgroundColor: "#1976d2",
+            color: "#fff",
+            width: 56,
+            height: 56,
+            borderRadius: "50%",
+            boxShadow: 6,
+            "&:hover": {
+              backgroundColor: "#1565c0",
+              transform: "scale(1.1)",
+            },
+            transition: "all 0.2s ease-in-out",
+          }}
+        >
+          <ChatIcon />
+        </IconButton>
+      </Box>
+
+      {/* ChatBot desplegado */}
+      <ChatBot visible={showBot} onClose={() => setShowBot(false)} />
     </Box>
   );
 };
