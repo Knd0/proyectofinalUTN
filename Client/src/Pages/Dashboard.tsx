@@ -194,13 +194,16 @@ const Dashboard = () => {
       }
 
       try {
-        // Fetch current user info
+        // retorna los datos del usuario autenticado
+        // y verifica si es admin
         const userResponse = await fetch(
           "https://proyectofinalutn-production.up.railway.app/auth/me",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+        //Si la respuesta no es ok, lanza un error
+        // Si la respuesta es ok, convierte la respuesta a JSON
         if (!userResponse.ok) {
           const errorData = await userResponse.json();
           throw new Error(errorData.message || "Error al obtener tus datos de usuario.");
@@ -208,7 +211,8 @@ const Dashboard = () => {
         const userData = await userResponse.json();
         setUserInfo(userData.user);
 
-        // If user is admin, fetch all users
+        // si el usuario es admin, obtiene la lista de usuarios
+        // y sus transacciones para el panel de administración
         if (userData.user.admin) {
           const usersResponse = await fetch(
             "https://proyectofinalutn-production.up.railway.app/admin/users",
@@ -257,7 +261,8 @@ const Dashboard = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al eliminar usuario.");
       }
-
+      //Actualiza el estado de usuarios después de eliminar
+      // y elimina el usuario de la lista
       setUsers(users.filter((u) => u.id !== userToDelete));
       // Optionally show a success message
     } catch (err) {

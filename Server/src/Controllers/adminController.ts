@@ -6,11 +6,12 @@ export const adminController = {
   // Obtener todos los usuarios con sus transacciones
   getAllUsersWithTransactions: async (req: Request, res: Response) => {
     try {
+      // Verificar si el usuario es admin
       const adminUser = await Usuario.findByPk((req as any).user.id);
       if (!adminUser || !adminUser.admin) {
         return res.status(403).json({ error: "Acceso denegado: solo admins" });
       }
-
+      // Obtener todos los usuarios con sus transacciones enviadas y recibidas
       const users = await Usuario.findAll({
         include: [
           {
@@ -39,7 +40,7 @@ export const adminController = {
   },
 
   // Actualizar perfil de cualquier usuario por ID
-  updateUserById: async (req: Request, res: Response) => {
+  /* updateUserById: async (req: Request, res: Response) => {
     try {
       const adminUser = await Usuario.findByPk((req as any).user.id);
       if (!adminUser || !adminUser.admin) {
@@ -64,20 +65,22 @@ export const adminController = {
       console.error("❌ Error al actualizar usuario:", error);
       res.status(500).json({ error: "Error interno al actualizar el usuario" });
     }
-  },
+  }, */
 
   // Eliminar usuario por ID
   deleteUserById: async (req: Request, res: Response) => {
     try {
+      // Verificar si el usuario es admin
       const adminUser = await Usuario.findByPk((req as any).user.id);
       if (!adminUser || !adminUser.admin) {
         return res.status(403).json({ error: "Acceso denegado: solo admins" });
       }
-
+      // Eliminar usuario por ID
       const { id } = req.params;
       const deleted = await Usuario.destroy({ where: { id } });
-
+      
       if (deleted === 0)
+        // Si no se encontró el usuario, retornar error 404
         return res.status(404).json({ error: "Usuario no encontrado" });
 
       res.json({ message: "Usuario eliminado correctamente" });
